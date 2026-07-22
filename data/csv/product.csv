@@ -1,0 +1,39 @@
+﻿product_id,product_name,category,subcategory,sales_type,unit,standard_weight_kg,shelf_life_days,base_cost,base_price,margin_rate,max_discount_rate,markdown_eligible,esl_applicable,freshness_decay_type,baseline_waste_rate,price_source
+P001,사과,produce,apple,fixed_price,bag,1.5,10,5200,6500,0.2,0.4,1,1,medium,0.056,synthetic_rule
+P002,바나나,produce,banana,fixed_price,bag,1.2,5,3200,4000,0.2,0.4,1,1,medium,0.056,synthetic_rule
+P003,딸기,produce,strawberry,fixed_price,pack,0.5,3,5600,7000,0.2,0.4,1,1,fast,0.056,synthetic_rule
+P004,포도,produce,grape,fixed_price,pack,1.0,7,6400,8000,0.2,0.4,1,1,medium,0.056,synthetic_rule
+P005,토마토,produce,tomato,fixed_price,pack,1.0,7,3600,4500,0.2,0.4,1,1,medium,0.056,synthetic_rule
+P006,상추,produce,leafy_vegetable,fixed_price,pack,0.3,3,1600,2000,0.2,0.4,1,1,fast,0.056,synthetic_rule
+P007,깻잎,produce,leafy_vegetable,fixed_price,pack,0.1,3,1200,1500,0.2,0.4,1,1,fast,0.056,synthetic_rule
+P008,대파,produce,green_onion,fixed_price,pack,0.5,7,1440,1800,0.2,0.4,1,1,medium,0.056,synthetic_rule
+P009,양파,produce,root_vegetable,fixed_price,bag,2.0,14,3520,4400,0.2,0.4,1,1,slow,0.056,synthetic_rule
+P010,감자,produce,root_vegetable,fixed_price,bag,2.0,14,4000,5000,0.2,0.4,1,1,slow,0.056,synthetic_rule
+P011,버섯,produce,mushroom,fixed_price,pack,0.3,5,2400,3000,0.2,0.4,1,1,medium,0.056,synthetic_rule
+P012,파프리카,produce,paprika,fixed_price,pack,0.5,7,3600,4500,0.2,0.4,1,1,medium,0.056,synthetic_rule
+P013,흰우유,dairy,milk,fixed_price,bottle,1.0,10,1800,2200,0.1818,0.4,1,1,medium,0.003,synthetic_rule
+P014,저지방우유,dairy,milk,fixed_price,bottle,1.0,10,1900,2300,0.1739,0.4,1,1,medium,0.003,synthetic_rule
+P015,요구르트,dairy,yogurt,fixed_price,pack,0.26,14,2800,3400,0.1765,0.4,1,1,medium,0.003,synthetic_rule
+P016,플레인요거트,dairy,yogurt,fixed_price,pack,0.4,14,3000,3600,0.1667,0.4,1,1,medium,0.003,synthetic_rule
+P017,생크림,dairy,cream,fixed_price,bottle,0.2,10,3200,3900,0.1795,0.4,1,1,medium,0.003,synthetic_rule
+P018,버터,dairy,butter,fixed_price,pack,0.2,30,4500,5500,0.1818,0.4,1,1,slow,0.003,synthetic_rule
+P019,한우 등심,meat,beef,weight_based,kg,1.0,4,65000,79000,0.1772,0.4,1,0,fast,0.017,synthetic_rule
+P020,한우 불고기,meat,beef,weight_based,kg,1.0,4,52000,63000,0.1746,0.4,1,0,fast,0.017,synthetic_rule
+P021,돼지 삼겹살,meat,pork,weight_based,kg,1.0,5,15500,18500,0.1622,0.4,1,0,medium,0.017,synthetic_rule
+P022,돼지 목살,meat,pork,weight_based,kg,1.0,5,14000,16800,0.1667,0.4,1,0,medium,0.017,synthetic_rule
+P023,돼지 앞다리살,meat,pork,weight_based,kg,1.0,5,10500,12500,0.16,0.4,1,0,medium,0.017,synthetic_rule
+P024,닭가슴살,meat,chicken,fixed_price,pack,0.5,5,4200,5000,0.16,0.4,1,1,medium,0.017,synthetic_rule
+P025,닭볶음탕용,meat,chicken,weight_based,kg,1.0,4,8500,10200,0.1667,0.4,1,0,medium,0.017,synthetic_rule
+P026,훈제오리,meat,duck,fixed_price,pack,0.3,14,6800,8200,0.1707,0.4,1,1,medium,0.017,synthetic_rule
+P027,슬라이스치즈,cheese,sliced_cheese,fixed_price,pack,0.4,30,5200,6500,0.2,0.4,1,1,medium,0.006,synthetic_rule
+P028,모짜렐라치즈,cheese,mozzarella_cheese,fixed_price,pack,0.2,21,4200,5200,0.1923,0.4,1,1,medium,0.006,synthetic_rule
+P029,체다치즈,cheese,cheddar_cheese,fixed_price,pack,0.3,30,6400,8000,0.2,0.4,1,1,slow,0.006,synthetic_rule
+P030,스트링치즈,cheese,string_cheese,fixed_price,pack,0.2,25,3800,4800,0.2083,0.4,1,1,medium,0.006,synthetic_rule
+P031,리코타치즈,cheese,ricotta_cheese,fixed_price,pack,0.2,14,4600,5800,0.2069,0.4,1,1,medium,0.006,synthetic_rule
+P032,초밥,deli,sushi,fixed_price,pack,0.25,1,4800,6000,0.2,0.4,1,1,fast,0.016,synthetic_rule
+P033,김밥,deli,gimbap,fixed_price,piece,0.23,1,2400,3000,0.2,0.4,1,1,fast,0.016,synthetic_rule
+P034,샐러드,deli,salad,fixed_price,pack,0.2,2,3600,4500,0.2,0.4,1,1,fast,0.016,synthetic_rule
+P035,닭강정,deli,fried_chicken,fixed_price,pack,0.4,2,7200,9000,0.2,0.4,1,1,fast,0.016,synthetic_rule
+P036,도시락,deli,lunch_box,fixed_price,piece,0.45,1,5600,7000,0.2,0.4,1,1,fast,0.016,synthetic_rule
+P037,샌드위치,deli,sandwich,fixed_price,piece,0.2,2,3200,4000,0.2,0.4,1,1,fast,0.016,synthetic_rule
+P038,즉석구이치킨,deli,roasted_chicken,fixed_price,piece,0.9,1,8800,11000,0.2,0.4,1,1,fast,0.016,synthetic_rule
