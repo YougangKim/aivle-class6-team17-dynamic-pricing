@@ -1,0 +1,32 @@
+name: 프론트엔드 자동 배포
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  AWS_REGION: ap-northeast-2
+  S3_BUCKET: aivle-web-git-update-s3-1888-7603-7193
+  EC2_INSTANCE_ID: i-0f4a53981a9799c62
+  CLOUDFRONT_DISTRIBUTION_ID: ELDUDUTC45Y21
+  DEPLOY_DIR: /usr/share/nginx/html
+
+jobs:
+  deploy:
+    name: 배포 환경 확인
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 저장소 코드 가져오기
+        uses: actions/checkout@v4
+
+      - name: 설정값 확인
+        run: |
+          echo "AWS 리전: ${AWS_REGION}"
+          echo "S3 버킷: ${S3_BUCKET}"
+          echo "EC2 인스턴스: ${EC2_INSTANCE_ID}"
+          echo "CloudFront 배포: ${CLOUDFRONT_DISTRIBUTION_ID}"
+          echo "EC2 배포 경로: ${DEPLOY_DIR}"
