@@ -53,7 +53,7 @@ export default function Login({ onLogin }) {
             담당자가 승인하면 ESL에 즉시 반영됩니다.
           </p>
           <div className="mt-10 flex gap-10">
-            {[["폐기율", "4.9% → 3.1%"], ["가격 조정", "32분 → 6분"], ["월 절감", "612만원"]].map(([k, v]) => (
+            {[["폐기율", "4.9% → 2.1%"], ["가격 조정", "32분 → 6분"], ["월 절감", "612만원"]].map(([k, v]) => (
               <div key={k}>
                 <p className="text-xs text-slate-500">{k}</p>
                 <p className="mt-1 text-lg font-bold text-white">{v}</p>
