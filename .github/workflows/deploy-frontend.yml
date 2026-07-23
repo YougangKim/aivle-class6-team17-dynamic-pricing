@@ -30,3 +30,15 @@ jobs:
           echo "EC2 인스턴스: ${EC2_INSTANCE_ID}"
           echo "CloudFront 배포: ${CLOUDFRONT_DISTRIBUTION_ID}"
           echo "EC2 배포 경로: ${DEPLOY_DIR}"
+
+      - name: AWS OIDC 인증
+        uses: aws-actions/configure-aws-credentials@v6
+        with:
+          role-to-assume: arn:aws:iam::188876037193:role/AivleWebGitHubDeployRole
+          role-session-name: GitHubActions-${{ github.run_id }}
+          aws-region: ${{ env.AWS_REGION }}
+          allowed-account-ids: "188876037193"
+
+      - name: AWS 인증 결과 확인
+        run: |
+          aws sts get-caller-identity
