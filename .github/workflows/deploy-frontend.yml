@@ -30,7 +30,7 @@ jobs:
 
     steps:
       - name: Checkout only frontend
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           sparse-checkout: |
             frontend
@@ -48,7 +48,7 @@ jobs:
           find frontend -maxdepth 2 -type f | sort | head -100
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{ vars.NODE_VERSION || '20' }}
           cache: npm
@@ -110,11 +110,10 @@ jobs:
       - name: Deploy frontend through SSM
         shell: bash
         run: |
-          ARTIFACT_URI="s3://${S3_BUCKET}/releases/${ARTIFACT_NAME}"
 
           PARAMETERS="$(
             jq -n \
-              --arg command "/usr/local/bin/deploy-aivle-web '${ARTIFACT_URI}'" \
+              --arg command "/usr/local/bin/deploy-aivle-web '${ARTIFACT_NAME}'" \
               '{commands: [$command]}'
           )"
 
