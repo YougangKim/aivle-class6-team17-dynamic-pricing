@@ -49,7 +49,8 @@ ESL · POS 즉시 반영
 | **폐기위험 대응** | 실시간 컨텍스트(날씨·시간·휴업), KPI 4종, 손실 흐름·소진 예측 차트, AI 승인 대기열, 마감 모드 |
 | **재고 모니터링** | 전체 신선 재고 · 검색/정렬/필터 · 상세 팝업 |
 | **승인 이력** | 가격 변경 전건 기록 · 카테고리별 조정 패턴 분석 · CSV 다운로드 |
-| **성과 리포트** | 폐기율 추이 · AI 모델 성능(MAPE·드리프트) · 미승인 건의 실제 결과 |
+| **성과 리포트** | 이번 달 폐기 절감 · 폐기율 추이 · 월별 손실액 · 추천 처리 비율 · 미승인 건의 실제 결과 (점장 관점 핵심 지표) |
+| **시연 스토리보드** | 매장 디지털 트윈(아이소메트릭 3D) · 실시간 유동 시뮬레이션 · AI 다이나믹 프라이싱 승인 → ESL 실시간 인하 · 동선 히트맵 · 요일 프리셋 · 추천 근거 곡선 · ROI 계산기 |
 
 ### 본사 화면
 
@@ -125,10 +126,11 @@ src/
 ├─ lib/
 │  ├─ api.js            ★ API 레이어 · 목 데이터 · 손익 계산
 │  ├─ brand.js          브랜딩 문구·로고
+│  ├─ chart.js          공통 차트 테마(색·툴팁·그리드)
 │  └─ format.js         숫자 포맷
 ├─ components/          ui · DetailModal · EslModal · PdaModal · SettingsModal
-└─ pages/               Login · Home · Inventory · History · Performance
-                        Hq · Esg · AbTest · PolicySim
+└─ pages/               Login · Home · Inventory · History · Performance · Demo
+                        Hq · Esg · AbTest · PolicySim · Ordering
 ```
 
 ---

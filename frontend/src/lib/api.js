@@ -247,9 +247,9 @@ export async function savePolicy(storeId, policy) {
 
 /* ---------- 역할(권한) ---------- */
 export const ROLES = {
-  staff:   { key: "staff",   label: "신선팀 담당자", scope: ["home", "inv", "hist", "perf"], canPolicy: false, canAuto: false },
-  manager: { key: "manager", label: "점장",         scope: ["home", "inv", "hist", "perf"], canPolicy: true,  canAuto: true },
-  hq:      { key: "hq",      label: "본사 운영팀",   scope: ["home", "inv", "hist", "perf", "hq", "esg", "ab", "sim"], canPolicy: true, canAuto: true },
+  staff:   { key: "staff",   label: "신선팀 담당자", scope: ["home", "inv", "hist", "perf", "demo"], canPolicy: false, canAuto: false },
+  manager: { key: "manager", label: "점장",         scope: ["home", "inv", "hist", "perf", "demo"], canPolicy: true,  canAuto: true },
+  hq:      { key: "hq",      label: "본사 운영팀",   scope: ["home", "inv", "hist", "perf", "demo", "hq", "esg", "ab", "sim"], canPolicy: true, canAuto: true },
 };
 
 /* ---------- ESG · 탄소 환산 ---------- */
