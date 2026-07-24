@@ -1,7 +1,7 @@
-import { Wallet, TrendingDown, Check, Cpu, Activity } from "lucide-react";
+import { Wallet, TrendingDown, Check } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell, PieChart, Pie } from "recharts";
 import { Panel, Kpi, Skeleton, ErrorBox, useAsync } from "../components/ui";
-import { getKpi, getModelPerf } from "../lib/api";
+import { getKpi } from "../lib/api";
 import { man, pct } from "../lib/format";
 
 const tooltipStyle = { borderRadius: 12, border: "1px solid #cbd5e1", fontSize: 12, boxShadow: "0 4px 14px rgba(0,0,0,.10)", background: "#ffffff", color: "#0f172a" };
@@ -9,7 +9,6 @@ const PIE = ["#E6002D", "#f59e0b", "#cbd5e1"];
 
 export default function Performance({ storeId, approvedCount = 0 }) {
   const { data, loading, error, reload } = useAsync(() => getKpi(storeId), [storeId]);
-  const mp = useAsync(() => getModelPerf(), []);
   if (error) return <ErrorBox message={error} onRetry={reload} />;
 
   return (
@@ -71,62 +70,6 @@ export default function Performance({ storeId, approvedCount = 0 }) {
           )}
         </Panel>
       </div>
-
-      <Panel title="AI 모델 성능"
-             right={mp.data && <span className="rounded-md bg-cjblue-50 px-2 py-0.5 text-[11px] font-semibold text-cjblue-700">{mp.data.version} · {mp.data.trained_at} 학습</span>}>
-        {mp.loading ? <Skeleton className="h-24 w-full" /> : mp.data && (
-          <>
-            <div className="grid gap-4 md:grid-cols-4">
-              {[
-                ["수요예측 오차 (MAPE)", `${(mp.data.mape * 100).toFixed(1)}%`, `도입 전 ${(mp.data.mape_before * 100).toFixed(1)}%`, "text-slate-900"],
-                ["추천 적중률", `${Math.round(mp.data.hit_rate * 100)}%`, "예측 소진율 ±10%p 이내", "text-slate-900"],
-                ["현장 채택률", `${Math.round(mp.data.adoption * 100)}%`, "추천 그대로 승인 비율", "text-emerald-600"],
-                ["드리프트 상태", mp.data.drift, `다음 재학습 ${mp.data.next_train}`, "text-emerald-600"],
-              ].map(([k, v, d2, cls]) => (
-                <div key={k} className="rounded-xl bg-slate-50 px-4 py-3">
-                  <p className="text-xs text-slate-500">{k}</p>
-                  <p className={`mt-1 text-xl font-bold ${cls}`}>{v}</p>
-                  <p className="mt-0.5 text-[11px] text-slate-400">{d2}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-4 space-y-2">
-              <p className="flex items-center gap-1.5 text-xs font-semibold text-slate-500">
-                <Activity size={12} /> 카테고리별 예측 오차
-              </p>
-              {mp.data.by_cat.map((c) => (
-                <div key={c.name} className="flex items-center gap-3">
-                  <span className="w-14 shrink-0 text-xs text-slate-500">{c.name}</span>
-                  <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-100">
-                    <div className={`h-full rounded-full ${c.mape > 0.2 ? "bg-brand-500" : c.mape > 0.15 ? "bg-cjorange-500" : "bg-emerald-500"}`}
-                         style={{ width: `${Math.min(c.mape * 400, 100)}%` }} />
-                  </div>
-                  <span className="w-12 shrink-0 text-right text-xs font-semibold">{(c.mape * 100).toFixed(1)}%</span>
-                </div>
-              ))}
-              <p className="pt-1 text-[11px] leading-relaxed text-slate-400">
-                즉석·수산은 수요 변동이 커 오차가 큽니다. 해당 카테고리는 추천 시 보수적인 할인율을 적용합니다.
-              </p>
-            </div>
-          </>
-        )}
-      </Panel>
-
-      <Panel title="오늘 처리 현황" right={<span className="text-xs text-slate-400">실시간</span>}>
-        <div className="grid gap-4 md:grid-cols-4">
-          {[
-            ["오늘 승인", `${approvedCount}건`, ""],
-            ["평균 처리시간", "6초/건", ""],
-            ["기존 방식 대비", "−97%", "text-emerald-600"],
-            ["ESL 자동 반영률", "92%", ""],
-          ].map(([k, v, cls]) => (
-            <div key={k} className="rounded-xl bg-slate-50 px-4 py-3">
-              <p className="text-xs text-slate-500">{k}</p>
-              <p className={`mt-1 text-xl font-bold ${cls}`}>{v}</p>
-            </div>
-          ))}
-        </div>
-      </Panel>
 
       <Panel title="미승인 건의 실제 결과"
              right={<span className="text-xs text-slate-400">서비스 효과 검증 지표</span>}>

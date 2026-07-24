@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   AlertTriangle, Boxes, BarChart3, Bell, LogOut, Menu, X, ChevronDown, Settings, TabletSmartphone,
   Smartphone, History as HistoryIcon, Building2, Leaf, FlaskConical, SlidersHorizontal,
-  Lock, HelpCircle, ArrowRight,
+  Lock, HelpCircle, ArrowRight, Film,
 } from "lucide-react";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
@@ -13,6 +13,7 @@ import Esg from "./pages/Esg";
 import AbTest from "./pages/AbTest";
 import PolicySim from "./pages/PolicySim";
 import Performance from "./pages/Performance";
+import Demo from "./pages/Demo";
 import EslModal from "./components/EslModal";
 import PdaModal from "./components/PdaModal";
 import SettingsModal from "./components/SettingsModal";
@@ -25,6 +26,7 @@ const NAV = [
   { key: "inv", label: "재고 모니터링", icon: Boxes, desc: "전체 신선 재고", group: "점포" },
   { key: "hist", label: "승인 이력", icon: HistoryIcon, desc: "가격 변경 기록·조정 패턴", group: "점포" },
   { key: "perf", label: "성과 리포트", icon: BarChart3, desc: "도입 효과", group: "점포" },
+  { key: "demo", label: "시연 스토리보드", icon: Film, desc: "3D 매장 워크스루", group: "점포" },
   { key: "hq", label: "본사 대시보드", icon: Building2, desc: "전 점포 비교·확산 현황", group: "본사" },
   { key: "esg", label: "ESG 리포트", icon: Leaf, desc: "폐기 감축의 탄소 환산", group: "본사" },
   { key: "ab", label: "효과 검증", icon: FlaskConical, desc: "적용·대조 점포 비교 실험", group: "본사" },
@@ -44,6 +46,7 @@ export default function App() {
   const [noticeOpen, setNoticeOpen] = useState(false);
   const [notices, setNotices] = useState([]);
   const [tourStep, setTourStep] = useState(0);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
 
   /* 대한민국 표준시 실시간 표시 */
   const fmtKst = () =>
@@ -58,6 +61,8 @@ export default function App() {
   }, []);
 
   useEffect(() => { getNotifications().then(setNotices).catch(() => {}); }, []);
+  /* 탭 이동 시 하단 알림 배너 다시 노출 */
+  useEffect(() => { setBannerDismissed(false); }, [tab]);
   const [toast, setToast] = useState(null);
 
   /* 승인 상태 — 화면 전체가 이 값을 공유합니다 */
@@ -117,7 +122,9 @@ export default function App() {
         onLogin={(res) => {
           setAuth(res);
           setStoreId(res.storeId ?? "S01");
-          setTimeout(() => setTourStep(1), 400);
+          let seen = false;
+          try { seen = !!localStorage.getItem("fw_tour_seen"); } catch { seen = false; }
+          if (!seen) setTimeout(() => setTourStep(1), 400);   // 최초 1회만 자동 안내
         }}
       />
     );
@@ -135,6 +142,9 @@ export default function App() {
   const store = auth.stores.find((s) => s.store_id === storeId) ?? auth.stores[0];
   const pendingCount = Math.max(items.length - approved.size - pendingMgr.size, 0);
   const current = NAV.find((n) => n.key === tab);
+  /* 전역 하단 알림: 홈(폐기위험 대응) 외 화면에서 폐기위험을 상기 → 홈으로 이동 유도 */
+  const dangerNotice = notices.find((n) => n.type === "danger");
+  const showBanner = tab !== "home" && allowed("home") && dangerNotice && !bannerDismissed;
 
   const NavList = () => (
     <nav className="flex-1 space-y-1 px-3">
@@ -359,6 +369,7 @@ export default function App() {
           {tab === "sim" && <PolicySim onToast={fire} />}
           {tab === "inv" && <Inventory storeId={storeId} onToast={fire} />}
           {tab === "perf" && <Performance storeId={storeId} approvedCount={approved.size} />}
+          {tab === "demo" && <Demo onGoToReport={() => setTab("perf")} />}
         </main>
 
         <footer className="border-t border-slate-200 px-5 py-4 text-[11px] leading-relaxed text-slate-400 lg:px-8">
@@ -393,8 +404,12 @@ export default function App() {
                       ))}
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => setTourStep(0)} className="rounded-xl px-3 py-2 text-xs font-semibold text-slate-400 hover:text-slate-600">건너뛰기</button>
-                      <button onClick={() => setTourStep(tourStep >= 3 ? 0 : tourStep + 1)}
+                      <button onClick={() => { setTourStep(0); try { localStorage.setItem("fw_tour_seen", "1"); } catch { /* noop */ } }}
+                              className="rounded-xl px-3 py-2 text-xs font-semibold text-slate-400 hover:text-slate-600">다시 보지 않기</button>
+                      <button onClick={() => {
+                                if (tourStep >= 3) { setTourStep(0); try { localStorage.setItem("fw_tour_seen", "1"); } catch { /* noop */ } }
+                                else setTourStep(tourStep + 1);
+                              }}
                               className="flex items-center gap-1.5 rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white active:scale-95">
                         {tourStep >= 3 ? "시작하기" : "다음"} <ArrowRight size={13} />
                       </button>
@@ -412,6 +427,27 @@ export default function App() {
         <PdaModal items={items} approvedIds={new Set([...approved.keys(), ...pendingMgr.keys()])} onApprove={handleApprove}
                   onClose={() => setPdaOpen(false)} onToast={fire} />
       )}
+      {/* 전역 하단 폐기위험 알림 배너 (어느 화면에서든 표시 → 폐기위험 대응으로 이동) */}
+      {showBanner && (
+        <div className="animate-slide-in fixed bottom-6 left-1/2 z-50 flex w-[92vw] max-w-xl -translate-x-1/2 items-center gap-3 rounded-2xl border border-brand-100 bg-white px-4 py-3 shadow-2xl ring-1 ring-black/5">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50">
+            <AlertTriangle size={20} className="text-brand-600" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-bold text-slate-900">{dangerNotice.title}</p>
+            <p className="truncate text-xs text-slate-500">{dangerNotice.desc}</p>
+          </div>
+          <button onClick={() => { setTab("home"); }}
+                  className="flex shrink-0 items-center gap-1 rounded-xl bg-brand-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-700">
+            대응하기 <ArrowRight size={14} />
+          </button>
+          <button onClick={() => setBannerDismissed(true)} title="닫기"
+                  className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
+            <X size={16} />
+          </button>
+        </div>
+      )}
+
       <Toast show={!!toast} tone={toast?.tone} title={toast?.title} desc={toast?.desc} />
     </div>
   );
