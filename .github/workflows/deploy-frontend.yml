@@ -18,9 +18,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # -----------------------------------------------------------------
-  # 1. 빌드 및 S3 업로드 (1회 수행 - 중복 빌드 방지)
-  # -----------------------------------------------------------------
+  # 1. 빌드 및 S3 업로드
   build-and-upload:
     runs-on: ubuntu-latest
     env:
@@ -46,14 +44,12 @@ jobs:
           npm ci
           npm run build
 
-      # AWS credentials 설정 및 S3 업로드 (필요시 추가)
+      # 기존에 사용하시던 AWS 인증 스텝이 있다면 여기에 추가
       # - name: Configure AWS credentials
       #   uses: aws-actions/configure-aws-credentials@v4
       #   with: ...
 
-  # -----------------------------------------------------------------
-  # 2. EC2 SSM 배포 (Matrix 전략으로 여러 인스턴스에 병렬 배포)
-  # -----------------------------------------------------------------
+  # 2. EC2 SSM 배포 (Matrix 병렬 실행)
   deploy-ec2:
     needs: build-and-upload
     runs-on: ubuntu-latest
@@ -66,16 +62,25 @@ jobs:
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
     steps:
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with: ...
+      # ⚠️ 핵심: 이 Job에서도 AWS Credentials 인증을 거쳐야 합니다!
+      # (기존 워크플로우에서 사용하시던 OIDC Role 또는 Access Key 방식을 넣어주세요)
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          # 예시 1) Access Key 방식 사용 시
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+          # 예시 2) IAM Role(OIDC) 방식 사용 시
+          # role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          # aws-region: ${{ vars.AWS_REGION }}
 
-      - name: Deploy via SSM and Wait
+      - name: Deploy via SSM
         shell: bash
         run: |
           ARTIFACT_NAME="build-${GITHUB_SHA}.tar.gz"
-          
-          # 1. SSM Command 전송
+
+          # SSM 명령 전송
           COMMAND_ID="$(aws ssm send-command \
             --instance-ids "${{ matrix.ec2-instance }}" \
             --document-name "AWS-RunShellScript" \
@@ -88,15 +93,13 @@ jobs:
 
           echo "SSM Command ID: ${COMMAND_ID}"
 
-          # 2. AWS Built-in Waiter 사용 (복잡한 bash 반복문 대체)
+          # 대기 수행
           aws ssm wait command-executed \
             --command-id "${COMMAND_ID}" \
             --instance-id "${{ matrix.ec2-instance }}" \
             --region "${AWS_REGION}"
 
-  # -----------------------------------------------------------------
-  # 3. CloudFront 캐시 무효화 (모든 EC2 배포 완료 후 1회 수행)
-  # -----------------------------------------------------------------
+  # 3. CloudFront 캐시 무효화
   invalidate-cloudfront:
     needs: deploy-ec2
     runs-on: ubuntu-latest
@@ -104,9 +107,12 @@ jobs:
       AWS_REGION: ${{ vars.AWS_REGION }}
       CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
     steps:
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v4
-      #   with: ...
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Invalidate CloudFront cache
         shell: bash
