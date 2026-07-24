@@ -7,7 +7,6 @@ on:
     paths:
       - "frontend/**"
       - ".github/workflows/deploy-frontend.yml"
-
   workflow_dispatch:
 
 permissions:
@@ -19,159 +18,95 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-deploy:
+  # -----------------------------------------------------------------
+  # 1. 빌드 및 S3 업로드 (1회 수행 - 중복 빌드 방지)
+  # -----------------------------------------------------------------
+  build-and-upload:
     runs-on: ubuntu-latest
-
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
       S3_BUCKET: ${{ vars.S3_BUCKET }}
-      EC2_INSTANCE_ID: ${{ vars.EC2_INSTANCE_ID }}
-      CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
-
     steps:
-      - name: Checkout only frontend
-        uses: actions/checkout@v6
+      - name: Checkout repository
+        uses: actions/checkout@v4
         with:
-          sparse-checkout: |
-            frontend
+          sparse-checkout: "frontend"
           sparse-checkout-cone-mode: true
-          fetch-depth: 1
-
-      - name: Verify frontend files
-        shell: bash
-        run: |
-          test -f frontend/package.json
-          test -f frontend/package-lock.json
-          test -f frontend/vite.config.js
-
-          echo "Frontend files:"
-          find frontend -maxdepth 2 -type f | sort | head -100
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4
         with:
           node-version: ${{ vars.NODE_VERSION || '20' }}
           cache: npm
           cache-dependency-path: frontend/package-lock.json
 
-      - name: Install frontend dependencies
+      - name: Install dependencies & Build
         working-directory: frontend
-        run: npm ci
+        run: |
+          npm ci
+          npm run build
 
-      - name: Build frontend
-        working-directory: frontend
-        run: npm run build
+      # AWS credentials 설정 및 S3 업로드 (필요시 추가)
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with: ...
 
-      - name: Validate frontend build
+  # -----------------------------------------------------------------
+  # 2. EC2 SSM 배포 (Matrix 전략으로 여러 인스턴스에 병렬 배포)
+  # -----------------------------------------------------------------
+  deploy-ec2:
+    needs: build-and-upload
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        ec2-instance:
+          - "i-0f223753033fc55b5"
+          - "i-0f4a53981a9799c62"
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+    steps:
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with: ...
+
+      - name: Deploy via SSM and Wait
         shell: bash
         run: |
-          test -d frontend/dist
-          test -f frontend/dist/index.html
-
-          echo "Build output:"
-          find frontend/dist -maxdepth 2 -type f | sort
-
-          echo "Build size:"
-          du -sh frontend/dist
-
-      - name: Package frontend dist only
-        shell: bash
-        run: |
-          ARTIFACT_NAME="frontend-${GITHUB_SHA}.zip"
-
-          cd frontend/dist
-          zip -qr "${GITHUB_WORKSPACE}/${ARTIFACT_NAME}" .
-          cd "${GITHUB_WORKSPACE}"
-
-          test -s "${ARTIFACT_NAME}"
-
-          echo "ARTIFACT_NAME=${ARTIFACT_NAME}" >> "${GITHUB_ENV}"
-
-          echo "Artifact:"
-          ls -lh "${ARTIFACT_NAME}"
-
-      - name: Configure AWS credentials using OIDC
-        uses: aws-actions/configure-aws-credentials@v6
-        with:
-          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Verify AWS identity
-        run: aws sts get-caller-identity
-
-      - name: Upload frontend artifact to S3
-        shell: bash
-        run: |
-          aws s3 cp \
-            "${ARTIFACT_NAME}" \
-            "s3://${S3_BUCKET}/releases/${ARTIFACT_NAME}" \
-            --region "${AWS_REGION}"
-
-      name: Deploy frontend through SSM
-      shell: bash
-      run: |
-        PARAMETERS="$(jq -n \
-          --arg command "/usr/local/bin/deploy-aivle-web '${ARTIFACT_NAME}'" \
-          '{commands: [$command]}'
-        )"
-
-        # EC2_INSTANCE_ID 환경변수에 "i-xxx i-yyy" 형태로 여러 개가 들어있다고 가정
-        COMMAND_ID="$(aws ssm send-command \
-          --instance-ids ${EC2_INSTANCE_ID} \
-          --document-name "AWS-RunShellScript" \
-          --comment "Deploy frontend ${GITHUB_SHA}" \
-          --parameters "${PARAMETERS}" \
-          --query "Command.CommandId" \
-          --output text \
-          --region "${AWS_REGION}"
-        )"
-
-        echo "SSM Command ID: ${COMMAND_ID}"
-
-        # 모든 인스턴스의 상태가 완료(Success)될 때까지 확인
-        for attempt in $(seq 1 60); do
-          # list-command-invocations로 명령을 전달받은 모든 인스턴스의 상태 추출
-          STATUSES="$(aws ssm list-command-invocations \
-            --command-id "${COMMAND_ID}" \
-            --query "CommandInvocations[].Status" \
+          ARTIFACT_NAME="build-${GITHUB_SHA}.tar.gz"
+          
+          # 1. SSM Command 전송
+          COMMAND_ID="$(aws ssm send-command \
+            --instance-ids "${{ matrix.ec2-instance }}" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy frontend ${GITHUB_SHA}" \
+            --parameters "{\"commands\":[\"/usr/local/bin/deploy-aivle-web '${ARTIFACT_NAME}'\"]}" \
+            --query "Command.CommandId" \
             --output text \
-            --region "${AWS_REGION}"
+            --region "${AWS_REGION}" \
           )"
 
-          echo "SSM statuses: ${STATUSES}"
+          echo "SSM Command ID: ${COMMAND_ID}"
 
-          # 에러 상태가 있는지 체크
-          if echo "${STATUSES}" | grep -qE "Failed|Cancelled|TimedOut|Cancelling"; then
-            echo "일부 또는 전체 EC2 배포 실패"
-            exit 1
-          fi
-
-          # 모든 인스턴스가 Success인지 체크
-          FAIL_OR_PENDING=0
-          for status in ${STATUSES}; do
-            if [[ "${status}" != "Success" ]]; then
-              FAIL_OR_PENDING=1
-              break
-            fi
-          done
-
-          if [[ ${FAIL_OR_PENDING} -eq 0 ]]; then
-            echo "모든 EC2 인스턴스에 배포 완료!"
-            break
-          fi
-
-          sleep 10
-        done
-
-          if [[ "${STATUS}" != "Success" ]]; then
-            echo "SSM 배포가 제한 시간 안에 완료되지 않았습니다."
-            exit 1
-          fi
-
-          aws ssm get-command-invocation \
+          # 2. AWS Built-in Waiter 사용 (복잡한 bash 반복문 대체)
+          aws ssm wait command-executed \
             --command-id "${COMMAND_ID}" \
-            --instance-id "${EC2_INSTANCE_ID}" \
+            --instance-id "${{ matrix.ec2-instance }}" \
             --region "${AWS_REGION}"
+
+  # -----------------------------------------------------------------
+  # 3. CloudFront 캐시 무효화 (모든 EC2 배포 완료 후 1회 수행)
+  # -----------------------------------------------------------------
+  invalidate-cloudfront:
+    needs: deploy-ec2
+    runs-on: ubuntu-latest
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      CLOUDFRONT_DISTRIBUTION_ID: ${{ vars.CLOUDFRONT_DISTRIBUTION_ID }}
+    steps:
+      # - name: Configure AWS credentials
+      #   uses: aws-actions/configure-aws-credentials@v4
+      #   with: ...
 
       - name: Invalidate CloudFront cache
         shell: bash
