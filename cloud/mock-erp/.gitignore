@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+data/*.db
+tests/*.db
+.env
+.env.*
+!.env.example
+aws/dist/*.zip
+exports/*.zip
+*.pem
+*.key

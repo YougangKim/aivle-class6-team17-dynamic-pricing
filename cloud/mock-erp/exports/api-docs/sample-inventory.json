@@ -1,0 +1,23 @@
+[
+  {
+    "inventory_id": "INV000001",
+    "store_id": "STORE001",
+    "product_id": "PROD001",
+    "lot_id": "LOT20260718001",
+    "current_date": "2026-07-22",
+    "manufacture_date": "2026-07-18",
+    "expiry_date": "2026-07-25",
+    "inbound_qty": 50,
+    "daily_sold_qty": 12,
+    "daily_waste_qty": 0,
+    "current_stock_qty": 38,
+    "reserved_qty": 3,
+    "unit_cost": 3500,
+    "unit_price": 4980,
+    "discount_rate": 20,
+    "inventory_status": "ON_SALE",
+    "waste_reason": null,
+    "weight_kg": 0.45
+  }
+]
+

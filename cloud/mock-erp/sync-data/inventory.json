@@ -1,0 +1,22 @@
+[
+  {
+    "inventory_id": "GIT-DEMO-001",
+    "store_id": "STORE001",
+    "product_id": "PROD004",
+    "lot_id": "GITLOT20260724001",
+    "current_date": "2026-07-24",
+    "manufacture_date": "2026-07-23",
+    "expiry_date": "2026-07-29",
+    "inbound_qty": 40,
+    "daily_sold_qty": 5,
+    "daily_waste_qty": 0,
+    "current_stock_qty": 35,
+    "reserved_qty": 2,
+    "unit_cost": 3500,
+    "unit_price": 4980,
+    "discount_rate": 10,
+    "inventory_status": "ON_SALE",
+    "waste_reason": null,
+    "weight_kg": 0.45
+  }
+]

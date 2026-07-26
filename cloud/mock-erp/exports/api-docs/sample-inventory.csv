@@ -1,0 +1,3 @@
+inventory_id,store_id,product_id,lot_id,current_date,manufacture_date,expiry_date,days_to_expiry,inbound_qty,daily_sold_qty,daily_waste_qty,current_stock_qty,reserved_qty,available_qty,freshness_score,unit_cost,unit_price,discount_rate,discount_price,disposal_candidate,inventory_status,waste_reason,weight_kg
+INV000001,STORE001,PROD001,LOT20260718001,2026-07-22,2026-07-18,2026-07-25,3,50,12,0,38,3,35,42.9,3500,4980,20,3984,N,ON_SALE,,0.45
+

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>신선식품 Mock ERP</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header>
+    <div>
+      <p class="eyebrow">LOCAL MOCK ERP</p>
+      <h1>신선식품 재고·가격 관리</h1>
+      <p>SQLite에 저장된 로트별 재고를 조회하고 AWS 전송 데이터를 미리 확인합니다.</p>
+    </div>
+    <div class="status"><span></span> 로컬 실행 중</div>
+  </header>
+
+  <main>
+    <section class="summary" id="summary"></section>
+
+    <section class="panel">
+      <div class="panel-title">
+        <div>
+          <p class="eyebrow">INVENTORY SNAPSHOT</p>
+          <h2>재고 목록</h2>
+        </div>
+        <div class="actions">
+          <select id="statusFilter" aria-label="재고 상태 필터">
+            <option value="">전체 상태</option>
+            <option value="ON_SALE">판매 가능</option>
+            <option value="OUT_OF_STOCK">품절</option>
+            <option value="DISPOSAL">폐기</option>
+            <option value="RESERVED">예약</option>
+          </select>
+          <button id="previewButton" class="secondary">AWS 전송 미리보기</button>
+          <button id="newButton">재고 추가</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>재고 ID</th><th>매장</th><th>상품</th><th>로트</th><th>소비기한</th>
+              <th>잔여일</th><th>판매가능</th><th>신선도</th><th>판매가</th><th>상태</th>
+            </tr>
+          </thead>
+          <tbody id="inventoryRows"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel guide">
+      <div>
+        <p class="eyebrow">LEARNING FLOW</p>
+        <h2>AWS 연동 순서</h2>
+      </div>
+      <ol>
+        <li><strong>현재 단계</strong><span>로컬 ERP 데이터 입력·조회·검증</span></li>
+        <li><strong>다음 단계</strong><span>API Gateway와 Lambda 수신 API 생성</span></li>
+        <li><strong>연동 단계</strong><span>미리보기 JSON을 DynamoDB에 저장</span></li>
+      </ol>
+    </section>
+  </main>
+
+  <dialog id="recordDialog">
+    <form id="recordForm">
+      <div class="dialog-title">
+        <div><p class="eyebrow">NEW RECORD</p><h2>재고 추가</h2></div>
+        <button type="button" class="icon" id="closeDialog">×</button>
+      </div>
+      <div class="form-grid" id="formFields"></div>
+      <p class="form-note">잔여 소비기한, 판매가능수량, 할인 판매가는 서버가 자동 계산합니다.</p>
+      <p class="error" id="formError"></p>
+      <div class="dialog-actions"><button type="button" class="secondary" id="cancelDialog">취소</button><button type="submit">저장</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="previewDialog" class="preview-dialog">
+    <div class="dialog-title">
+      <div><p class="eyebrow">AWS PAYLOAD</p><h2>전송 JSON 미리보기</h2></div>
+      <button type="button" class="icon" id="closePreview">×</button>
+    </div>
+    <p>아직 AWS로 전송하지 않습니다. 향후 API Gateway로 보낼 데이터 형식입니다.</p>
+    <pre id="payloadPreview"></pre>
+  </dialog>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
+
