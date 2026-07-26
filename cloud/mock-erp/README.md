@@ -66,27 +66,6 @@ GET /api/inventory?inventory_status=DISPOSAL
 GET /api/inventory?disposal_candidate=Y
 ```
 
-## AWS 연결은 나중에 활성화
-
-API Gateway와 Lambda가 완성된 다음에만 `.env.example`을 참고해 아래 두 값을 운영체제 환경변수로 설정합니다.
-
-```text
-AWS_SYNC_URL=https://...execute-api.ap-northeast-2.amazonaws.com/erp/sync
-ERP_SHARED_TOKEN=무작위-비밀키-aws 혹은 나영에게 있음
-```
-
-현재 버전은 `.env` 파일을 자동으로 읽지 않습니다. 비밀키가 실수로 저장소에 들어가는 일을 줄이기 위해 의도적으로 운영체제 환경변수만 사용합니다.
-
-PowerShell 실행 예시:
-
-```powershell
-$env:AWS_SYNC_URL="https://...execute-api.ap-northeast-2.amazonaws.com/erp/sync"
-$env:ERP_SHARED_TOKEN="비밀키"
-.\run.ps1
-```
-
-AWS URL은 반드시 `https://`여야 하며, 설정되지 않은 경우 실제 전송을 거부합니다. 비밀키는 GitHub, 문서, 채팅, 화면 캡처에 포함하지 마세요.
-
 ## 테스트
 
 서버를 종료한 상태에서 실행합니다.
@@ -107,16 +86,6 @@ mock-erp/
 ├─ requirements.txt
 └─ run.ps1
 ```
-
-## 향후 AWS 단계
-
-로컬 검증이 완료된 후 다음 순서로만 확장합니다.
-
-1. DynamoDB `erp-integrated-data` 테이블 생성
-2. Lambda 수신 함수 생성
-3. API Gateway HTTP API의 `POST /erp/sync` 연결
-4. 잘못된 비밀키와 누락 필드 거부 테스트
-5. 로컬 `/api/aws/sync`에서 1~10건 수동 전송
 
 ## 재고 등록·수정 시 AWS 자동 전송
 
