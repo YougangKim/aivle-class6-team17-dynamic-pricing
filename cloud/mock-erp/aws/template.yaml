@@ -1,0 +1,153 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Fresh-food Mock ERP to API Gateway, Lambda, and RDS PostgreSQL
+
+Parameters:
+  DbMasterPassword:
+    Type: String
+    NoEcho: true
+    MinLength: 12
+    Description: RDS PostgreSQL master password
+  ErpSharedToken:
+    Type: String
+    NoEcho: true
+    MinLength: 24
+    Description: Value expected in the X-ERP-API-KEY request header
+
+Globals:
+  Function:
+    Runtime: python3.12
+    Architectures:
+      - x86_64
+    Timeout: 30
+    MemorySize: 256
+
+Resources:
+  ErpVpc:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.20.0.0/16
+      EnableDnsHostnames: true
+      EnableDnsSupport: true
+      Tags:
+        - Key: Name
+          Value: mock-erp-vpc
+
+  PrivateSubnetA:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ErpVpc
+      AvailabilityZone: !Select [0, !GetAZs ""]
+      CidrBlock: 10.20.1.0/24
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: mock-erp-private-a
+
+  PrivateSubnetB:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref ErpVpc
+      AvailabilityZone: !Select [1, !GetAZs ""]
+      CidrBlock: 10.20.2.0/24
+      MapPublicIpOnLaunch: false
+      Tags:
+        - Key: Name
+          Value: mock-erp-private-b
+
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Outbound access from ERP receiver Lambda
+      VpcId: !Ref ErpVpc
+
+  DatabaseSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: PostgreSQL access from ERP receiver Lambda only
+      VpcId: !Ref ErpVpc
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 5432
+          ToPort: 5432
+          SourceSecurityGroupId: !GetAtt LambdaSecurityGroup.GroupId
+
+  DatabaseSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: Private subnets for the Mock ERP RDS instance
+      SubnetIds:
+        - !Ref PrivateSubnetA
+        - !Ref PrivateSubnetB
+
+  ErpDatabase:
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Delete
+    UpdateReplacePolicy: Delete
+    Properties:
+      Engine: postgres
+      DBInstanceClass: db.t4g.micro
+      AllocatedStorage: 20
+      MaxAllocatedStorage: 30
+      StorageType: gp3
+      StorageEncrypted: true
+      DBName: erp_sync
+      MasterUsername: erp_admin
+      MasterUserPassword: !Ref DbMasterPassword
+      Port: 5432
+      PubliclyAccessible: false
+      MultiAZ: false
+      BackupRetentionPeriod: 1
+      AutoMinorVersionUpgrade: true
+      CopyTagsToSnapshot: true
+      DeletionProtection: false
+      DBSubnetGroupName: !Ref DatabaseSubnetGroup
+      VPCSecurityGroups:
+        - !GetAtt DatabaseSecurityGroup.GroupId
+      Tags:
+        - Key: Project
+          Value: fresh-food-mock-erp
+
+  ErpReceiverApi:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      StageName: demo
+
+  ErpReceiverFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: receiver/
+      Handler: lambda_function.lambda_handler
+      Environment:
+        Variables:
+          DB_HOST: !GetAtt ErpDatabase.Endpoint.Address
+          DB_PORT: "5432"
+          DB_NAME: erp_sync
+          DB_USER: erp_admin
+          DB_PASSWORD: !Ref DbMasterPassword
+          ERP_SHARED_TOKEN: !Ref ErpSharedToken
+      VpcConfig:
+        SecurityGroupIds:
+          - !GetAtt LambdaSecurityGroup.GroupId
+        SubnetIds:
+          - !Ref PrivateSubnetA
+          - !Ref PrivateSubnetB
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+      Events:
+        SyncInventory:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref ErpReceiverApi
+            Path: /erp/sync
+            Method: POST
+
+Outputs:
+  SyncUrl:
+    Description: Set this value as the local Mock ERP AWS_SYNC_URL
+    Value: !Sub "https://${ErpReceiverApi}.execute-api.${AWS::Region}.${AWS::URLSuffix}/demo/erp/sync"
+  DatabaseEndpoint:
+    Description: Private RDS endpoint
+    Value: !GetAtt ErpDatabase.Endpoint.Address
+  DatabaseName:
+    Value: erp_sync
