@@ -116,7 +116,7 @@ jobs:
       fail-fast: false
       matrix:
         ec2-instance:
-          - "i-04f098448e132943d"
+          - "i-023b94e6be4bf181e"
           - "i-0f4a53981a9799c62"
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
