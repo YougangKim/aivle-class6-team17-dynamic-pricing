@@ -19,9 +19,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  # ==========================================
-  # 1. 빌드 및 S3 업로드 (1회만 실행)
-  # ==========================================
+  # 1. 프론트엔드를 한 번 빌드하고 S3에 업로드합니다.
   build-and-upload:
     runs-on: ubuntu-latest
     env:
@@ -98,7 +96,7 @@ jobs:
       - name: Verify AWS identity
         run: aws sts get-caller-identity
 
-      - name: Upload frontend artifact to S3
+      - name: Upload versioned and latest frontend artifacts to S3
         shell: bash
         run: |
           aws s3 cp \
@@ -106,32 +104,52 @@ jobs:
             "s3://${S3_BUCKET}/releases/${ARTIFACT_NAME}" \
             --region "${AWS_REGION}"
 
-  # ==========================================
-  # 2. EC2 SSM 배포 (Matrix 2대 병렬 실행)
-  # ==========================================
-  deploy-ec2:
+          aws s3 cp \
+            "${ARTIFACT_NAME}" \
+            "s3://${S3_BUCKET}/releases/frontend-latest.zip" \
+            --region "${AWS_REGION}"
+
+  # 2. ASG에서 현재 정상 상태인 EC2를 조회하고 SSM으로 한 번에 배포합니다.
+  deploy-asg:
     needs: build-and-upload
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        ec2-instance:
-          - "i-023b94e6be4bf181e"
-          - "i-0f4a53981a9799c62"
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
+      ASG_NAME: ${{ vars.ASG_NAME }}
     steps:
-      # 독립된 Job이므로 OIDC AWS 인증을 여기서 다시 수행합니다.
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v6
         with:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Deploy frontend through SSM
+      - name: Find healthy EC2 instances in the Auto Scaling group
+        id: instances
         shell: bash
         run: |
+          INSTANCE_IDS_TEXT="$(
+            aws autoscaling describe-auto-scaling-groups \
+              --auto-scaling-group-names "${ASG_NAME}" \
+              --query "AutoScalingGroups[0].Instances[?LifecycleState=='InService' && HealthStatus=='Healthy'].InstanceId" \
+              --output text \
+              --region "${AWS_REGION}"
+          )"
+
+          if [[ -z "${INSTANCE_IDS_TEXT}" || "${INSTANCE_IDS_TEXT}" == "None" ]]; then
+            echo "No Healthy/InService EC2 instances found in ASG: ${ASG_NAME}"
+            exit 1
+          fi
+
+          echo "Target instances: ${INSTANCE_IDS_TEXT}"
+          echo "instance_ids=${INSTANCE_IDS_TEXT}" >> "${GITHUB_OUTPUT}"
+
+      - name: Deploy frontend to all current ASG instances through SSM
+        shell: bash
+        env:
+          INSTANCE_IDS_TEXT: ${{ steps.instances.outputs.instance_ids }}
+        run: |
           ARTIFACT_NAME="frontend-${GITHUB_SHA}.zip"
+          read -r -a INSTANCE_IDS <<< "${INSTANCE_IDS_TEXT}"
 
           PARAMETERS="$(
             jq -n \
@@ -141,7 +159,7 @@ jobs:
 
           COMMAND_ID="$(
             aws ssm send-command \
-              --instance-ids "${{ matrix.ec2-instance }}" \
+              --instance-ids "${INSTANCE_IDS[@]}" \
               --document-name "AWS-RunShellScript" \
               --comment "Deploy frontend ${GITHUB_SHA}" \
               --parameters "${PARAMETERS}" \
@@ -152,47 +170,47 @@ jobs:
 
           echo "SSM Command ID: ${COMMAND_ID}"
 
-          STATUS="Pending"
+          for INSTANCE_ID in "${INSTANCE_IDS[@]}"; do
+            STATUS="Pending"
 
-          for attempt in $(seq 1 60); do
-            STATUS="$(
-              aws ssm get-command-invocation \
-                --command-id "${COMMAND_ID}" \
-                --instance-id "${{ matrix.ec2-instance }}" \
-                --query "Status" \
-                --output text \
-                --region "${AWS_REGION}" \
-                2>/dev/null || echo "Pending"
-            )"
-
-            echo "SSM status: ${STATUS}"
-
-            case "${STATUS}" in
-              Success)
-                break
-                ;;
-              Failed|Cancelled|TimedOut|Cancelling)
+            for attempt in $(seq 1 60); do
+              STATUS="$(
                 aws ssm get-command-invocation \
                   --command-id "${COMMAND_ID}" \
-                  --instance-id "${{ matrix.ec2-instance }}" \
-                  --region "${AWS_REGION}" || true
-                exit 1
-                ;;
-            esac
+                  --instance-id "${INSTANCE_ID}" \
+                  --query "Status" \
+                  --output text \
+                  --region "${AWS_REGION}" \
+                  2>/dev/null || echo "Pending"
+              )"
 
-            sleep 10
+              echo "${INSTANCE_ID}: ${STATUS}"
+
+              case "${STATUS}" in
+                Success)
+                  break
+                  ;;
+                Failed|Cancelled|TimedOut|Cancelling)
+                  aws ssm get-command-invocation \
+                    --command-id "${COMMAND_ID}" \
+                    --instance-id "${INSTANCE_ID}" \
+                    --region "${AWS_REGION}" || true
+                  exit 1
+                  ;;
+              esac
+
+              sleep 10
+            done
+
+            if [[ "${STATUS}" != "Success" ]]; then
+              echo "Deployment did not complete in time on ${INSTANCE_ID}"
+              exit 1
+            fi
           done
 
-          if [[ "${STATUS}" != "Success" ]]; then
-            echo "SSM 배포가 제한 시간 안에 완료되지 않았습니다."
-            exit 1
-          fi
-
-  # ==========================================
-  # 3. CloudFront 캐시 무효화 (1회만 실행)
-  # ==========================================
+  # 3. 모든 현재 ASG EC2의 배포가 성공한 후 CloudFront 캐시를 무효화합니다.
   invalidate-cloudfront:
-    needs: deploy-ec2
+    needs: deploy-asg
     runs-on: ubuntu-latest
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
