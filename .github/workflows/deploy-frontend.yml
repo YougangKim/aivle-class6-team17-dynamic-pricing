@@ -123,11 +123,11 @@ jobs:
           role-to-assume: ${{ vars.AWS_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Find healthy EC2 instances in the Auto Scaling group
+      - name: Find deployable EC2 instances in the Auto Scaling group
         id: instances
         shell: bash
         run: |
-          INSTANCE_IDS_TEXT="$(
+          ASG_INSTANCE_IDS_TEXT="$(
             aws autoscaling describe-auto-scaling-groups \
               --auto-scaling-group-names "${ASG_NAME}" \
               --query "AutoScalingGroups[0].Instances[?LifecycleState=='InService' && HealthStatus=='Healthy'].InstanceId" \
@@ -135,13 +135,48 @@ jobs:
               --region "${AWS_REGION}"
           )"
 
-          if [[ -z "${INSTANCE_IDS_TEXT}" || "${INSTANCE_IDS_TEXT}" == "None" ]]; then
+          if [[ -z "${ASG_INSTANCE_IDS_TEXT}" || "${ASG_INSTANCE_IDS_TEXT}" == "None" ]]; then
             echo "No Healthy/InService EC2 instances found in ASG: ${ASG_NAME}"
             exit 1
           fi
 
-          echo "Target instances: ${INSTANCE_IDS_TEXT}"
-          echo "instance_ids=${INSTANCE_IDS_TEXT}" >> "${GITHUB_OUTPUT}"
+          read -r -a ASG_INSTANCE_IDS <<< "${ASG_INSTANCE_IDS_TEXT}"
+          SSM_FILTER_VALUES="$(IFS=,; echo "${ASG_INSTANCE_IDS[*]}")"
+
+          echo "ASG instances: ${ASG_INSTANCE_IDS_TEXT}"
+          echo "Waiting for every ASG instance to become SSM Online..."
+
+          SSM_ONLINE_IDS_TEXT=""
+
+          for attempt in $(seq 1 30); do
+            SSM_ONLINE_IDS_TEXT="$(
+              aws ssm describe-instance-information \
+                --filters "Key=InstanceIds,Values=${SSM_FILTER_VALUES}" \
+                --query "InstanceInformationList[?PingStatus=='Online'].InstanceId" \
+                --output text \
+                --region "${AWS_REGION}"
+            )"
+
+            read -r -a SSM_ONLINE_IDS <<< "${SSM_ONLINE_IDS_TEXT}"
+
+            echo "Attempt ${attempt}/30: ${#SSM_ONLINE_IDS[@]}/${#ASG_INSTANCE_IDS[@]} instances are SSM Online"
+
+            if [[ "${#SSM_ONLINE_IDS[@]}" -eq "${#ASG_INSTANCE_IDS[@]}" ]]; then
+              break
+            fi
+
+            sleep 10
+          done
+
+          if [[ "${#SSM_ONLINE_IDS[@]}" -ne "${#ASG_INSTANCE_IDS[@]}" ]]; then
+            echo "Some ASG instances are not registered as SSM Online."
+            echo "ASG instances: ${ASG_INSTANCE_IDS_TEXT}"
+            echo "SSM Online instances: ${SSM_ONLINE_IDS_TEXT:-None}"
+            exit 1
+          fi
+
+          echo "Deployable instances: ${SSM_ONLINE_IDS_TEXT}"
+          echo "instance_ids=${SSM_ONLINE_IDS_TEXT}" >> "${GITHUB_OUTPUT}"
 
       - name: Deploy frontend to all current ASG instances through SSM
         shell: bash
