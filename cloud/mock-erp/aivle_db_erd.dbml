@@ -1,0 +1,470 @@
+Project aivle_db {
+  database_type: "PostgreSQL"
+  Note: '''
+  AWS RDS aivle_db ERD
+  작성 기준: 2026-07-30 information_schema 조회 결과
+
+  Ref 이름이 actual_ 로 시작하면 PostgreSQL에 선언된 실제 FK다.
+  Ref 이름이 logical_ 로 시작하면 값은 연결되지만 DB FK Constraint가 없는 논리 관계다.
+  '''
+}
+
+TableGroup "AI Feature" {
+  ai_feature.feature_current
+  ai_feature.feature_history
+  ai_feature.model_result
+}
+
+TableGroup "CRM" {
+  crm.customer
+  crm.visitor
+}
+
+TableGroup "Inventory" {
+  inventory.inventory
+}
+
+TableGroup "Pricing Operations" {
+  pricing_ops.ingestion_event
+  pricing_ops.price_decision
+  pricing_ops.price_deployment
+}
+
+TableGroup "Product and Price" {
+  product_price.calendar
+  product_price.hourly_censored_demand
+  product_price.product
+  product_price.store
+  product_price.store_calendar
+  product_price.store_visitor_profile
+}
+
+TableGroup "Sales" {
+  sales.receipt
+  sales.sales_transaction
+}
+
+Table ai_feature.feature_current {
+  store_id varchar [not null]
+  product_id varchar [not null]
+  feature_time timestamptz [not null]
+  feature_values jsonb [not null]
+  feature_version varchar
+  updated_at timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+
+  indexes {
+    (store_id, product_id) [pk]
+  }
+
+  Note: "매장·상품별 최신 파생변수. 현재 파이프라인 단계에서는 저장 대상에서 제외."
+}
+
+Table ai_feature.feature_history {
+  feature_history_id bigint [pk, not null]
+  store_id varchar [not null]
+  product_id varchar [not null]
+  feature_time timestamptz [not null]
+  feature_values jsonb [not null]
+  feature_version varchar
+  created_at timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+
+  Note: "파생변수 이력. 현재 파이프라인 단계에서는 저장 대상에서 제외."
+}
+
+Table ai_feature.model_result {
+  model_result_id bigint [pk, not null]
+  store_id varchar [not null]
+  product_id varchar [not null]
+  inventory_id varchar
+  model_name varchar [not null]
+  model_version varchar [not null]
+  experiment_group varchar
+  recommended_price numeric [not null]
+  recommended_discount numeric [not null, default: 0]
+  prediction_values jsonb
+  inferred_at timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+
+  Note: "향후 SageMaker 추론 결과."
+}
+
+Table crm.customer {
+  customer_id varchar [pk, not null]
+  age_group varchar
+  household_type varchar
+  income_level varchar
+  residence_type varchar
+  price_sensitivity numeric
+  freshness_sensitivity numeric
+  preferred_category varchar
+  visit_frequency varchar
+  created_at timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+
+  Note: "10,000 rows 확인."
+}
+
+Table crm.visitor {
+  visitor_id varchar [pk, not null]
+  customer_id varchar
+  store_id varchar [not null]
+  visit_date date [not null]
+  visit_time time [not null]
+  time_slot varchar
+  day_type varchar
+  visit_sequence integer
+
+  Note: "629,170 rows 확인."
+}
+
+Table inventory.inventory {
+  inventory_id varchar [pk, not null]
+  store_id varchar [not null]
+  product_id varchar [not null]
+  lot_id varchar [not null]
+  inventory_date date [not null]
+  manufacture_date date
+  expiry_date date
+  days_to_expiry integer
+  inbound_qty integer [not null, default: 0]
+  daily_sold_qty integer [not null, default: 0]
+  daily_waste_qty integer [not null, default: 0]
+  current_stock_qty integer [not null, default: 0]
+  reserved_qty integer [not null, default: 0]
+  available_qty integer [not null, default: 0]
+  freshness_score numeric
+  unit_cost numeric
+  unit_price numeric
+  discount_rate numeric
+  discount_price numeric
+  disposal_candidate boolean
+  inventory_status varchar
+  waste_reason varchar
+  weight_kg numeric
+  sold_out_flag boolean
+
+  Note: '''
+  75,537 rows 확인.
+  updated_at이 없으므로 10분 증분 추출 원본으로 직접 사용하지 않는다.
+  store_id와 product_id는 논리적으로 Master Table과 연결되지만 실제 FK는 없다.
+  '''
+}
+
+Table pricing_ops.ingestion_event {
+  ingestion_event_id bigint [pk, not null]
+  source_system varchar [not null]
+  event_type varchar [not null]
+  source_event_id varchar
+  payload jsonb [not null]
+  processing_status varchar [not null, default: 'RECEIVED']
+  received_at timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  processed_at timestamptz
+  error_message text
+
+  Note: '''
+  Mock ERP 변경 이벤트 원본.
+  확인된 이벤트: source_system=mock-erp, event_type=inventory.UPSERT.
+  증분 추출 Cursor로 ingestion_event_id를 사용한다.
+  '''
+}
+
+Table pricing_ops.price_decision {
+  decision_id bigint [pk, not null]
+  store_id varchar [not null]
+  product_id varchar [not null]
+  inventory_id varchar
+  requested_price numeric [not null]
+  requested_discount_rate numeric [not null, default: 0]
+  model_version varchar
+  simulation_iteration integer
+  expected_sales_qty numeric
+  expected_waste_qty numeric
+  expected_margin numeric
+  decision_status varchar [not null, default: 'PENDING']
+  requested_at timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  decided_at timestamptz
+  decided_by varchar
+  rejection_reason text
+}
+
+Table pricing_ops.price_deployment {
+  deployment_id bigint [pk, not null]
+  decision_id bigint [not null]
+  target_channel varchar [not null]
+  deployed_price numeric [not null]
+  deployment_status varchar [not null, default: 'QUEUED']
+  request_id varchar
+  requested_at timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+  deployed_at timestamptz
+  verified_at timestamptz
+  actual_price numeric
+  retry_count integer [not null, default: 0]
+  error_message text
+}
+
+Table product_price.calendar {
+  calendar_date date [pk, not null]
+  year smallint [not null]
+  month smallint [not null]
+  day smallint [not null]
+  day_of_week varchar [not null]
+  week_of_month smallint
+  day_type varchar
+  is_weekend boolean
+  is_holiday boolean
+  holiday_name varchar
+  season varchar
+  season_index numeric
+  is_event_day boolean
+  event_type varchar
+  event_index numeric
+
+  Note: "365 rows 확인."
+}
+
+Table product_price.hourly_censored_demand {
+  store_id varchar [not null]
+  product_id varchar [not null]
+  demand_date date [not null]
+  hour smallint [not null]
+  censored_demand_flag boolean [not null]
+
+  indexes {
+    (store_id, product_id, demand_date, hour) [pk]
+  }
+
+  Note: "492,404 rows 확인."
+}
+
+Table product_price.product {
+  product_id varchar [pk, not null]
+  product_name varchar [not null]
+  category varchar [not null]
+  subcategory varchar
+  sales_type varchar
+  unit varchar
+  standard_weight_kg numeric
+  shelf_life_days integer
+  base_cost numeric
+  base_price numeric
+  margin_rate numeric
+  max_discount_rate numeric
+  markdown_eligible boolean
+  esl_applicable boolean
+  freshness_decay_type varchar
+  baseline_waste_rate numeric
+  price_source varchar
+  created_at timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+
+  Note: "38 rows 확인."
+}
+
+Table product_price.store {
+  store_id varchar [pk, not null]
+  store_name varchar [not null]
+  area_type varchar [not null]
+  resident_pop integer
+  floating_idx numeric
+  open_hour smallint [not null]
+  close_hour smallint [not null]
+  closure_weekday varchar
+  closure_week_1 smallint
+  closure_week_2 smallint
+  order_error_sigma numeric
+  created_at timestamptz [not null, default: `CURRENT_TIMESTAMP`]
+
+  Note: "S01, S02, S03의 3 rows 확인."
+}
+
+Table product_price.store_calendar {
+  calendar_date date [not null]
+  store_id varchar [not null]
+  is_mandatory_closed boolean
+  is_open boolean
+  open_hour numeric
+  close_hour numeric
+  closure_reason varchar
+
+  indexes {
+    (calendar_date, store_id) [pk]
+  }
+
+  Note: "1,095 rows 확인."
+}
+
+Table product_price.store_visitor_profile {
+  area_type varchar [not null]
+  day_type varchar [not null]
+  close_hour smallint [not null]
+  time_slot varchar [not null]
+  start_hour smallint [not null]
+  end_hour smallint [not null]
+  visitor_ratio numeric [not null]
+  profile_source varchar
+
+  indexes {
+    (area_type, day_type, close_hour, time_slot) [pk]
+  }
+
+  Note: "45 rows 확인."
+}
+
+Table sales.receipt {
+  receipt_id varchar [not null]
+  line_no integer [not null]
+  visitor_id varchar
+  customer_id varchar
+  store_id varchar [not null]
+  sale_date date [not null]
+  sale_time time [not null]
+  sale_datetime timestamp [not null]
+  time_slot varchar
+  inventory_id varchar
+  lot_id varchar
+  product_id varchar [not null]
+  quantity integer [not null]
+  unit_price numeric [not null]
+  discount_rate numeric [not null]
+  sale_unit_price numeric [not null]
+  line_amount numeric [not null]
+  payment_method varchar
+
+  indexes {
+    (receipt_id, line_no) [pk]
+  }
+
+  Note: "115,593 rows 확인."
+}
+
+Table sales.sales_transaction {
+  transaction_id varchar [pk, not null]
+  receipt_id varchar [not null, unique]
+  visitor_id varchar
+  customer_id varchar
+  store_id varchar [not null]
+  transaction_date date [not null]
+  transaction_time time [not null]
+  transaction_datetime timestamp [not null]
+  time_slot varchar
+  item_count integer [not null]
+  total_quantity integer [not null]
+  gross_amount numeric [not null]
+  discount_amount numeric [not null]
+  final_amount numeric [not null]
+  payment_method varchar
+
+  Note: "105,387 rows 확인."
+}
+
+// PostgreSQL에 실제 선언된 Foreign Key
+Ref actual_crm_visitor_customer {
+  crm.visitor.customer_id > crm.customer.customer_id
+}
+
+Ref actual_demand_store {
+  product_price.hourly_censored_demand.store_id > product_price.store.store_id
+}
+
+Ref actual_demand_product {
+  product_price.hourly_censored_demand.product_id > product_price.product.product_id
+}
+
+Ref actual_demand_calendar {
+  product_price.hourly_censored_demand.demand_date > product_price.calendar.calendar_date
+}
+
+Ref actual_store_calendar_store {
+  product_price.store_calendar.store_id > product_price.store.store_id
+}
+
+Ref actual_store_calendar_date {
+  product_price.store_calendar.calendar_date > product_price.calendar.calendar_date
+}
+
+Ref actual_receipt_transaction {
+  sales.receipt.receipt_id > sales.sales_transaction.receipt_id
+}
+
+Ref actual_deployment_decision {
+  pricing_ops.price_deployment.decision_id > pricing_ops.price_decision.decision_id
+}
+
+// DB Constraint는 없지만 업무상 연결되는 논리 관계
+Ref logical_inventory_store {
+  inventory.inventory.store_id > product_price.store.store_id
+}
+
+Ref logical_inventory_product {
+  inventory.inventory.product_id > product_price.product.product_id
+}
+
+Ref logical_receipt_inventory {
+  sales.receipt.inventory_id > inventory.inventory.inventory_id
+}
+
+Ref logical_receipt_store {
+  sales.receipt.store_id > product_price.store.store_id
+}
+
+Ref logical_receipt_product {
+  sales.receipt.product_id > product_price.product.product_id
+}
+
+Ref logical_receipt_customer {
+  sales.receipt.customer_id > crm.customer.customer_id
+}
+
+Ref logical_receipt_visitor {
+  sales.receipt.visitor_id > crm.visitor.visitor_id
+}
+
+Ref logical_transaction_store {
+  sales.sales_transaction.store_id > product_price.store.store_id
+}
+
+Ref logical_transaction_customer {
+  sales.sales_transaction.customer_id > crm.customer.customer_id
+}
+
+Ref logical_transaction_visitor {
+  sales.sales_transaction.visitor_id > crm.visitor.visitor_id
+}
+
+Ref logical_feature_current_store {
+  ai_feature.feature_current.store_id > product_price.store.store_id
+}
+
+Ref logical_feature_current_product {
+  ai_feature.feature_current.product_id > product_price.product.product_id
+}
+
+Ref logical_feature_history_store {
+  ai_feature.feature_history.store_id > product_price.store.store_id
+}
+
+Ref logical_feature_history_product {
+  ai_feature.feature_history.product_id > product_price.product.product_id
+}
+
+Ref logical_model_result_store {
+  ai_feature.model_result.store_id > product_price.store.store_id
+}
+
+Ref logical_model_result_product {
+  ai_feature.model_result.product_id > product_price.product.product_id
+}
+
+Ref logical_model_result_inventory {
+  ai_feature.model_result.inventory_id > inventory.inventory.inventory_id
+}
+
+Ref logical_decision_store {
+  pricing_ops.price_decision.store_id > product_price.store.store_id
+}
+
+Ref logical_decision_product {
+  pricing_ops.price_decision.product_id > product_price.product.product_id
+}
+
+Ref logical_decision_inventory {
+  pricing_ops.price_decision.inventory_id > inventory.inventory.inventory_id
+}
+
