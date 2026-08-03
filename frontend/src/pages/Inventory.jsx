@@ -2,13 +2,14 @@ import { useState, useMemo } from "react";
 import { Search, PackageSearch, ArrowUpDown } from "lucide-react";
 import { Panel, DayTag, Skeleton, ErrorBox, Empty, useAsync } from "../components/ui";
 import DetailModal from "../components/DetailModal";
-import { getInventory } from "../lib/api";
+import { getInventory, policyDep } from "../lib/api";
 import { won, man } from "../lib/format";
 
 const CATS = ["전체", "축산", "수산", "청과", "유제품", "즉석"];
 
-export default function Inventory({ storeId, onToast }) {
-  const { data, loading, error, reload } = useAsync(() => getInventory(storeId), [storeId]);
+export default function Inventory({ storeId, onToast, policy }) {
+  /* 정책이 바뀌면 추천 할인율이 달라지므로 다시 불러옵니다 */
+  const { data, loading, error, reload } = useAsync(() => getInventory(storeId), [storeId, policyDep(policy)]);
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("전체");
   const [sort, setSort] = useState("risk");
@@ -138,6 +139,8 @@ export default function Inventory({ storeId, onToast }) {
         <DetailModal
           item={detail}
           rate={rateOf(detail)}
+          policy={policy}
+          threshold={policy?.two_step_over ?? 30}
           onRate={(v) => setRates({ ...rates, [detail.product_id]: v })}
           onClose={() => setDetail(null)}
           onApprove={() => {

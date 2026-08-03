@@ -19,10 +19,13 @@ export default {
         "fade-up": { "0%": { opacity: 0, transform: "translateY(10px)" }, "100%": { opacity: 1, transform: "translateY(0)" } },
         "slide-in": { "0%": { opacity: 0, transform: "translateY(16px) translateX(-50%)" }, "100%": { opacity: 1, transform: "translateY(0) translateX(-50%)" } },
         shimmer: { "100%": { transform: "translateX(100%)" } },
+        /* AI 재추천 진행 표시용 무한 진행바 */
+        indeterminate: { "0%": { transform: "translateX(-100%)" }, "100%": { transform: "translateX(320%)" } },
       },
       animation: {
         "fade-up": "fade-up .5s ease-out both",
         "slide-in": "slide-in .35s ease-out both",
+        indeterminate: "indeterminate 1.1s ease-in-out infinite",
       },
     },
   },

@@ -39,8 +39,8 @@ export default function PolicySim({ onToast }) {
   const current = useMemo(() => simulatePolicy({ maxDiscount: 40, startDay: 2, autoApprove: 0, stores }), [stores]);
 
   const curve = useMemo(
-    () => Array.from({ length: 13 }, (_, i) => {
-      const rate = 20 + i * 5;
+    () => Array.from({ length: 51 }, (_, i) => {
+      const rate = 20 + i;
       const r = simulatePolicy({ maxDiscount: rate, startDay, autoApprove, stores });
       return { rate, net: Math.round(r.netTotal / 100000000), saved: Math.round(r.savedPerStore / 10000) };
     }),
@@ -61,12 +61,12 @@ export default function PolicySim({ onToast }) {
 
       <div className="grid gap-4 lg:grid-cols-5">
         <Panel className="lg:col-span-2" title="정책 변수">
-          <Slider label="할인율 상한" desc="현행 본사 지침 40%" value={maxDiscount} onChange={setMax}
-                  min={20} max={70} step={5} unit="%" marks={["20%", "40%", "70%"]} />
+          <Slider label="할인율 상한" desc="현행 본사 지침 40% · 1%p 단위" value={maxDiscount} onChange={setMax}
+                  min={20} max={70} step={1} unit="%" marks={["20%", "40%", "70%"]} />
           <Slider label="할인 시작 시점" desc="유통기한 며칠 전부터 할인" value={startDay} onChange={setStart}
                   min={1} max={4} unit="일 전" marks={["1일", "2일", "3일", "4일"]} />
           <Slider label="자동 승인 임계값" desc="이 할인율 이하는 승인 없이 반영 (0 = 사용 안 함)" value={autoApprove} onChange={setAuto}
-                  min={0} max={30} step={5} unit="%" marks={["미사용", "15%", "30%"]} />
+                  min={0} max={30} step={1} unit="%" marks={["미사용", "15%", "30%"]} />
           <Slider label="적용 점포 수" value={stores} onChange={setStores} min={4} max={110} step={1} unit="개점"
                   marks={["4", "30", "110"]} />
           <div className="mt-4 flex gap-2">
