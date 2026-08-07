@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from "react";
 import {
   Tag, AlertTriangle, Wallet, Trash2, Check, Minus, Plus,
   LineChart as LineIcon, Loader2, PartyPopper, CloudRain, Clock, MoonStar, EyeOff, ChevronDown,
-  Timer, Zap, ArrowDownWideNarrow, CalendarOff, ShieldCheck, UserCheck, X,
+  Timer, Zap, ArrowDownWideNarrow, CalendarOff, ShieldCheck, UserCheck, X, Lock,
 } from "lucide-react";
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, Cell,
@@ -10,7 +10,8 @@ import {
 } from "recharts";
 import { Panel, Kpi, DayTag, UrgencyBar, Skeleton, ErrorBox, Empty, Button, useAsync } from "../components/ui";
 import DetailModal from "../components/DetailModal";
-import { getSummary, getRecommendations, approve, getSkipped, APPROVAL_THRESHOLD } from "../lib/api";
+import RepriceFlow from "../components/RepriceFlow";
+import { getSummary, getRecommendations, approve, getSkipped, policyDep, dayCap, pricePath, rateAt, nextStep } from "../lib/api";
 import { won, man, discounted } from "../lib/format";
 
 const tip = { borderRadius: 12, border: "1px solid #cbd5e1", fontSize: 12, boxShadow: "0 4px 14px rgba(0,0,0,.10)", background: "#ffffff", color: "#0f172a" };
@@ -21,9 +22,12 @@ const FILTERS = [
   { key: "유제품", label: "유제품" }, { key: "즉석", label: "즉석" },
 ];
 
-function Row({ item, selected, onToggle, rate, onRate, onOpen }) {
+function Row({ item, selected, onToggle, rate, onRate, onOpen, threshold, cap, onReject, canApprove }) {
   const recRate = Math.round(item.recommended_rate * 100);
   const price = discounted(item.regular_price, rate / 100);
+  /* 담당자는 결재선(threshold) 이하 건만 직접 반려할 수 있습니다.
+     그 이상은 점장 최종 승인 대기열(pendingMgr)에서 점장만 반려합니다. */
+  const managerOnly = rate > threshold && !canApprove;
 
   return (
     <div className={`border-b border-slate-100 px-5 py-4 transition-all last:border-0 ${selected ? "bg-brand-50/60" : "hover:bg-slate-50"}`}>
@@ -50,9 +54,18 @@ function Row({ item, selected, onToggle, rate, onRate, onOpen }) {
             재고 {item.stock_quantity}개 · 원가 {won(item.cost)}원 · 미판매 시 손실{" "}
             <b className="font-semibold text-brand-600">{man(item.expected_loss)}만원</b>
           </p>
-          <button onClick={onOpen} className="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-cjblue-600 hover:text-cjblue-700">
-            <LineIcon size={12} /> AI 추천 근거 · 손익 시뮬레이션
-          </button>
+          <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1">
+            <button onClick={onOpen} className="inline-flex items-center gap-1 text-xs font-semibold text-cjblue-600 hover:text-cjblue-700">
+              <LineIcon size={12} /> AI 추천 근거 · 손익 시뮬레이션
+            </button>
+            <button onClick={onReject} disabled={managerOnly}
+                    title={managerOnly
+                      ? "점장 승인 대상입니다 · 담당자는 결재 요청만 가능하며 반려는 점장이 처리합니다"
+                      : "반려 사유를 남기면 AI가 그 제약을 반영해 새 할인율을 다시 계산합니다"}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-slate-400 transition-colors hover:text-brand-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-slate-400">
+              <X size={12} /> 반려
+            </button>
+          </div>
         </div>
 
         <div className="shrink-0 text-right">
@@ -60,14 +73,26 @@ function Row({ item, selected, onToggle, rate, onRate, onOpen }) {
           <p className="text-lg font-bold tracking-tight">
             {won(price)}<span className="ml-1.5 text-xs font-bold text-brand-600">−{rate}%</span>
           </p>
-          <div className="mt-1.5 inline-flex overflow-hidden rounded-lg border border-slate-200">
+          <div className="mt-1.5 flex items-center justify-end gap-1.5">
             <button onClick={() => onRate(Math.max(0, rate - 1))} disabled={rate <= 0}
-                    className="px-2 py-1 text-slate-500 transition-colors hover:bg-slate-100 disabled:opacity-30"><Minus size={13} /></button>
-            <button onClick={() => onRate(Math.min(40, rate + 1))} disabled={rate >= 40}
-                    className="border-l border-slate-200 px-2 py-1 text-slate-500 transition-colors hover:bg-slate-100 disabled:opacity-30"><Plus size={13} /></button>
+                    className="rounded-lg border border-slate-200 px-1.5 py-1 text-slate-500 transition-colors hover:bg-slate-100 disabled:opacity-30"><Minus size={13} /></button>
+            <input type="range" min="0" max={cap} step="1" value={Math.min(rate, cap)} aria-label="할인율 조정"
+                   onChange={(e) => onRate(+e.target.value)}
+                   className="h-1.5 w-24 cursor-pointer appearance-none rounded-full bg-slate-200 accent-brand-600" />
+            <button onClick={() => onRate(Math.min(cap, rate + 1))} disabled={rate >= cap}
+                    className="rounded-lg border border-slate-200 px-1.5 py-1 text-slate-500 transition-colors hover:bg-slate-100 disabled:opacity-30"><Plus size={13} /></button>
           </div>
-          {rate !== recRate && <p className="mt-1 text-[11px] font-medium text-cjorange-600">추천 {recRate}%에서 조정</p>}
-          {rate > APPROVAL_THRESHOLD && (
+          <p className="mt-1 text-[11px] text-slate-400">
+            0% <span className="mx-1 text-slate-300">·</span> 1%p 단위 <span className="mx-1 text-slate-300">·</span> {cap}% 상한
+          </p>
+          {rate !== recRate && <p className="mt-0.5 text-[11px] font-medium text-cjorange-600">추천 {recRate}%에서 조정</p>}
+          {item.capped_by_policy && (
+            <p className="mt-0.5 flex items-center justify-end gap-1 text-[11px] font-medium text-cjorange-600"
+               title={`정책 상한 ${item.policy_cap}%가 없었다면 모델은 ${Math.round(item.uncapped_rate * 100)}%를 권장합니다`}>
+              <Lock size={10} /> 상한 적용 · 모델 권장 {Math.round(item.uncapped_rate * 100)}%
+            </p>
+          )}
+          {rate > threshold && (
             <p className="mt-1 flex items-center justify-end gap-1 text-[11px] font-semibold text-brand-600">
               <ShieldCheck size={11} /> 점장 승인 필요
             </p>
@@ -78,9 +103,17 @@ function Row({ item, selected, onToggle, rate, onRate, onOpen }) {
   );
 }
 
-export default function Home({ storeId, onToast, approved, onApprove, rates, setRates, onItemsLoaded, role, pendingMgr, onMgrDecision }) {
-  const s = useAsync(() => getSummary(storeId), [storeId]);
-  const r = useAsync(() => getRecommendations(storeId), [storeId]);
+export default function Home({
+  storeId, onToast, approved, onApprove, rates, setRates, onItemsLoaded, role,
+  pendingMgr, onMgrDecision, policy, threshold,
+  /* 반려 이후 흐름 — App이 상태를 소유하고 Home은 화면만 그립니다 */
+  repricing, restaged, closedFlow, onOpenReject, onAcceptRestaged, onFinalizeManual, onDiscard,
+}) {
+  /* 정책이 바뀌면 추천 할인율 자체가 달라지므로 즉시 다시 계산합니다.
+     (이 의존성이 없으면 정책을 저장해도 새로고침 전까지 옛 추천이 남습니다) */
+  const pDep = policyDep(policy);
+  const s = useAsync(() => getSummary(storeId), [storeId, pDep]);
+  const r = useAsync(() => getRecommendations(storeId), [storeId, pDep]);
   const [filter, setFilter] = useState("all");
   const [sel, setSel] = useState(null);
   const [sending, setSending] = useState(false);
@@ -123,17 +156,54 @@ export default function Home({ storeId, onToast, approved, onApprove, rates, set
   const mm = String(clock % 60).padStart(2, "0");
   const closingMode = manualClosing || remain <= 240;
 
-  /* 시간이 갈수록 추천 상향: 마감 3시간 전부터 1시간마다 +5%p */
-  const escalation = Math.min(Math.max(Math.floor((180 - remain) / 60) + 1, 0), 3) * 5;
-  const nextStepIn = remain > 0 ? remain % 60 || 60 : 0;
   const canApprove = !!role?.canPolicy;
-  const closingRate = (i) => Math.min(40, Math.round(i.recommended_rate * 100) + (i.days_until_expiry === 0 ? escalation : 0));
+  /* 상품별 상한 — 정책에서 잔여일별로 정해집니다. 어떤 조작도 이 값을 넘지 못합니다. */
+  const capOf = (i) => i.policy_cap ?? dayCap(i.days_until_expiry, policy);
+
+  /* ── 마감 가격 경로 ──────────────────────────────────────────
+     기존에는 1시간마다 +5%p 계단이었습니다. 추천이 36%인 상품은 한 번에
+     상한(40%)에 붙어버려 이후 2시간이 정지 상태가 됐고, 1%p 단위 원칙과도
+     어긋났습니다. 이제는 인하 시작 시각부터 마감까지 1%p씩 나눠 내려갑니다. */
+  const pathStartMin = (policy?.closing_hour ?? 20) * 60;
+  const earliestMin = CLOSE_MIN - 240;   // 마감 모드 진입 시각보다 일찍은 시작하지 않습니다
+  const pathOf = (i) => pricePath(i, { startMin: pathStartMin, closeMin: CLOSE_MIN, cap: capOf(i), earliestMin });
+  const closingRate = (i) => rateAt(pathOf(i), clock);
+
+  /* 배너용 — 대기 중 D-Day 상품의 다음 인하 시점과 진행 상황 */
+  const pathInfo = useMemo(() => {
+    const targets = (r.data ?? []).filter(
+      (i) => i.days_until_expiry === 0 &&
+        !approved.has(i.product_id) && !pendingMgr.has(i.product_id) &&
+        !repricing?.has(i.product_id) && !restaged?.has(i.product_id) && !closedFlow?.has(i.product_id)
+    );
+    const paths = targets.map((i) => ({ item: i, path: pathOf(i) })).filter((x) => !x.path.flat);
+    if (!paths.length) return null;
+    const nexts = paths.map((x) => nextStep(x.path, clock)).filter(Boolean);
+    const soonest = nexts.length ? Math.min(...nexts.map((s) => s.min)) : null;
+    const lifted = paths.reduce((s, x) => s + (rateAt(x.path, clock) - x.path.r0), 0);
+    return {
+      count: paths.length,
+      avgLift: +(lifted / paths.length).toFixed(1),
+      nextInMin: soonest != null ? Math.max(soonest - clock, 0) : null,
+      started: clock >= pathStartMin,
+      startLabel: `${String(Math.floor(pathStartMin / 60)).padStart(2, "0")}:00`,
+      eslTotal: paths.reduce((s, x) => s + x.path.eslCount, 0),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [r.data, approved, pendingMgr, clock, pathStartMin, policy]);
 
   const all = r.data ?? [];
   useEffect(() => { if (r.data) onItemsLoaded(r.data); }, [r.data]); // eslint-disable-line
-  const pending = all.filter((i) => !approved.has(i.product_id) && !pendingMgr.has(i.product_id));
+  /* 정책이 바뀌면 직접 조정해둔 값이 새 상한을 넘을 수 있으므로 초기화합니다 */
+  useEffect(() => { setRates({}); setSel(null); }, [pDep]); // eslint-disable-line
+  /* 승인·결재대기뿐 아니라 반려 후속 처리(재계산·재검토·종결) 중인 건도 대기열에서 제외합니다 */
+  const inFlow = (id) =>
+    approved.has(id) || pendingMgr.has(id) ||
+    !!repricing?.has(id) || !!restaged?.has(id) || !!closedFlow?.has(id);
+  const pending = all.filter((i) => !inFlow(i.product_id));
   const selected = sel ?? new Set(pending.map((i) => i.product_id));
-  const rateOf = (i) => rates[i.product_id] ?? (closingMode ? closingRate(i) : Math.round(i.recommended_rate * 100));
+  const rateOf = (i) =>
+    Math.min(capOf(i), rates[i.product_id] ?? (closingMode ? closingRate(i) : Math.round(i.recommended_rate * 100)));
   const d = s.data;
   const cal = d?.calendar;
 
@@ -218,9 +288,9 @@ export default function Home({ storeId, onToast, approved, onApprove, rates, set
     if (targets.length === 0) return;
     setSending(true);
     try {
-      const payload = targets.map((i) => ({ product_id: i.product_id, approved_rate: 0.4, recommended_rate: i.recommended_rate }));
+      const payload = targets.map((i) => ({ product_id: i.product_id, approved_rate: capOf(i) / 100, recommended_rate: i.recommended_rate }));
       await approve(storeId, payload);
-      const r = onApprove(targets.map((i) => ({ ...i, rate: 40 })));
+      const r = onApprove(targets.map((i) => ({ ...i, rate: capOf(i) })));
       onToast({
         title: `D-Day ${targets.length}건 상한 적용`,
         desc: r?.escalate ? `40% 할인 ${r.escalate}건은 점장 최종 승인 대기` : "ESL 전송 요청됨",
@@ -244,7 +314,7 @@ export default function Home({ storeId, onToast, approved, onApprove, rates, set
       if (r?.escalate) {
         onToast({
           title: `${r.direct}건 승인 완료 · ${r.escalate}건 점장 결재 요청`,
-          desc: `${APPROVAL_THRESHOLD}% 초과 할인은 점장 최종 승인 후 반영됩니다`,
+          desc: `${threshold}% 초과 할인은 점장 최종 승인 후 반영됩니다`,
         });
       } else {
         onToast({ title: `${r?.direct ?? targets.length}건 승인 완료`, desc: "ESL 전송 요청됨" });
@@ -332,11 +402,27 @@ export default function Home({ storeId, onToast, approved, onApprove, rates, set
             </div>
 
             <div>
-              <p className="text-[11px] text-slate-400">할인 자동 상향</p>
-              <p className="text-sm font-semibold">
-                <span className="text-cjorange-400">+{escalation}%p</span>
-                <span className="ml-1.5 text-[11px] font-normal text-slate-500">다음 상향 {nextStepIn}분 후</span>
-              </p>
+              <p className="text-[11px] text-slate-400">가격 자동 인하 · 1%p 단위</p>
+              {pathInfo ? (
+                pathInfo.started ? (
+                  <p className="text-sm font-semibold">
+                    <span className="text-cjorange-400">평균 +{pathInfo.avgLift}%p</span>
+                    <span className="ml-1.5 text-[11px] font-normal text-slate-500">
+                      {pathInfo.nextInMin != null ? `다음 인하 ${pathInfo.nextInMin}분 후` : "마감가 도달"}
+                      {" · "}{pathInfo.count}개 품목
+                    </span>
+                  </p>
+                ) : (
+                  <p className="text-sm font-semibold">
+                    <span className="text-slate-300">대기</span>
+                    <span className="ml-1.5 text-[11px] font-normal text-slate-500">
+                      {pathInfo.startLabel}부터 {pathInfo.count}개 품목 인하 시작
+                    </span>
+                  </p>
+                )
+              ) : (
+                <p className="text-sm font-semibold text-slate-500">대상 없음</p>
+              )}
             </div>
 
             <div className="hidden md:block">
@@ -470,12 +556,12 @@ export default function Home({ storeId, onToast, approved, onApprove, rates, set
               <ShieldCheck size={15} className="text-brand-600" />
               <p className="text-sm font-bold text-brand-700">점장 최종 승인 대기 {pendingMgr.size}건</p>
               <span className="rounded-md bg-white px-2 py-0.5 text-[11px] font-semibold text-brand-600">
-                {APPROVAL_THRESHOLD}% 초과 할인
+                {threshold}% 초과 할인
               </span>
             </div>
             {canApprove ? (
               <div className="flex gap-2">
-                <button onClick={() => onMgrDecision([...pendingMgr.keys()], false)}
+                <button onClick={() => onOpenReject([...pendingMgr.values()], Math.max(0, ...[...pendingMgr.values()].map((v) => v.round ?? 0)))}
                         className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">
                   전체 반려
                 </button>
@@ -495,11 +581,15 @@ export default function Home({ storeId, onToast, approved, onApprove, rates, set
               <span className="rounded-md bg-brand-50 px-2 py-0.5 text-xs font-bold text-brand-600">−{i.rate}%</span>
               <span className="min-w-0 flex-1 text-xs text-slate-500">
                 {i.requested_by} 요청 · 재고 {i.stock_quantity}개 · 미판매 시 손실 {man(i.expected_loss)}만원
+                {i.round > 0 && (
+                  <b className="ml-1.5 text-cjblue-700">· {i.round}차 재추천안 재상신</b>
+                )}
               </span>
               {canApprove && (
                 <span className="flex gap-1.5">
-                  <button onClick={() => onMgrDecision([i.product_id], false)}
-                          className="rounded-lg border border-slate-200 p-1.5 text-slate-400 hover:bg-slate-50" title="반려">
+                  <button onClick={() => onOpenReject([i], i.round ?? 0)}
+                          className="rounded-lg border border-slate-200 p-1.5 text-slate-400 hover:bg-slate-50"
+                          title="반려 · AI 재추천 요청">
                     <X size={13} />
                   </button>
                   <button onClick={() => { onMgrDecision([i.product_id], true); onToast({ title: "최종 승인", desc: i.product_name }); }}
@@ -513,10 +603,23 @@ export default function Home({ storeId, onToast, approved, onApprove, rates, set
         </div>
       )}
 
+      {/* 반려 후속 처리 — 재계산 · 재검토 · 종결 */}
+      <RepriceFlow
+        repricing={repricing ?? new Map()}
+        restaged={restaged ?? new Map()}
+        closed={closedFlow ?? new Map()}
+        canApprove={canApprove}
+        threshold={threshold}
+        onAccept={onAcceptRestaged}
+        onReReject={(i) => onOpenReject([{ ...i, rate: i.reprice.new_rate }], i.round ?? 0)}
+        onFinalizeManual={onFinalizeManual}
+        onDiscard={onDiscard}
+      />
+
       <div>
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h2 className="flex items-center gap-2 text-base font-bold tracking-tight">
-            AI 할인 추천 · 승인 대기열
+            AI 다이나믹 프라이싱 · 승인 대기열
             {closingMode && (
               <span className="flex items-center gap-1 rounded-md bg-slate-900 px-2 py-0.5 text-[11px] font-semibold text-white">
                 <ArrowDownWideNarrow size={11} /> 마감 우선순위 정렬
@@ -546,6 +649,30 @@ export default function Home({ storeId, onToast, approved, onApprove, rates, set
           </div>
         </div>
 
+        {!loading && pending.length > 0 && (
+          <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-xl bg-slate-50 px-4 py-2.5 text-[11px] text-slate-500">
+            <span>
+              AI 추천 할인율{" "}
+              <b className="text-slate-800">
+                {Math.min(...pending.map((i) => Math.round(i.recommended_rate * 100)))}~
+                {Math.max(...pending.map((i) => Math.round(i.recommended_rate * 100)))}%
+              </b>{" "}
+              <span className="text-slate-400">· 상품별 순이익 최대점을 1%p 단위로 산출</span>
+            </span>
+            <span className="flex items-center gap-1">
+              <ShieldCheck size={11} className="text-brand-500" />
+              {threshold}% 초과 <b className="text-brand-600">{pending.filter((i) => rateOf(i) > threshold).length}건</b> 점장 결재 필요
+            </span>
+            <span className="text-slate-400">나머지 {pending.filter((i) => rateOf(i) <= threshold).length}건은 담당자 승인 즉시 ESL 반영</span>
+            {pending.some((i) => i.capped_by_policy) && (
+              <span className="flex items-center gap-1 font-medium text-cjorange-700">
+                <Lock size={11} />
+                {pending.filter((i) => i.capped_by_policy).length}건은 정책 상한에 걸려 모델 권장보다 낮게 추천됨
+              </span>
+            )}
+          </div>
+        )}
+
         <Panel padded={false}>
           {loading ? (
             <div className="space-y-4 p-5">{[0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full" />)}</div>
@@ -557,9 +684,11 @@ export default function Home({ storeId, onToast, approved, onApprove, rates, set
           ) : (
             shown.map((i) => (
               <Row key={i.product_id} item={i} selected={selected.has(i.product_id)}
-                   onToggle={() => toggle(i.product_id)} rate={rateOf(i)}
-                   onRate={(v) => setRates({ ...rates, [i.product_id]: v })}
-                   onOpen={() => setDetail(i)} />
+                   onToggle={() => toggle(i.product_id)} rate={rateOf(i)} cap={capOf(i)}
+                   onRate={(v) => setRates({ ...rates, [i.product_id]: Math.min(v, capOf(i)) })}
+                   onOpen={() => setDetail(i)} threshold={threshold}
+                   canApprove={canApprove}
+                   onReject={() => onOpenReject([{ ...i, rate: rateOf(i) }], 0)} />
             ))
           )}
         </Panel>
@@ -618,13 +747,18 @@ export default function Home({ storeId, onToast, approved, onApprove, rates, set
       </div>
 
       {detail && (
-        <DetailModal item={detail} rate={rateOf(detail)}
-          onRate={(v) => setRates({ ...rates, [detail.product_id]: v })}
+        <DetailModal item={detail} rate={rateOf(detail)} threshold={threshold} policy={policy}
+          canApprove={canApprove}
+          onRate={(v) => setRates({ ...rates, [detail.product_id]: Math.min(v, capOf(detail)) })}
           onClose={() => setDetail(null)}
           onApprove={() => {
             onApprove([{ ...detail, rate: rateOf(detail) }]);
             setDetail(null);
             onToast({ title: "승인 완료", desc: `${detail.product_name} · ESL 반영 요청됨` });
+          }}
+          onReject={() => {
+            onOpenReject([{ ...detail, rate: rateOf(detail) }], 0);
+            setDetail(null);
           }} />
       )}
     </div>
