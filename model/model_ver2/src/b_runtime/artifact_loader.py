@@ -1,0 +1,109 @@
+"""Load and validate B artifacts without executing the delivered notebooks."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+import json
+from pathlib import Path
+from typing import Any
+
+import numpy as np
+import pandas as pd
+
+from .schemas import DTE_LABELS, POLICY_SHAPE, PRODUCT_COUNT
+
+
+class BArtifactError(RuntimeError):
+    """Raised when a real-B dependency is missing or inconsistent."""
+
+
+@dataclass(frozen=True)
+class BArtifactBundle:
+    artifact_dir: Path
+    data_dir: Path
+    product_ids: tuple[str, ...]
+    dte_labels: tuple[str, ...]
+    arrays: dict[str, np.ndarray]
+    params: dict[str, Any]
+    tables: dict[str, pd.DataFrame]
+    missing_optional_artifacts: tuple[str, ...]
+
+    @property
+    def policy_shape(self) -> tuple[int, int]:
+        return POLICY_SHAPE
+
+    @property
+    def product_index(self) -> dict[str, int]:
+        return {pid: i for i, pid in enumerate(self.product_ids)}
+
+
+def _read_csv(path: Path, parse_dates: tuple[str, ...] = ()) -> pd.DataFrame:
+    if not path.exists():
+        raise BArtifactError(f"Required B source table is missing: {path}")
+    frame = pd.read_csv(path)
+    frame.columns = [str(c).lstrip("\ufeff") for c in frame.columns]
+    for column in parse_dates:
+        if column in frame.columns:
+            frame[column] = pd.to_datetime(frame[column], errors="raise")
+    return frame
+
+
+def load_b_artifacts(artifact_dir: str | Path, data_dir: str | Path) -> BArtifactBundle:
+    artifact_path = Path(artifact_dir).resolve()
+    data_path = Path(data_dir).resolve()
+    params_path = artifact_path / "params_customer_sim.json"
+    arrays_path = artifact_path / "sim_arrays.npz"
+    missing = [str(p) for p in (params_path, arrays_path) if not p.exists()]
+    if missing:
+        raise BArtifactError("Real B initialization failed; missing required artifacts: " + ", ".join(missing))
+
+    raw = np.load(arrays_path, allow_pickle=True)
+    required_arrays = ("PS", "FS", "BSF", "LAM", "NSEG", "PREF_J", "TRIP_BUD", "CAT_IDX", "BASE_PRICE", "BASE_COST", "PID")
+    absent = [key for key in required_arrays if key not in raw.files]
+    if absent:
+        raise BArtifactError(f"sim_arrays.npz is missing keys: {absent}")
+    arrays = {key: np.asarray(raw[key]) for key in required_arrays}
+    product_ids = tuple(str(v) for v in arrays["PID"].tolist())
+    if len(product_ids) != PRODUCT_COUNT:
+        raise BArtifactError(f"B product count must be {PRODUCT_COUNT}; got {len(product_ids)}")
+    if arrays["PREF_J"].shape[1] != PRODUCT_COUNT:
+        raise BArtifactError(f"PREF_J shape is inconsistent: {arrays['PREF_J'].shape}")
+
+    with params_path.open(encoding="utf-8") as handle:
+        saved = json.load(handle)
+    required_params = ("alpha", "c", "beta_disc", "beta_fresh", "beta_bud", "gamma", "visit_scale", "EQ")
+    absent_params = [key for key in required_params if key not in saved]
+    if absent_params:
+        raise BArtifactError(f"params_customer_sim.json is missing keys: {absent_params}")
+    params: dict[str, Any] = dict(saved)
+    params["alpha"] = np.asarray(saved["alpha"], dtype=np.float64)
+
+    tables = {
+        "product": _read_csv(data_path / "product.csv"),
+        "store": _read_csv(data_path / "store.csv"),
+        "calendar": _read_csv(data_path / "calendar.csv", ("date",)),
+        "store_calendar": _read_csv(data_path / "store_calendar.csv", ("date",)),
+        "store_visitor_profile": _read_csv(data_path / "store_visitor_profile.csv"),
+        "inventory": _read_csv(data_path / "inventory.csv", ("current_date", "expiry_date")),
+    }
+    prod_ids = set(tables["product"]["product_id"].astype(str))
+    missing_products = [pid for pid in product_ids if pid not in prod_ids]
+    if missing_products:
+        raise BArtifactError(f"product.csv is missing B products: {missing_products}")
+    aligned = tables["product"].set_index("product_id").loc[list(product_ids)].reset_index()
+    if tuple(aligned["product_id"].astype(str)) != product_ids:
+        raise BArtifactError("Product mapping could not be aligned to B PID order")
+    tables["product_aligned"] = aligned
+
+    optional = (artifact_path / "params_discriminator.json", artifact_path / "surrogate_ridge.pkl")
+    missing_optional = tuple(p.name for p in optional if not p.exists())
+    return BArtifactBundle(
+        artifact_dir=artifact_path,
+        data_dir=data_path,
+        product_ids=product_ids,
+        dte_labels=DTE_LABELS,
+        arrays=arrays,
+        params=params,
+        tables=tables,
+        missing_optional_artifacts=missing_optional,
+    )

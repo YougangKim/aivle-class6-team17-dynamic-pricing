@@ -1,0 +1,43 @@
+{
+  "b_backend": "REAL_B",
+  "policy_shape": [
+    38,
+    4
+  ],
+  "product_count": 38,
+  "dte_labels": [
+    "당일만료",
+    "D-1",
+    "D-2",
+    "D-3 이상"
+  ],
+  "required_artifacts_loaded": [
+    "params_customer_sim.json",
+    "sim_arrays.npz"
+  ],
+  "discriminator_version": "code2-judge-fde746d978e2",
+  "threshold_version": "code2-threshold-a3890aa58479-alpha-0.03",
+  "artifact_source": "B_TEAM_ORIGINAL_CODE2_PACKAGE",
+  "artifact_paths": {
+    "discriminator_source": "C:\\Users\\User\\Desktop\\A_dsicount_optimizer\\external\\b_original\\code2_package\\01_code2_notebook.ipynb",
+    "threshold_source": "C:\\Users\\User\\Desktop\\A_dsicount_optimizer\\external\\b_original\\code2_package\\03_code2_outputs\\policy_comparison.csv",
+    "threshold_audit": "C:\\Users\\User\\Desktop\\A_dsicount_optimizer\\external\\b_original\\code2_package\\03_code2_outputs\\run_summary_nb2.md"
+  },
+  "profit_threshold": 10862169.930707233,
+  "threshold_margin_alpha": 0.03,
+  "threshold_scope": "2025-12-01/2025-12-31; all delivered stores",
+  "warnings": [
+    "ORIGINAL_CODE2_THRESHOLD_SCOPE_IS_2025_12_ALL_STORES; CURRENT_RUNTIME_SIMULATION_SCOPE_IS_CURRENT_STORE_TO_CLOSE",
+    "B_TEAM_FINAL_PARAMS_DISCRIMINATOR_JSON_NOT_DELIVERED; no rebuilt or uncalibrated params file is used"
+  ],
+  "missing_delivery_artifacts": [
+    "params_discriminator.json",
+    "surrogate_ridge.pkl"
+  ],
+  "excluded_non_authoritative_artifacts": [
+    "params_discriminator_rebuilt_uncalibrated.json"
+  ],
+  "runtime_product_alpha_source": "raw category alpha expanded to 38 products",
+  "exact_delivered_code2_calibration_reproducible": false,
+  "reason": "The delivered Code2 judge and threshold output are used. The final calibrated product-alpha params_discriminator.json and Ridge runtime artifact were not delivered; no rebuilt/mock discriminator artifact is used."
+}

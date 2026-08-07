@@ -1,0 +1,22 @@
+{
+  "model_status": "TRAINED",
+  "sample_count": 12,
+  "real_b_sample_count": 12,
+  "test_double_sample_count": 0,
+  "total_train_loss": 0.4207974970340729,
+  "total_validation_loss": 0.03716963157057762,
+  "target_mae": {
+    "expected_demand": 0.638128936290741,
+    "expected_sales_qty": 0.6131458282470703,
+    "expected_revenue": 4258.15625,
+    "expected_profit": 8227.6357421875,
+    "expected_waste_qty": 0.22837543487548828
+  },
+  "target_rmse": {
+    "expected_demand": 1.006424903869629,
+    "expected_sales_qty": 0.9754696488380432,
+    "expected_revenue": 6926.3564453125,
+    "expected_profit": 12249.3017578125,
+    "expected_waste_qty": 0.3669314682483673
+  }
+}
