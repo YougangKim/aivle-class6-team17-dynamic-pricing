@@ -6,7 +6,8 @@
       레드 = 주색(액션·긴급) / 오렌지 = 중간 경고(D-1) / 블루 = AI·예측 영역
    ------------------------------------------------------------------ */
 export const BRAND = {
-  product: "FreshWatch AI",
+  product: "신선",
+  productMeaning: "신선을 선도하다",
   tagline: "신선식품 폐기저감 · AI 다이나믹 프라이싱",
   vendor: "CJ올리브네트웍스",
   vendorRole: "제안사",
