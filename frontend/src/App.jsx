@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import {
   AlertTriangle, Boxes, BarChart3, Bell, LogOut, Menu, X, ChevronDown, Settings, TabletSmartphone,
   Smartphone, History as HistoryIcon, Building2, Leaf, FlaskConical, SlidersHorizontal,
-  Lock, HelpCircle, ArrowRight, Film,
+  Lock, HelpCircle, ArrowRight,
 } from "lucide-react";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
@@ -13,20 +13,22 @@ import Esg from "./pages/Esg";
 import AbTest from "./pages/AbTest";
 import PolicySim from "./pages/PolicySim";
 import Performance from "./pages/Performance";
-import Demo from "./pages/Demo";
 import EslModal from "./components/EslModal";
 import PdaModal from "./components/PdaModal";
 import SettingsModal from "./components/SettingsModal";
+import RejectModal from "./components/RejectModal";
 import { Toast, BrandMark } from "./components/ui";
 import { BRAND } from "./lib/brand";
-import { getNotifications, ROLES, APPROVAL_THRESHOLD } from "./lib/api";
+import {
+  getNotifications, ROLES, loadPolicy,
+  requestReprice, closeRepriceFlow, REJECT_REASONS,
+} from "./lib/api";
 
 const NAV = [
   { key: "home", label: "폐기위험 대응", icon: AlertTriangle, desc: "AI 추천 검토·승인", group: "점포" },
   { key: "inv", label: "재고 모니터링", icon: Boxes, desc: "전체 신선 재고", group: "점포" },
   { key: "hist", label: "승인 이력", icon: HistoryIcon, desc: "가격 변경 기록·조정 패턴", group: "점포" },
   { key: "perf", label: "성과 리포트", icon: BarChart3, desc: "도입 효과", group: "점포" },
-  { key: "demo", label: "시연 스토리보드", icon: Film, desc: "3D 매장 워크스루", group: "점포" },
   { key: "hq", label: "본사 대시보드", icon: Building2, desc: "전 점포 비교·확산 현황", group: "본사" },
   { key: "esg", label: "ESG 리포트", icon: Leaf, desc: "폐기 감축의 탄소 환산", group: "본사" },
   { key: "ab", label: "효과 검증", icon: FlaskConical, desc: "적용·대조 점포 비교 실험", group: "본사" },
@@ -37,6 +39,8 @@ export default function App() {
   const [auth, setAuth] = useState(null);
   const [tab, setTab] = useState("home");
   const [storeId, setStoreId] = useState("S01");
+  /* 할인 정책 — 점포별로 저장/로드됩니다. 승인 로직은 이 값(특히 two_step_over)을 기준으로 동작합니다. */
+  const [policy, setPolicy] = useState(() => loadPolicy("S01"));
   const [openMenu, setOpenMenu] = useState(false);
   const [storeOpen, setStoreOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
@@ -46,7 +50,6 @@ export default function App() {
   const [noticeOpen, setNoticeOpen] = useState(false);
   const [notices, setNotices] = useState([]);
   const [tourStep, setTourStep] = useState(0);
-  const [bannerDismissed, setBannerDismissed] = useState(false);
 
   /* 대한민국 표준시 실시간 표시 */
   const fmtKst = () =>
@@ -54,6 +57,9 @@ export default function App() {
       timeZone: "Asia/Seoul", month: "long", day: "numeric", weekday: "short",
       hour: "2-digit", minute: "2-digit", hour12: false,
     });
+  /* 승인 시각(초 단위) — ESL 카드의 "반영 완료 · HH:MM:SS" 표시용 */
+  const nowHms = () =>
+    new Date().toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour12: false });
   const [nowKst, setNowKst] = useState(fmtKst);
   useEffect(() => {
     const t = setInterval(() => setNowKst(fmtKst()), 1000);
@@ -61,8 +67,6 @@ export default function App() {
   }, []);
 
   useEffect(() => { getNotifications().then(setNotices).catch(() => {}); }, []);
-  /* 탭 이동 시 하단 알림 배너 다시 노출 */
-  useEffect(() => { setBannerDismissed(false); }, [tab]);
   const [toast, setToast] = useState(null);
 
   /* 승인 상태 — 화면 전체가 이 값을 공유합니다 */
@@ -73,13 +77,24 @@ export default function App() {
   /* 2단 결재: 임계값 이하는 담당자 승인으로 확정, 초과는 점장 승인 대기 */
   const [pendingMgr, setPendingMgr] = useState(new Map());
 
+  /* ── 반려 이후의 업무 흐름 ────────────────────────────────────────
+     점장 반려는 프로세스의 끝이 아닙니다. 아래 3개 상태로 이어집니다.
+       repricing  : 반려 사유를 제약으로 넘겨 AI가 새 할인율을 계산 중
+       restaged   : 새 추천안 도착 · 담당자 재검토 대기
+       closedFlow : 재추천 한도 소진 → 수동 지정 / 할인 미적용으로 종결
+     ───────────────────────────────────────────────────────────── */
+  const [repricing, setRepricing] = useState(new Map());
+  const [restaged, setRestaged] = useState(new Map());
+  const [closedFlow, setClosedFlow] = useState(new Map());
+  const [rejectTarget, setRejectTarget] = useState(null);   // { items: [...], round }
+
   const handleApprove = (list) => {
-    const direct = list.filter((i) => i.rate <= APPROVAL_THRESHOLD);
-    const escalate = list.filter((i) => i.rate > APPROVAL_THRESHOLD);
+    const direct = list.filter((i) => i.rate <= policy.two_step_over);
+    const escalate = list.filter((i) => i.rate > policy.two_step_over);
     if (direct.length) {
       setApproved((prev) => {
         const next = new Map(prev);
-        direct.forEach((i) => next.set(i.product_id, { rate: i.rate, name: i.product_name, esl: i.esl_applicable }));
+        direct.forEach((i) => next.set(i.product_id, { rate: i.rate, name: i.product_name, esl: i.esl_applicable, regular_price: i.regular_price, approved_at: nowHms() }));
         return next;
       });
     }
@@ -93,15 +108,17 @@ export default function App() {
     return { direct: direct.length, escalate: escalate.length };
   };
 
+  /* 점장 최종 승인 — 반려는 handleMgrReject(사유 입력 후 재추천)로 분리했습니다 */
   const handleMgrDecision = (ids, ok) => {
+    if (!ok) return;                       // 반려는 RejectModal 경유
     setPendingMgr((prev) => {
       const next = new Map(prev);
       ids.forEach((id) => {
         const item = next.get(id);
-        if (ok && item) {
+        if (item) {
           setApproved((a) => {
             const m = new Map(a);
-            m.set(id, { rate: item.rate, name: item.product_name, esl: item.esl_applicable });
+            m.set(id, { rate: item.rate, name: item.product_name, esl: item.esl_applicable, regular_price: item.regular_price, approved_at: nowHms() });
             return m;
           });
         }
@@ -110,6 +127,13 @@ export default function App() {
       return next;
     });
   };
+
+  const dropFrom = (setter, ids) =>
+    setter((prev) => {
+      const next = new Map(prev);
+      ids.forEach((id) => next.delete(id));
+      return next;
+    });
 
   const fire = (t) => {
     setToast(t);
@@ -122,6 +146,7 @@ export default function App() {
         onLogin={(res) => {
           setAuth(res);
           setStoreId(res.storeId ?? "S01");
+          setPolicy(loadPolicy(res.storeId ?? "S01"));
           let seen = false;
           try { seen = !!localStorage.getItem("fw_tour_seen"); } catch { seen = false; }
           if (!seen) setTimeout(() => setTourStep(1), 400);   // 최초 1회만 자동 안내
@@ -131,20 +156,142 @@ export default function App() {
 
   const changeStore = (id) => {
     setStoreId(id);
+    setPolicy(loadPolicy(id));
     setApproved(new Map());
     setPendingMgr(new Map());
+    setRepricing(new Map());
+    setRestaged(new Map());
+    setClosedFlow(new Map());
+    setRejectTarget(null);
     setRates({});
     setStoreOpen(false);
+  };
+
+  /* ── 반려 분기 ─────────────────────────────────────────────────
+     ① 반려 사유 입력 → ② AI 재계산 → ③ 담당자 재검토 대기열 복귀
+     ④ 새 할인율이 임계값을 넘으면 다시 점장 결재, 넘지 않으면 담당자 확정
+     ⑤ 재추천 한도(2회) 소진 시 수동 지정 / 할인 미적용으로 강제 종결
+     ──────────────────────────────────────────────────────────── */
+  const openReject = (list, round = 0) => setRejectTarget({ items: list, round });
+
+  const runReprice = async ({ code, memo }) => {
+    const list = rejectTarget?.items ?? [];
+    const round = (rejectTarget?.round ?? 0) + 1;
+    setRejectTarget(null);
+    if (!list.length) return;
+    const ids = list.map((i) => i.product_id);
+
+    dropFrom(setPendingMgr, ids);
+    dropFrom(setRestaged, ids);
+    setRepricing((prev) => {
+      const next = new Map(prev);
+      list.forEach((i) => next.set(i.product_id, { ...i, reason_code: code, memo, round }));
+      return next;
+    });
+    fire({
+      title: `${list.length}건 반려 · AI 재계산 시작`,
+      desc: `${REJECT_REASONS.find((r) => r.code === code)?.label ?? "기타"} 제약을 반영해 새 할인율을 계산합니다`,
+    });
+
+    try {
+      const res = await requestReprice(
+        storeId,
+        list.map((i) => ({ item: i, previous_rate: i.rate, reason_code: code, memo, round }))
+      );
+      const byId = new Map(res.map((r) => [r.product_id, r]));
+      setRestaged((prev) => {
+        const next = new Map(prev);
+        list.forEach((i) => {
+          const r = byId.get(i.product_id);
+          if (r) next.set(i.product_id, { ...i, round, reprice: r });
+        });
+        return next;
+      });
+      fire({ title: `${res.length}건 재추천 완료`, desc: "담당자 재검토 대기열로 이동했습니다" });
+    } catch (e) {
+      /* 실패 시 결재 대기 상태로 되돌립니다 — 건이 증발하지 않게 */
+      setPendingMgr((prev) => {
+        const next = new Map(prev);
+        list.forEach((i) => next.set(i.product_id, i));
+        return next;
+      });
+      fire({ tone: "error", title: "재추천 실패", desc: e.message });
+    } finally {
+      dropFrom(setRepricing, ids);
+    }
+  };
+
+  /* 재추천 한도 소진 → 강제 종결 (manual: 점장 수동 지정 · no_discount: 할인 미적용) */
+  const forceClose = async (mode, targets) => {
+    const list = targets ?? rejectTarget?.items ?? [];
+    setRejectTarget(null);
+    if (!list.length) return;
+    const ids = list.map((i) => i.product_id);
+    dropFrom(setPendingMgr, ids);
+    dropFrom(setRestaged, ids);
+    setClosedFlow((prev) => {
+      const next = new Map(prev);
+      list.forEach((i) =>
+        next.set(i.product_id, {
+          ...i, mode,
+          rate: mode === "manual" ? Math.max(0, (i.rate ?? 0) - 5) : 0,
+          cap: i.policy_cap ?? policy.max_discount,
+        })
+      );
+      return next;
+    });
+    try { await closeRepriceFlow(storeId, { mode, product_ids: ids }); } catch { /* 기록 실패해도 화면 상태는 유지 */ }
+    fire(mode === "manual"
+      ? { title: `${list.length}건 수동 가격 지정으로 전환`, desc: "점장이 직접 할인율을 입력해 확정합니다" }
+      : { title: `${list.length}건 할인 미적용 종결`, desc: "정가 유지 · 미판매분 폐기 처리" });
+  };
+
+  /* 담당자 재검토 승인 — 새 할인율이 임계값을 넘으면 다시 점장 결재로 */
+  const acceptRestaged = (id) => {
+    const item = restaged.get(id);
+    if (!item) return;
+    const rate = item.reprice.new_rate;
+    dropFrom(setRestaged, [id]);
+    if (rate > policy.two_step_over) {
+      setPendingMgr((prev) => {
+        const next = new Map(prev);
+        next.set(id, { ...item, rate, round: item.round, requested_by: auth?.user?.name ?? "담당자" });
+        return next;
+      });
+      fire({ title: "점장 재결재 요청", desc: `${item.product_name} · ${rate}% (${policy.two_step_over}% 초과)` });
+    } else {
+      setApproved((prev) => {
+        const next = new Map(prev);
+        next.set(id, { rate, name: item.product_name, esl: item.esl_applicable, regular_price: item.regular_price, approved_at: nowHms() });
+        return next;
+      });
+      fire({ title: "재검토 승인 완료", desc: `${item.product_name} · ${rate}% ESL 반영 요청됨` });
+    }
+  };
+
+  /* 수동 지정 확정 → 승인 상태로 편입(ESL 반영 대상) */
+  const finalizeManual = (id, rate) => {
+    const item = closedFlow.get(id);
+    if (!item) return;
+    dropFrom(setClosedFlow, [id]);
+    setApproved((prev) => {
+      const next = new Map(prev);
+      next.set(id, { rate, name: item.product_name, esl: item.esl_applicable, regular_price: item.regular_price, approved_at: nowHms() });
+      return next;
+    });
+    fire({ title: "수동 가격 확정", desc: `${item.product_name} · ${rate}% ESL 반영 요청됨` });
   };
 
   const role = ROLES[auth.role] ?? ROLES.manager;
   const allowed = (k) => role.scope.includes(k);
   const store = auth.stores.find((s) => s.store_id === storeId) ?? auth.stores[0];
-  const pendingCount = Math.max(items.length - approved.size - pendingMgr.size, 0);
+  /* 대기 배지 — 반려 후속 처리 중인 건도 대기열에서 빠집니다 */
+  const inFlow = new Set([
+    ...approved.keys(), ...pendingMgr.keys(),
+    ...repricing.keys(), ...restaged.keys(), ...closedFlow.keys(),
+  ]);
+  const pendingCount = Math.max(items.length - inFlow.size, 0);
   const current = NAV.find((n) => n.key === tab);
-  /* 전역 하단 알림: 홈(폐기위험 대응) 외 화면에서 폐기위험을 상기 → 홈으로 이동 유도 */
-  const dangerNotice = notices.find((n) => n.type === "danger");
-  const showBanner = tab !== "home" && allowed("home") && dangerNotice && !bannerDismissed;
 
   const NavList = () => (
     <nav className="flex-1 space-y-1 px-3">
@@ -184,7 +331,7 @@ export default function App() {
           <div className="flex items-center gap-2.5">
             <BrandMark size={26} plate />
             <p className="text-lg font-bold tracking-tight text-white">
-              Fresh<span className="text-brand-500">Watch</span>
+              신<span className="text-brand-500">선</span>
             </p>
           </div>
           <p className="mt-1 text-[11px] text-slate-500">{store.name} · 신선1부문</p>
@@ -207,7 +354,7 @@ export default function App() {
           <div className="absolute left-0 top-0 flex h-full w-64 flex-col bg-slate-900 py-6">
             <div className="flex items-center justify-between px-6 pb-4">
               <span className="flex items-center gap-2 text-lg font-bold text-white">
-                <BrandMark size={22} plate />Fresh<span className="text-brand-500">Watch</span>
+                <BrandMark size={22} plate />신<span className="text-brand-500">선</span>
               </span>
               <button onClick={() => setOpenMenu(false)} className="text-slate-400"><X size={20} /></button>
             </div>
@@ -360,16 +507,20 @@ export default function App() {
           {tab === "home" && (
             <Home storeId={storeId} onToast={fire} approved={approved} onApprove={handleApprove}
                   rates={rates} setRates={setRates} onItemsLoaded={setItems}
-                  role={role} pendingMgr={pendingMgr} onMgrDecision={handleMgrDecision} />
+                  role={role} pendingMgr={pendingMgr} onMgrDecision={handleMgrDecision}
+                  repricing={repricing} restaged={restaged} closedFlow={closedFlow}
+                  onOpenReject={openReject} onAcceptRestaged={acceptRestaged}
+                  onFinalizeManual={finalizeManual}
+                  onDiscard={(id) => forceClose("no_discount", [restaged.get(id)].filter(Boolean))}
+                  policy={policy} threshold={policy.two_step_over} />
           )}
           {tab === "hist" && <History storeId={storeId} onToast={fire} />}
           {tab === "hq" && <Hq onPickStore={(id) => { changeStore(id); setTab("home"); }} />}
           {tab === "esg" && <Esg scope="hq" />}
           {tab === "ab" && <AbTest />}
           {tab === "sim" && <PolicySim onToast={fire} />}
-          {tab === "inv" && <Inventory storeId={storeId} onToast={fire} />}
+          {tab === "inv" && <Inventory storeId={storeId} onToast={fire} policy={policy} />}
           {tab === "perf" && <Performance storeId={storeId} approvedCount={approved.size} />}
-          {tab === "demo" && <Demo onGoToReport={() => setTab("perf")} />}
         </main>
 
         <footer className="border-t border-slate-200 px-5 py-4 text-[11px] leading-relaxed text-slate-400 lg:px-8">
@@ -422,30 +573,19 @@ export default function App() {
         </div>
       )}
 
-      {setOpen && <SettingsModal storeId={storeId} onClose={() => setSetOpen(false)} onToast={fire} />}
-      {pdaOpen && (
-        <PdaModal items={items} approvedIds={new Set([...approved.keys(), ...pendingMgr.keys()])} onApprove={handleApprove}
-                  onClose={() => setPdaOpen(false)} onToast={fire} />
+      {setOpen && (
+        <SettingsModal storeId={storeId} policy={policy} onSaved={setPolicy}
+                       onClose={() => setSetOpen(false)} onToast={fire} />
       )}
-      {/* 전역 하단 폐기위험 알림 배너 (어느 화면에서든 표시 → 폐기위험 대응으로 이동) */}
-      {showBanner && (
-        <div className="animate-slide-in fixed bottom-6 left-1/2 z-50 flex w-[92vw] max-w-xl -translate-x-1/2 items-center gap-3 rounded-2xl border border-brand-100 bg-white px-4 py-3 shadow-2xl ring-1 ring-black/5">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50">
-            <AlertTriangle size={20} className="text-brand-600" />
-          </span>
-          <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold text-slate-900">{dangerNotice.title}</p>
-            <p className="truncate text-xs text-slate-500">{dangerNotice.desc}</p>
-          </div>
-          <button onClick={() => { setTab("home"); }}
-                  className="flex shrink-0 items-center gap-1 rounded-xl bg-brand-600 px-4 py-2.5 text-xs font-bold text-white hover:bg-brand-700">
-            대응하기 <ArrowRight size={14} />
-          </button>
-          <button onClick={() => setBannerDismissed(true)} title="닫기"
-                  className="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600">
-            <X size={16} />
-          </button>
-        </div>
+      {pdaOpen && (
+        <PdaModal items={items} approvedIds={inFlow} onApprove={handleApprove}
+                  threshold={policy.two_step_over} onClose={() => setPdaOpen(false)} onToast={fire} />
+      )}
+      {rejectTarget && (
+        <RejectModal targets={rejectTarget.items} round={rejectTarget.round}
+                     onClose={() => setRejectTarget(null)}
+                     onSubmit={runReprice}
+                     onForceClose={(mode) => forceClose(mode)} />
       )}
 
       <Toast show={!!toast} tone={toast?.tone} title={toast?.title} desc={toast?.desc} />

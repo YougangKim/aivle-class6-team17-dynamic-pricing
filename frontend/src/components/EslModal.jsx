@@ -1,6 +1,7 @@
-import { X, Send, CheckCircle2, AlertTriangle, RefreshCw, Printer } from "lucide-react";
+import { X, Send, CheckCircle2, AlertTriangle, RefreshCw, Printer, ArrowRight } from "lucide-react";
 import { Skeleton, Button, useAsync } from "./ui";
 import { getEslStatus } from "../lib/api";
+import { won, discounted } from "../lib/format";
 
 const STATUS = {
   ok: { dot: "bg-emerald-500", label: "반영 완료", cls: "text-emerald-600" },
@@ -15,9 +16,12 @@ export default function EslModal({ storeId, approved, onClose, onToast }) {
     product_name: a.name,
     label_id: a.esl ? `A-${1100 + i}` : "-",
     status: a.esl ? "ok" : "manual",
-    detail: a.esl ? `방금 반영 완료 · ${a.rate}% 할인` : "ESL 미적용 품목 · 수기 라벨 필요",
-    elapsed: "방금",
+    detail: a.esl ? "방금 반영 완료" : "ESL 미적용 품목 · 수기 라벨 필요",
+    elapsed: a.approved_at ?? "방금",
     action: a.esl ? undefined : "print",
+    rate: a.rate,
+    regular_price: a.esl ? a.regular_price : null,
+    new_price: a.esl && a.regular_price ? discounted(a.regular_price, a.rate / 100) : null,
   }));
   const logs = [...extra, ...(data?.logs ?? [])];
   const sent = (data?.sent_today ?? 0) + extra.length;
@@ -57,6 +61,37 @@ export default function EslModal({ storeId, approved, onClose, onToast }) {
               <div className="space-y-3 p-4">{[0, 1, 2].map((i) => <Skeleton key={i} className="h-8 w-full" />)}</div>
             ) : (
               logs.map((l, i) => {
+                if (l.regular_price) {
+                  return (
+                    <div key={i} className="border-b border-slate-100 bg-slate-50/60 p-4 last:border-0">
+                      <div className="flex items-stretch gap-3">
+                        <div className="min-w-0 flex-1 rounded-2xl border border-slate-200 bg-white p-3 opacity-60">
+                          <p className="text-[11px] text-slate-400">변경 전</p>
+                          <p className="mt-1 truncate text-xs text-slate-500">{l.product_name}</p>
+                          <p className="mt-1.5 text-lg font-bold text-slate-700">{won(l.regular_price)}원</p>
+                        </div>
+                        <div className="flex shrink-0 items-center">
+                          <ArrowRight size={18} className="text-slate-300" />
+                        </div>
+                        <div className="min-w-0 flex-1 rounded-2xl border-2 border-brand-200 bg-white p-3">
+                          <div className="flex items-center justify-between gap-2">
+                            <p className="text-[11px] text-slate-400">변경 후</p>
+                            <span className="shrink-0 rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-bold text-brand-600">
+                              -{l.rate}%
+                            </span>
+                          </div>
+                          <p className="mt-1 truncate text-xs text-slate-500">{l.product_name}</p>
+                          <p className="text-xs text-slate-400 line-through">{won(l.regular_price)}원</p>
+                          <p className="text-lg font-bold text-brand-700">{won(l.new_price)}원</p>
+                        </div>
+                      </div>
+                      <div className="mt-2.5 flex items-center justify-center gap-1.5 text-[11px] text-slate-500">
+                        <CheckCircle2 size={12} className="text-emerald-500" />
+                        {l.label_id !== "-" ? `ESL ${l.label_id}` : "ESL"} · 반영 완료 · {l.elapsed}
+                      </div>
+                    </div>
+                  );
+                }
                 const st = STATUS[l.status];
                 return (
                   <div key={i} className="flex flex-wrap items-center gap-3 border-b border-slate-100 px-4 py-3 last:border-0">

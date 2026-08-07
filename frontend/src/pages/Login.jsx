@@ -38,7 +38,8 @@ export default function Login({ onLogin }) {
           <div className="flex items-center gap-3">
             <BrandMark size={34} plate />
             <p className="text-2xl font-bold tracking-tight text-white">
-              Fresh<span className="text-brand-500">Watch</span>
+              신<span className="text-brand-500">선</span>
+              <span className="ml-2 align-middle text-xs font-medium text-slate-400">신선을 선도하다</span>
             </p>
           </div>
           <p className="mt-1.5 text-xs text-slate-500">{BRAND.tagline}</p>
@@ -76,7 +77,7 @@ export default function Login({ onLogin }) {
       <div className="flex flex-1 items-center justify-center bg-white px-6">
         <form onSubmit={submit} className="w-full max-w-sm">
           <p className="flex items-center gap-2 text-2xl font-bold tracking-tight lg:hidden">
-            <BrandMark size={28} />Fresh<span className="text-brand-600">Watch</span>
+            <BrandMark size={28} />신<span className="text-brand-600">선</span>
           </p>
           <h2 className="mt-2 text-xl font-bold tracking-tight lg:mt-0">로그인</h2>
           <p className="mt-1 text-sm text-slate-500">{BRAND.client} 점포 담당자 계정으로 접속해주세요.</p>

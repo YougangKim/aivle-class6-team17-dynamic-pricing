@@ -1,11 +1,10 @@
 import { useState } from "react";
 import { X, ScanLine, Check, ChevronLeft, Wifi, WifiOff, Battery, Signal, CloudUpload, Loader2 } from "lucide-react";
 import { won, man, discounted } from "../lib/format";
-import { APPROVAL_THRESHOLD } from "../lib/api";
 import { BrandMark } from "./ui";
 
 /* 현장 PDA 모드 — 매대에서 상품을 스캔해 즉시 승인하는 화면 */
-export default function PdaModal({ items, approvedIds, onApprove, onClose, onToast }) {
+export default function PdaModal({ items, approvedIds, onApprove, onClose, onToast, threshold }) {
   const [scanning, setScanning] = useState(false);
   const [picked, setPicked] = useState(null);
   const [rate, setRate] = useState(0);
@@ -32,7 +31,7 @@ export default function PdaModal({ items, approvedIds, onApprove, onClose, onToa
     } else {
       const r = onApprove([{ ...picked, rate }]);
       if (r?.escalate) {
-        onToast({ title: "점장 결재 요청됨", desc: `${picked.product_name} · ${rate}% (${APPROVAL_THRESHOLD}% 초과)` });
+        onToast({ title: "점장 결재 요청됨", desc: `${picked.product_name} · ${rate}% (${threshold}% 초과)` });
       } else {
         onToast({ title: "ESL 반영 완료", desc: `${picked.product_name} · ${rate}% 할인` });
       }
@@ -84,7 +83,7 @@ export default function PdaModal({ items, approvedIds, onApprove, onClose, onToa
               ) : (
                 <BrandMark size={18} />
               )}
-              <p className="text-sm font-bold">{picked ? "가격 확인" : "FreshWatch 현장"}</p>
+              <p className="text-sm font-bold">{picked ? "가격 확인" : "신선 현장"}</p>
               {!picked && (
                 <span className="ml-auto rounded-full bg-brand-50 px-2 py-0.5 text-[11px] font-bold text-brand-600">
                   {pending.length}건
@@ -148,7 +147,7 @@ export default function PdaModal({ items, approvedIds, onApprove, onClose, onToa
 
                 <button onClick={approve}
                         className="mt-4 flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 py-4 text-base font-bold text-white shadow-lg active:scale-95">
-                  <Check size={18} strokeWidth={3} /> {rate > APPROVAL_THRESHOLD ? "점장 결재 요청" : "승인 · ESL 반영"}
+                  <Check size={18} strokeWidth={3} /> {rate > threshold ? "점장 결재 요청" : "승인 · ESL 반영"}
                 </button>
               </div>
             ) : (

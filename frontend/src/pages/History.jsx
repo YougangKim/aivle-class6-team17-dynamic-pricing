@@ -36,12 +36,13 @@ export default function History({ storeId, onToast }) {
   }, [rows]);
 
   const exportCsv = () => {
-    const head = ["승인ID", "일시", "담당자", "상품명", "카테고리", "AI추천율", "승인율", "조정폭(%p)", "결과", "판매수량", "재고수량", "매출액"];
+    const head = ["승인ID", "일시", "담당자", "상품명", "카테고리", "AI추천율", "승인율", "조정폭(%p)", "최종결재", "결과", "판매수량", "재고수량", "매출액"];
     const body = filtered.map((r) => [
       r.id, r.date, r.user, r.product_name, r.category,
       `${Math.round(r.recommended_rate * 100)}%`,
       `${Math.round(r.approved_rate * 100)}%`,
       Math.round((r.approved_rate - r.recommended_rate) * 100),
+      !r.approver || r.approver === "-" ? "담당자 승인" : r.approver,
       { sold: "완판", partial: "일부 판매", wasted: "폐기 발생" }[r.result] ?? r.result,
       r.sold_qty, r.stock_quantity, r.revenue,
     ]);
@@ -148,6 +149,7 @@ export default function History({ storeId, onToast }) {
                   <th className="px-3 py-3 font-medium">상품</th>
                   <th className="px-3 py-3 text-center font-medium">AI 추천</th>
                   <th className="px-3 py-3 text-center font-medium">승인</th>
+                  <th className="px-3 py-3 text-center font-medium">결재</th>
                   <th className="px-3 py-3 text-center font-medium">결과</th>
                   <th className="px-5 py-3 text-right font-medium">매출</th>
                 </tr>
@@ -176,6 +178,15 @@ export default function History({ storeId, onToast }) {
                         )}
                       </td>
                       <td className="px-3 py-3 text-center">
+                        {!r.approver || r.approver === "-" ? (
+                          <span className="text-[11px] text-slate-400">담당자 승인</span>
+                        ) : r.approver === "반려" ? (
+                          <span className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500">점장 반려</span>
+                        ) : (
+                          <span className="rounded-md bg-brand-50 px-2 py-0.5 text-[11px] font-semibold text-brand-600">{r.approver}</span>
+                        )}
+                      </td>
+                      <td className="px-3 py-3 text-center">
                         <span className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ${R.cls}`}>
                           <R.icon size={11} /> {R.label}
                         </span>
@@ -191,7 +202,7 @@ export default function History({ storeId, onToast }) {
       </Panel>
 
       <p className="text-xs text-slate-400">
-        가격 변경은 전건 기록되며 담당자·시각·추천값·승인값이 함께 저장됩니다. (감사 추적 · 모델 재학습 데이터)
+        가격 변경은 전건 기록되며 담당자·시각·추천값(1%p 단위)·승인값·결재 단계가 함께 저장됩니다. (감사 추적 · 모델 재학습 데이터)
       </p>
     </div>
   );
