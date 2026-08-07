@@ -1,0 +1,5 @@
+{
+  "status": "INVALID",
+  "model_status": "NOT_TRAINED",
+  "reason": "REAL_B bootstrap produced no threshold-passing final validated policy; no LightGBM labels were created"
+}

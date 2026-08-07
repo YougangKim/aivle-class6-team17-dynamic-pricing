@@ -1,0 +1,38 @@
+{
+  "alpha": [
+    -0.057272153001445024,
+    0.20877079853998684,
+    -0.18869528681422737,
+    0.36264106977002714,
+    -0.3254444284943416
+  ],
+  "c": -5.953155517578125,
+  "beta_fresh": 1.2,
+  "beta_bud": 0.55,
+  "gamma": 3.0,
+  "beta_disc": 0.7,
+  "visit_scale": 1.0,
+  "EQ": 1.3,
+  "seg_keys": [
+    "income_decile",
+    "household_size",
+    "age_group"
+  ],
+  "cats": [
+    "produce",
+    "meat",
+    "dairy",
+    "deli",
+    "cheese"
+  ],
+  "slots": [
+    "morning",
+    "lunch",
+    "afternoon",
+    "evening",
+    "closing"
+  ],
+  "n_segments": 164,
+  "n_products": 38,
+  "note": "alpha/c=캘리브레이션 · beta_disc/beta_fresh/beta_bud/gamma=사전값(민감도 축)"
+}

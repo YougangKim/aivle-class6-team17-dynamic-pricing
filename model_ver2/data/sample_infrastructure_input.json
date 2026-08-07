@@ -1,0 +1,23 @@
+{
+  "request_id": "INFRA_DEMO_S01_20251231T180000",
+  "schema_version": "1.0",
+  "store_id": "S01",
+  "current_time": "2025-12-31T18:00:00+09:00",
+  "current_state": {
+    "source": "PROJECT_DATA_SNAPSHOT_DEMO_ONLY",
+    "cells": []
+  },
+  "options": {
+    "discriminator_mode": "SCOPE_ALIGNED_EXPERIMENTAL",
+    "allow_initial_policy_fallback": true,
+    "max_outer_iterations": 4,
+    "max_b_evaluations": 10,
+    "max_runtime_seconds": 60,
+    "minimum_replay_size": 6,
+    "surrogate_epochs": 2,
+    "surrogate_update_epochs": 1,
+    "seed": 42
+  },
+  "demo_only": true,
+  "notes": "함수 연결 검증용 예시입니다. 운영에서는 current_state.cells를 실제 점포 재고 snapshot으로 채우고 유효한 학습 모델을 사용해야 합니다."
+}
