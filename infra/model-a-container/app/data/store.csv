@@ -1,0 +1,4 @@
+﻿store_id,store_name,area_type,resident_pop,floating_idx,open_hour,close_hour,closure_weekday,closure_week_1,closure_week_2,order_error_sigma
+S01,가상주거형점,residential,25000,0.85,10,23,SUN,2,4,0.12
+S02,가상오피스형점,office,8000,1.4,10,22,WED,2,4,0.15
+S03,가상복합형점,mixed,16000,1.1,10,23,SUN,2,4,0.18

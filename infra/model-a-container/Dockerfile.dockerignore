@@ -1,0 +1,10 @@
+**
+!infra/
+!infra/model-a-container/
+!infra/model-a-container/Dockerfile
+!infra/model-a-container/requirements-container.txt
+!infra/model-a-container/app/
+!infra/model-a-container/app/**
+!data/
+!data/csv/
+!data/csv/inventory.csv

@@ -1,0 +1,63 @@
+name: Build and verify Model A container
+
+on:
+  push:
+    branches:
+      - cloud/infra
+    paths:
+      - "infra/model-a-container/**"
+      - "data/csv/inventory.csv"
+      - ".github/workflows/build-model-a.yml"
+  pull_request:
+    paths:
+      - "infra/model-a-container/**"
+      - "data/csv/inventory.csv"
+      - ".github/workflows/build-model-a.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Build image
+        run: docker build --file infra/model-a-container/Dockerfile --tag model-a:test .
+
+      - name: Verify HTTP endpoints
+        shell: bash
+        run: |
+          docker run --detach --name model-a-test --publish 8080:8080 model-a:test
+          trap 'docker logs model-a-test; docker rm --force model-a-test' EXIT
+
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:8080/ping > /dev/null; then
+              break
+            fi
+            if [[ "${attempt}" -eq 60 ]]; then
+              echo "Model A container did not become ready"
+              exit 1
+            fi
+            sleep 1
+          done
+
+          response="$(
+            curl --fail-with-body --silent \
+              --header 'Content-Type: application/json' \
+              --data @infra/model-a-container/app/data/sample_infrastructure_input.json \
+              http://127.0.0.1:8080/invocations
+          )"
+
+          RESPONSE="${response}" python - <<'PY'
+          import json
+          import os
+
+          result = json.loads(os.environ["RESPONSE"])
+          assert result["policy_shape"] == [38, 4]
+          assert len(result["policy_matrix"]) == 38
+          print(json.dumps({"ping": "PASS", "invocations": "PASS", "policy_shape": result["policy_shape"]}))
+          PY
