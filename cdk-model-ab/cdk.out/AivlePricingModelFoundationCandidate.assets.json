@@ -1,0 +1,21 @@
+{
+  "version": "54.0.0",
+  "files": {
+    "b2a400811492e0fc5e99f58652c965caba2062525a1b6c356a5afd667a9730eb": {
+      "displayName": "AivlePricingModelFoundationCandidate Template",
+      "source": {
+        "path": "AivlePricingModelFoundationCandidate.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "188876037193-ap-northeast-2-1cf43b25": {
+          "bucketName": "cdk-hnb659fds-assets-188876037193-ap-northeast-2",
+          "objectKey": "b2a400811492e0fc5e99f58652c965caba2062525a1b6c356a5afd667a9730eb.json",
+          "region": "ap-northeast-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::188876037193:role/cdk-hnb659fds-file-publishing-role-188876037193-ap-northeast-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}

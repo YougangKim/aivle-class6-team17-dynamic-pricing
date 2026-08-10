@@ -1,0 +1,297 @@
+{
+ "Description": "Candidate foundation for pricing model artifacts and results",
+ "Resources": {
+  "PricingResultDlq7506B8AE": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "MessageRetentionPeriod": 1209600,
+    "QueueName": "aivle-dev-pricing-result-dlq",
+    "SqsManagedSseEnabled": true,
+    "VisibilityTimeout": 180
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AivlePricingModelFoundationCandidate/PricingResultDlq/Resource"
+   }
+  },
+  "PricingResultQueueB3592891": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "MessageRetentionPeriod": 86400,
+    "QueueName": "aivle-dev-pricing-result-queue",
+    "RedrivePolicy": {
+     "deadLetterTargetArn": {
+      "Fn::GetAtt": [
+       "PricingResultDlq7506B8AE",
+       "Arn"
+      ]
+     },
+     "maxReceiveCount": 3
+    },
+    "SqsManagedSseEnabled": true,
+    "VisibilityTimeout": 180
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AivlePricingModelFoundationCandidate/PricingResultQueue/Resource"
+   }
+  },
+  "PricingModelArtifactBucket235DE6B4": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketEncryption": {
+     "ServerSideEncryptionConfiguration": [
+      {
+       "ServerSideEncryptionByDefault": {
+        "SSEAlgorithm": "AES256"
+       }
+      }
+     ]
+    },
+    "LifecycleConfiguration": {
+     "Rules": [
+      {
+       "NoncurrentVersionExpiration": {
+        "NoncurrentDays": 30
+       },
+       "Status": "Enabled"
+      }
+     ]
+    },
+    "PublicAccessBlockConfiguration": {
+     "BlockPublicAcls": true,
+     "BlockPublicPolicy": true,
+     "IgnorePublicAcls": true,
+     "RestrictPublicBuckets": true
+    },
+    "VersioningConfiguration": {
+     "Status": "Enabled"
+    }
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AivlePricingModelFoundationCandidate/PricingModelArtifactBucket/Resource"
+   }
+  },
+  "PricingModelArtifactBucketPolicy797D714E": {
+   "Type": "AWS::S3::BucketPolicy",
+   "Properties": {
+    "Bucket": {
+     "Ref": "PricingModelArtifactBucket235DE6B4"
+    },
+    "PolicyDocument": {
+     "Statement": [
+      {
+       "Action": "s3:*",
+       "Condition": {
+        "Bool": {
+         "aws:SecureTransport": "false"
+        }
+       },
+       "Effect": "Deny",
+       "Principal": {
+        "AWS": "*"
+       },
+       "Resource": [
+        {
+         "Fn::GetAtt": [
+          "PricingModelArtifactBucket235DE6B4",
+          "Arn"
+         ]
+        },
+        {
+         "Fn::Join": [
+          "",
+          [
+           {
+            "Fn::GetAtt": [
+             "PricingModelArtifactBucket235DE6B4",
+             "Arn"
+            ]
+           },
+           "/*"
+          ]
+         ]
+        }
+       ]
+      }
+     ],
+     "Version": "2012-10-17"
+    }
+   },
+   "Metadata": {
+    "aws:cdk:path": "AivlePricingModelFoundationCandidate/PricingModelArtifactBucket/Policy/Resource"
+   }
+  },
+  "ModelARepositoryDFC2308E": {
+   "Type": "AWS::ECR::Repository",
+   "Properties": {
+    "EmptyOnDelete": false,
+    "ImageScanningConfiguration": {
+     "ScanOnPush": true
+    },
+    "LifecyclePolicy": {
+     "LifecyclePolicyText": "{\"rules\":[{\"rulePriority\":1,\"selection\":{\"tagStatus\":\"any\",\"countType\":\"imageCountMoreThan\",\"countNumber\":3},\"action\":{\"type\":\"expire\"}}]}"
+    },
+    "RepositoryName": "aivle-dev-model-a-candidate"
+   },
+   "UpdateReplacePolicy": "Retain",
+   "DeletionPolicy": "Retain",
+   "Metadata": {
+    "aws:cdk:path": "AivlePricingModelFoundationCandidate/ModelARepository/Resource"
+   }
+  },
+  "CDKMetadata": {
+   "Type": "AWS::CDK::Metadata",
+   "Properties": {
+    "Analytics": "v2:deflate64:H4sIAAAAAAAA/0WKUQ7CIBAFz9J/ugo1HkAPoK0HMEjXhFKhsmBjCHc3LSb9mjeTJ0AcG9hXcqZa9aYe9QPSLUhlmJzpnuhNkNqIEdn5adeRGTWQTlEZDEv8r4KrG7X6brl4Zqg8pA4nRzo4vx42y3nxSwxTDJlZ1yMMtPuIA3AOvBpI69pHG/QLoSv8AfsMuYy4AAAA"
+   },
+   "Metadata": {
+    "aws:cdk:path": "AivlePricingModelFoundationCandidate/CDKMetadata/Default"
+   }
+  }
+ },
+ "Outputs": {
+  "PricingResultQueueUrl": {
+   "Value": {
+    "Ref": "PricingResultQueueB3592891"
+   }
+  },
+  "PricingResultQueueArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PricingResultQueueB3592891",
+     "Arn"
+    ]
+   }
+  },
+  "PricingResultDlqUrl": {
+   "Value": {
+    "Ref": "PricingResultDlq7506B8AE"
+   }
+  },
+  "PricingResultDlqArn": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PricingResultDlq7506B8AE",
+     "Arn"
+    ]
+   }
+  },
+  "PricingModelArtifactBucketName": {
+   "Value": {
+    "Ref": "PricingModelArtifactBucket235DE6B4"
+   }
+  },
+  "ModelARepositoryUri": {
+   "Value": {
+    "Fn::Join": [
+     "",
+     [
+      {
+       "Fn::Select": [
+        4,
+        {
+         "Fn::Split": [
+          ":",
+          {
+           "Fn::GetAtt": [
+            "ModelARepositoryDFC2308E",
+            "Arn"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      ".dkr.ecr.",
+      {
+       "Fn::Select": [
+        3,
+        {
+         "Fn::Split": [
+          ":",
+          {
+           "Fn::GetAtt": [
+            "ModelARepositoryDFC2308E",
+            "Arn"
+           ]
+          }
+         ]
+        }
+       ]
+      },
+      ".",
+      {
+       "Ref": "AWS::URLSuffix"
+      },
+      "/",
+      {
+       "Ref": "ModelARepositoryDFC2308E"
+      }
+     ]
+    ]
+   }
+  },
+  "ExportsOutputFnGetAttPricingResultQueueB3592891Arn7BA2B660": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PricingResultQueueB3592891",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "AivlePricingModelFoundationCandidate:ExportsOutputFnGetAttPricingResultQueueB3592891Arn7BA2B660"
+   }
+  },
+  "ExportsOutputFnGetAttPricingModelArtifactBucket235DE6B4Arn80C59554": {
+   "Value": {
+    "Fn::GetAtt": [
+     "PricingModelArtifactBucket235DE6B4",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "AivlePricingModelFoundationCandidate:ExportsOutputFnGetAttPricingModelArtifactBucket235DE6B4Arn80C59554"
+   }
+  },
+  "ExportsOutputRefPricingModelArtifactBucket235DE6B4AE0168A4": {
+   "Value": {
+    "Ref": "PricingModelArtifactBucket235DE6B4"
+   },
+   "Export": {
+    "Name": "AivlePricingModelFoundationCandidate:ExportsOutputRefPricingModelArtifactBucket235DE6B4AE0168A4"
+   }
+  },
+  "ExportsOutputRefPricingResultQueueB3592891CD48A9F6": {
+   "Value": {
+    "Ref": "PricingResultQueueB3592891"
+   },
+   "Export": {
+    "Name": "AivlePricingModelFoundationCandidate:ExportsOutputRefPricingResultQueueB3592891CD48A9F6"
+   }
+  },
+  "ExportsOutputFnGetAttModelARepositoryDFC2308EArn767F5D58": {
+   "Value": {
+    "Fn::GetAtt": [
+     "ModelARepositoryDFC2308E",
+     "Arn"
+    ]
+   },
+   "Export": {
+    "Name": "AivlePricingModelFoundationCandidate:ExportsOutputFnGetAttModelARepositoryDFC2308EArn767F5D58"
+   }
+  },
+  "ExportsOutputRefModelARepositoryDFC2308EBC81A2DC": {
+   "Value": {
+    "Ref": "ModelARepositoryDFC2308E"
+   },
+   "Export": {
+    "Name": "AivlePricingModelFoundationCandidate:ExportsOutputRefModelARepositoryDFC2308EBC81A2DC"
+   }
+  }
+ }
+}

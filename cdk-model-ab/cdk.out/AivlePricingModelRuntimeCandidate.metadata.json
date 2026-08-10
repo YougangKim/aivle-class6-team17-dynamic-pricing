@@ -1,0 +1,250 @@
+{
+  "/AivlePricingModelRuntimeCandidate": [
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelBCodeKey": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelBCodeKey"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:23:27)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelAImageTag": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelAImageTag"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:28:28)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelBCodeVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelBCodeVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:33:31)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelAModel": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelAModel"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:78:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelAEndpointConfig": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelAEndpointConfig"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:87:28)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelAEndpoint": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelAEndpoint"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:96:22)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelBFunctionName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelBFunctionName"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:101:5)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelBFunctionArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelBFunctionArn"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:102:5)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelAEndpointName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelAEndpointName"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:103:5)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelBLogGroup/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelBLogGroup0878B154"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new LogGroup2 in aws-cdk-lib...",
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:40:28)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelBFunction/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelBFunction76563C0C"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:46:28)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelAExecutionRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelAExecutionRole417F0251"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Role2 in aws-cdk-lib...",
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:64:33)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelBFunction/ServiceRole/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelBFunctionServiceRole7B12A964"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Function2 in aws-cdk-lib...",
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:46:28)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:19:1)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelAExecutionRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelAExecutionRoleDefaultPolicy248ACE76"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...WrappedClass.grantPull in aws-cdk-lib...",
+        "new PricingModelRuntimeStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-runtime-stack.ts:67:28)"
+      ]
+    }
+  ],
+  "/AivlePricingModelRuntimeCandidate/ModelBFunction/ServiceRole/DefaultPolicy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelBFunctionServiceRoleDefaultPolicy66F9BE9F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ]
+}

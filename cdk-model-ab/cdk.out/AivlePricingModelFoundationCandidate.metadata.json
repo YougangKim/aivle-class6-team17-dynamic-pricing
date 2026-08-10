@@ -1,0 +1,271 @@
+{
+  "/AivlePricingModelFoundationCandidate": [
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/PricingResultQueueUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PricingResultQueueUrl"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelFoundationStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-foundation-stack.ts:54:5)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/PricingResultQueueArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PricingResultQueueArn"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelFoundationStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-foundation-stack.ts:55:5)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/PricingResultDlqUrl": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PricingResultDlqUrl"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelFoundationStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-foundation-stack.ts:56:5)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/PricingResultDlqArn": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PricingResultDlqArn"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelFoundationStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-foundation-stack.ts:57:5)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/PricingModelArtifactBucketName": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PricingModelArtifactBucketName"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelFoundationStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-foundation-stack.ts:58:5)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/ModelARepositoryUri": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelARepositoryUri"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "new PricingModelFoundationStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-foundation-stack.ts:59:5)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/PricingResultDlq/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PricingResultDlq7506B8AE"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Queue2 in aws-cdk-lib...",
+        "new PricingModelFoundationStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-foundation-stack.ts:15:23)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/PricingResultQueue/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PricingResultQueueB3592891"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Queue2 in aws-cdk-lib...",
+        "new PricingModelFoundationStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-foundation-stack.ts:23:24)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/PricingModelArtifactBucket/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PricingModelArtifactBucket235DE6B4"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Bucket2 in aws-cdk-lib...",
+        "new PricingModelFoundationStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-foundation-stack.ts:35:27)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/ModelARepository/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ModelARepositoryDFC2308E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Repository2 in aws-cdk-lib...",
+        "new PricingModelFoundationStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-foundation-stack.ts:45:29)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:26:2)",
+        "...node internals, tsx..."
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/CDKMetadata/Default": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CDKMetadata"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/Exports/Output{\"Fn::GetAtt\":[\"PricingResultQueueB3592891\",\"Arn\"]}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputFnGetAttPricingResultQueueB3592891Arn7BA2B660"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/Exports/Output{\"Fn::GetAtt\":[\"PricingModelArtifactBucket235DE6B4\",\"Arn\"]}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputFnGetAttPricingModelArtifactBucket235DE6B4Arn80C59554"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/Exports/Output{\"Ref\":\"PricingModelArtifactBucket235DE6B4\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefPricingModelArtifactBucket235DE6B4AE0168A4"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/Exports/Output{\"Ref\":\"PricingResultQueueB3592891\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefPricingResultQueueB3592891CD48A9F6"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/Exports/Output{\"Fn::GetAtt\":[\"ModelARepositoryDFC2308E\",\"Arn\"]}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputFnGetAttModelARepositoryDFC2308EArn767F5D58"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/Exports/Output{\"Ref\":\"ModelARepositoryDFC2308E\"}": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "ExportsOutputRefModelARepositoryDFC2308EBC81A2DC"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/AivlePricingModelFoundationCandidate/PricingModelArtifactBucket/Policy/Resource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "PricingModelArtifactBucketPolicy797D714E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...new Bucket2 in aws-cdk-lib...",
+        "new PricingModelFoundationStack (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\lib\\pricing-model-foundation-stack.ts:35:27)",
+        "<anonymous> (C:\\Users\\youga\\Documents\\Codex\\2026-07-22\\new-chat\\stage9-cdk\\bin\\cdk.ts:13:20)"
+      ]
+    }
+  ]
+}
