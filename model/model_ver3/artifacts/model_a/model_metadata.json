@@ -1,0 +1,12 @@
+{
+  "a_initial_policy_model": "LightGBM",
+  "initial_policy_status": "TRAINED",
+  "initial_policy_source": "LIGHTGBM",
+  "a_surrogate_model": "FullPolicyAttentionNeuralNetwork",
+  "surrogate_status": "TRAINED",
+  "a_optimizer": "Adam",
+  "a_model_version": "full-policy-a-v2",
+  "b_model_version": "delivered-code2-runtime-v1+scope-aligned-operational-v1",
+  "b_backend": "REAL_B_SIMULATION_SCOPE_ALIGNED_THRESHOLD",
+  "discriminator_mode": "SCOPE_ALIGNED_EXPERIMENTAL"
+}

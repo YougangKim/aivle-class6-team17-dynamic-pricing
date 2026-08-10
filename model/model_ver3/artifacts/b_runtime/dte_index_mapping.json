@@ -1,0 +1,21 @@
+{
+  "source": "01_code2_notebook.ipynb DTE_LABEL",
+  "bucket_rule": {
+    "0": "dte<=0",
+    "1": "dte==1",
+    "2": "dte==2",
+    "3": "dte>=3"
+  },
+  "dte_to_index": {
+    "당일만료": 0,
+    "D-1": 1,
+    "D-2": 2,
+    "D-3 이상": 3
+  },
+  "index_to_dte": {
+    "0": "당일만료",
+    "1": "D-1",
+    "2": "D-2",
+    "3": "D-3 이상"
+  }
+}

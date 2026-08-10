@@ -1,0 +1,34 @@
+# Python cache and environments
+__pycache__/
+*.py[cod]
+*.pyd
+.venv/
+venv/
+env/
+
+# IDE and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Runtime and temporary output
+outputs/
+tmpout*.json
+tmp*.json
+*.tmp
+*.log
+*.bak
+*.swp
+.pytest_cache/
+
+# Generated / non-runtime training and replay material
+artifacts/replay_buffer/
+artifacts/model_a/bootstrap_labels/
+artifacts/model_a/LEGACY_*
+artifacts/model_a/*bootstrap_report*.json
+
+# Archives are not source dependencies in this package
+*.zip
+*.tar
+*.tar.gz
