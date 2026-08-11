@@ -11,7 +11,7 @@ import {
 import { Panel, Kpi, DayTag, UrgencyBar, Skeleton, ErrorBox, Empty, Button, useAsync } from "../components/ui";
 import DetailModal from "../components/DetailModal";
 import RepriceFlow from "../components/RepriceFlow";
-import { getSummary, getRecommendations, approve, getSkipped, policyDep, dayCap, pricePath, rateAt, nextStep } from "../lib/api";
+import { getSummary, getRecommendations, approve, getSkipped, policyDep, dayCap, pricePath, rateAt, nextStep, USE_RECOMMENDATIONS_MOCK } from "../lib/api";
 import { won, man, discounted } from "../lib/format";
 
 const tip = { borderRadius: 12, border: "1px solid #cbd5e1", fontSize: 12, boxShadow: "0 4px 14px rgba(0,0,0,.10)", background: "#ffffff", color: "#0f172a" };
@@ -206,9 +206,22 @@ export default function Home({
     Math.min(capOf(i), rates[i.product_id] ?? (closingMode ? closingRate(i) : Math.round(i.recommended_rate * 100)));
   const d = s.data;
   const cal = d?.calendar;
+  // 모델 준비 전에는 기존 추천 데모를 유지하되, RDS 실재고와 혼동하지 않게 표시합니다.
+  const modelReady = d?.model_status !== "NOT_READY" || USE_RECOMMENDATIONS_MOCK;
+  const recommendationDemo = d?.model_status === "NOT_READY" && USE_RECOMMENDATIONS_MOCK;
 
   /* ---- 승인 상태가 반영된 실시간 KPI ---- */
   const kpi = useMemo(() => {
+    if (!modelReady) {
+      const risk = d?.risk_amount ?? 0;
+      return {
+        risk,
+        revenue: 0,
+        residual: risk,
+        byCat: d?.by_category ?? [],
+        baseRisk: risk,
+      };
+    }
     const risk = pending.reduce((sum, i) => sum + i.expected_loss, 0);
     let revenue = 0, residual = 0;
     all.forEach((i) => {
@@ -225,7 +238,7 @@ export default function Home({
       pending.reduce((a, i) => ({ ...a, [i.category]: (a[i.category] || 0) + i.expected_loss }), {})
     ).map(([name, value]) => ({ name, value: +(value / 10000).toFixed(1) })).sort((a, b) => b.value - a.value);
     return { risk, revenue, residual, byCat, baseRisk: all.reduce((s2, i) => s2 + i.expected_loss, 0) };
-  }, [all, approved, pending]);
+  }, [all, approved, pending, modelReady, d]);
 
   /* 손실 흐름(워터폴) — risk = 회수 + 잔여 */
   const waterfall = useMemo(() => {
@@ -476,15 +489,30 @@ export default function Home({
       )}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Kpi loading={loading} index={0} label="승인 대기" value={pending.length} unit="건" icon={Tag}
-             sub={`D-Day ${pending.filter((i) => i.days_until_expiry === 0).length} · D-1 ${pending.filter((i) => i.days_until_expiry === 1).length} · D-2 ${pending.filter((i) => i.days_until_expiry === 2).length}`} />
+        <Kpi loading={loading} index={0} label={modelReady ? "승인 대기" : "위험 재고 상품"}
+             value={modelReady ? pending.length : (d?.pending ?? 0)} unit="건" icon={Tag}
+             sub={modelReady
+               ? `D-Day ${pending.filter((i) => i.days_until_expiry === 0).length} · D-1 ${pending.filter((i) => i.days_until_expiry === 1).length} · D-2 ${pending.filter((i) => i.days_until_expiry === 2).length}`
+               : `RDS 기준 · D-Day ${d?.d_day ?? 0} · D-1 ${d?.d_1 ?? 0} · D-2 ${d?.d_2 ?? 0}`} />
         <Kpi loading={loading} index={1} tone="danger" label="오늘 폐기 위험" value={man(kpi.risk)} unit="만원" icon={AlertTriangle}
              sub={kpi.byCat.length ? `${kpi.byCat[0].name} 최대 · 미조치 기준` : "전량 조치 완료"} />
-        <Kpi loading={loading} index={2} tone="ok" label="예상 매출" value={man(kpi.revenue)} unit="만원" icon={Wallet}
-             sub={approved.size ? `승인 ${approved.size}건에서 발생` : "승인 시 집계됩니다"} />
-        <Kpi loading={loading} index={3} label="예상 폐기손실" value={man(kpi.residual)} unit="만원" icon={Trash2}
-             sub={`미조치 대비 ${kpi.baseRisk ? Math.round((1 - kpi.residual / kpi.baseRisk) * 100) : 0}% 감소`} />
+        <Kpi loading={loading} index={2} tone="ok" label={modelReady ? "예상 매출" : "판매 가능 재고"}
+             value={modelReady ? man(kpi.revenue) : (d?.total_stock_quantity ?? 0)} unit={modelReady ? "만원" : "개"} icon={Wallet}
+             sub={modelReady ? (approved.size ? `승인 ${approved.size}건에서 발생` : "승인 시 집계됩니다") : `RDS 상품 ${d?.product_count ?? 0}종`} />
+        <Kpi loading={loading} index={3} label={modelReady ? "예상 폐기손실" : "AI 추천"}
+             value={modelReady ? man(kpi.residual) : 0} unit={modelReady ? "만원" : "건"} icon={Trash2}
+             sub={modelReady ? `미조치 대비 ${kpi.baseRisk ? Math.round((1 - kpi.residual / kpi.baseRisk) * 100) : 0}% 감소` : "모델 준비 후 제공됩니다"} />
       </div>
+
+      {recommendationDemo && !loading && (
+        <div className="rounded-2xl border border-cjblue-200 bg-cjblue-50 px-5 py-4 text-sm text-cjblue-800">
+          <p className="font-bold">AWS RDS 실재고 연결 · 할인 추천은 기존 데모 유지</p>
+          <p className="mt-1 text-xs leading-relaxed text-cjblue-700">
+            P001~P038 재고 요약은 RDS에서 조회합니다. 아래 할인 추천·예상 매출·승인 흐름은 모델 연결 전까지 기존 Mock 계산을 사용합니다.
+            RDS 최신 스냅샷: {d?.snapshot_date ?? "확인 중"} · 상품 {d?.product_count ?? 0}종 · 판매 가능 재고 {d?.total_stock_quantity ?? 0}개
+          </p>
+        </div>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-5">
         {/* 오늘의 손실 흐름 — KPI 4종과 정확히 연결되는 워터폴 */}
