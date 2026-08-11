@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - "frontend/**"
+      - "cloud/web-api/**"
       - ".github/workflows/deploy-frontend.yml"
 
   workflow_dispatch:
@@ -26,11 +27,12 @@ jobs:
       AWS_REGION: ${{ vars.AWS_REGION }}
       S3_BUCKET: ${{ vars.S3_BUCKET }}
     steps:
-      - name: Checkout only frontend
+      - name: Checkout frontend and WEB API
         uses: actions/checkout@v6
         with:
           sparse-checkout: |
             frontend
+            cloud/web-api
           sparse-checkout-cone-mode: true
           fetch-depth: 1
 
@@ -57,6 +59,12 @@ jobs:
 
       - name: Build frontend
         working-directory: frontend
+        env:
+          VITE_USE_MOCK: "true"
+          VITE_USE_SUMMARY_MOCK: "false"
+          VITE_USE_RECOMMENDATIONS_MOCK: "true"
+          VITE_USE_INVENTORY_MOCK: "false"
+          VITE_API_BASE_URL: "/api"
         run: npm run build
 
       - name: Validate frontend build
@@ -87,6 +95,19 @@ jobs:
           echo "Artifact:"
           ls -lh "${ARTIFACT_NAME}"
 
+      - name: Package WEB API
+        shell: bash
+        run: |
+          WEB_API_ARTIFACT_NAME="web-api-${GITHUB_SHA}.zip"
+
+          cd cloud/web-api
+          zip -qr "${GITHUB_WORKSPACE}/${WEB_API_ARTIFACT_NAME}" . \
+            -x "*/__pycache__/*" "*.pyc" ".venv/*"
+          cd "${GITHUB_WORKSPACE}"
+
+          test -s "${WEB_API_ARTIFACT_NAME}"
+          echo "WEB_API_ARTIFACT_NAME=${WEB_API_ARTIFACT_NAME}" >> "${GITHUB_ENV}"
+
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v6
         with:
@@ -109,6 +130,11 @@ jobs:
             "s3://${S3_BUCKET}/releases/frontend-latest.zip" \
             --region "${AWS_REGION}"
 
+          aws s3 cp \
+            "${WEB_API_ARTIFACT_NAME}" \
+            "s3://${S3_BUCKET}/releases/${WEB_API_ARTIFACT_NAME}" \
+            --region "${AWS_REGION}"
+
   # 2. ASG에서 현재 정상 상태인 EC2를 조회하고 SSM으로 한 번에 배포합니다.
   deploy-asg:
     needs: build-and-upload
@@ -116,6 +142,7 @@ jobs:
     env:
       AWS_REGION: ${{ vars.AWS_REGION }}
       ASG_NAME: ${{ vars.ASG_NAME }}
+      S3_BUCKET: ${{ vars.S3_BUCKET }}
     steps:
       - name: Configure AWS credentials using OIDC
         uses: aws-actions/configure-aws-credentials@v6
@@ -184,11 +211,12 @@ jobs:
           INSTANCE_IDS_TEXT: ${{ steps.instances.outputs.instance_ids }}
         run: |
           ARTIFACT_NAME="frontend-${GITHUB_SHA}.zip"
+          WEB_API_ARTIFACT_NAME="web-api-${GITHUB_SHA}.zip"
           read -r -a INSTANCE_IDS <<< "${INSTANCE_IDS_TEXT}"
 
           PARAMETERS="$(
             jq -n \
-              --arg command "/usr/local/bin/deploy-aivle-web '${ARTIFACT_NAME}'" \
+              --arg command "set -Eeuo pipefail; WORK_DIR=\$(mktemp -d /tmp/aivle-api-deploy.XXXXXX); trap 'rm -rf \"\${WORK_DIR}\"' EXIT; aws s3 cp 's3://${S3_BUCKET}/releases/${WEB_API_ARTIFACT_NAME}' \"\${WORK_DIR}/web-api.zip\" --region '${AWS_REGION}'; unzip -q \"\${WORK_DIR}/web-api.zip\" -d \"\${WORK_DIR}/web-api\"; sudo bash \"\${WORK_DIR}/web-api/deploy.sh\" \"\${WORK_DIR}/web-api\" '${GITHUB_SHA}'; /usr/local/bin/deploy-aivle-web '${ARTIFACT_NAME}'" \
               '{commands: [$command]}'
           )"
 

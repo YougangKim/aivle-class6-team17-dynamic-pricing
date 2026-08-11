@@ -2,8 +2,11 @@
    API 레이어 — 백엔드 완성 전까지 목(mock)으로 동작합니다.
    USE_MOCK 를 false 로 바꾸면 실제 서버를 호출합니다.
    ------------------------------------------------------------------ */
-export const USE_MOCK = true;
-const BASE = "/api";
+export const USE_MOCK = import.meta.env.VITE_USE_MOCK !== "false";
+const USE_SUMMARY_MOCK = import.meta.env.VITE_USE_SUMMARY_MOCK !== "false";
+export const USE_RECOMMENDATIONS_MOCK = import.meta.env.VITE_USE_RECOMMENDATIONS_MOCK !== "false";
+const USE_INVENTORY_MOCK = import.meta.env.VITE_USE_INVENTORY_MOCK !== "false";
+const BASE = import.meta.env.VITE_API_BASE_URL || "/api";
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
 
 const STORES = [
@@ -194,20 +197,20 @@ export async function getStores() {
   return call("/stores");
 }
 export async function getSummary(storeId) {
-  if (USE_MOCK) { await delay(600); return mockSummary(storeId); }
-  return call(`/summary?store_id=${storeId}`);
+  if (USE_SUMMARY_MOCK) { await delay(600); return mockSummary(storeId); }
+  return call(`/summary?store_id=${encodeURIComponent(storeId)}`);
 }
 export async function getRecommendations(storeId) {
-  if (USE_MOCK) { await delay(700); return mockRecs(storeId); }
-  return call(`/recommendations?store_id=${storeId}`);
+  if (USE_RECOMMENDATIONS_MOCK) { await delay(700); return mockRecs(storeId); }
+  return call(`/recommendations?store_id=${encodeURIComponent(storeId)}`);
 }
 export async function getInventory(storeId) {
-  if (USE_MOCK) {
+  if (USE_INVENTORY_MOCK) {
     await delay(600);
     const policy = loadPolicy(storeId);
     return MOCK_INVENTORY_RAW.map((i) => withRecommendation(i, dayCap(i.days_until_expiry, policy), policy.max_discount));
   }
-  return call(`/inventory?store_id=${storeId}`);
+  return call(`/inventory?store_id=${encodeURIComponent(storeId)}`);
 }
 export async function approve(storeId, items) {
   if (USE_MOCK) {
@@ -531,7 +534,7 @@ export function simulatePolicy({ maxDiscount = 40, startDay = 2, autoApprove = 0
 
 /* ---------- AI 미추천 사유 ---------- */
 export async function getSkipped(storeId) {
-  if (USE_MOCK) {
+  if (USE_RECOMMENDATIONS_MOCK) {
     await delay(450);
     return [
       { product_id: "P002", product_name: "한우 채끝 300g", category: "축산", reason: "잔여 3일 · 예상 소진율 92%로 조치 불필요", type: "ok" },
@@ -540,7 +543,7 @@ export async function getSkipped(storeId) {
       { product_id: "P061", product_name: "수입 체리 500g", category: "청과", reason: "행사 진행 중 · 중복 할인 방지 규칙 적용", type: "block" },
     ];
   }
-  return call(`/recommendations/skipped?store_id=${storeId}`);
+  return call(`/recommendations/skipped?store_id=${encodeURIComponent(storeId)}`);
 }
 
 /* ---------- 모델 성능 ---------- */
