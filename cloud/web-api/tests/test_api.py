@@ -62,6 +62,9 @@ class WebApiTests(unittest.TestCase):
             self.assertEqual(inventory[0]["product_id"], "P001")
             self.assertEqual(inventory[0]["current_discount_rate"], 0.2)
             self.assertFalse(inventory[0]["recommendation_available"])
+            self.assertEqual(inventory[0]["category"], "축산")
+            self.assertIsNone(inventory[0]["turnover"])
+            self.assertEqual(inventory[0]["expected_loss"], 8000)
 
             summary = main.summary("S01")
             self.assertEqual(summary["data_source"], "AWS_RDS")
@@ -72,6 +75,14 @@ class WebApiTests(unittest.TestCase):
         with self.assertRaises(HTTPException) as context:
             main.inventory("S04")
         self.assertEqual(context.exception.status_code, 400)
+
+    def test_maps_rds_category_codes(self):
+        row = sample_row()
+        row["category"] = "produce"
+        with patch.object(main, "connect_rds", return_value=FakeConnection([row])):
+            inventory = main.inventory("S01")
+        self.assertEqual(inventory[0]["category"], "청과")
+        self.assertEqual(inventory[0]["category_code"], "produce")
 
 
 if __name__ == "__main__":

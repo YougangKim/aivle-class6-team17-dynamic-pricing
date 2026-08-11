@@ -30,6 +30,16 @@ app.add_middleware(
 
 SUPPORTED_STORES = {"S01", "S02", "S03"}
 
+CATEGORY_LABELS = {
+    "meat": "축산",
+    "seafood": "수산",
+    "fish": "수산",
+    "produce": "청과",
+    "dairy": "유제품",
+    "cheese": "유제품",
+    "deli": "즉석",
+}
+
 INVENTORY_SQL = """
 WITH latest_snapshot AS (
     SELECT MAX(inventory_date) AS inventory_date
@@ -74,6 +84,11 @@ def _normalize_rate(value: Any) -> float:
     return rate / 100.0 if rate > 1 else rate
 
 
+def _category_label(value: Any) -> str:
+    category = str(value or "").strip()
+    return CATEGORY_LABELS.get(category.lower(), category)
+
+
 def load_inventory(store_id: str) -> list[dict[str, Any]]:
     _validate_store(store_id)
     try:
@@ -88,7 +103,8 @@ def load_inventory(store_id: str) -> list[dict[str, Any]]:
         {
             "product_id": str(row["product_id"]),
             "product_name": str(row["product_name"]),
-            "category": str(row["category"]),
+            "category": _category_label(row["category"]),
+            "category_code": str(row["category"]),
             "days_until_expiry": int(row["days_until_expiry"]),
             "stock_quantity": int(row["stock_quantity"]),
             "current_stock_quantity": int(row["current_stock_quantity"]),
@@ -96,6 +112,14 @@ def load_inventory(store_id: str) -> list[dict[str, Any]]:
             "cost": float(row["cost"]),
             "regular_price": float(row["regular_price"]),
             "current_discount_rate": _normalize_rate(row["current_discount_rate"]),
+            # 현재 RDS 스키마에는 판매량 기반 회전율이 없으므로 값을 만들지 않습니다.
+            "turnover": None,
+            "turnover_available": False,
+            "expected_loss": (
+                float(row["stock_quantity"]) * float(row["cost"])
+                if int(row["days_until_expiry"]) <= 2
+                else 0.0
+            ),
             "recommended_rate": 0.0,
             "recommendation_available": False,
             "esl_applicable": bool(row["esl_applicable"]),
