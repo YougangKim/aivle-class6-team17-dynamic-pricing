@@ -7,6 +7,22 @@ import { won, man } from "../lib/format";
 
 const CATS = ["전체", "축산", "수산", "청과", "유제품", "즉석"];
 
+const CATEGORY_LABELS = {
+  meat: "축산",
+  seafood: "수산",
+  fish: "수산",
+  produce: "청과",
+  dairy: "유제품",
+  cheese: "유제품",
+  deli: "즉석",
+};
+
+const categoryLabel = (value) => CATEGORY_LABELS[String(value ?? "").toLowerCase()] ?? value;
+const turnoverValue = (item) => {
+  const value = Number(item.turnover);
+  return item.turnover != null && Number.isFinite(value) ? value : null;
+};
+
 export default function Inventory({ storeId, onToast, policy }) {
   /* 정책이 바뀌면 추천 할인율이 달라지므로 다시 불러옵니다 */
   const { data, loading, error, reload } = useAsync(() => getInventory(storeId), [storeId, policyDep(policy)]);
@@ -16,7 +32,10 @@ export default function Inventory({ storeId, onToast, policy }) {
   const [detail, setDetail] = useState(null);
   const [rates, setRates] = useState({});
 
-  const items = data ?? [];
+  const items = useMemo(
+    () => (data ?? []).map((item) => ({ ...item, category: categoryLabel(item.category) })),
+    [data],
+  );
   const rateOf = (i) => rates[i.product_id] ?? Math.round((i.recommended_rate ?? 0) * 100);
 
   const rows = useMemo(() => {
@@ -27,7 +46,14 @@ export default function Inventory({ storeId, onToast, policy }) {
       risk: (a, b) => b.expected_loss - a.expected_loss,
       expiry: (a, b) => a.days_until_expiry - b.days_until_expiry,
       stock: (a, b) => b.stock_quantity - a.stock_quantity,
-      turnover: (a, b) => a.turnover - b.turnover,
+      turnover: (a, b) => {
+        const av = turnoverValue(a);
+        const bv = turnoverValue(b);
+        if (av == null && bv == null) return 0;
+        if (av == null) return 1;
+        if (bv == null) return -1;
+        return av - bv;
+      },
     }[sort];
     return [...r].sort(by);
   }, [items, cat, q, sort]);
@@ -111,9 +137,13 @@ export default function Inventory({ storeId, onToast, policy }) {
                     <td className="px-3 py-3.5"><DayTag d={Math.min(i.days_until_expiry, 2)} /></td>
                     <td className="px-3 py-3.5 text-right font-medium">{i.stock_quantity}개</td>
                     <td className="px-3 py-3.5 text-right">
-                      <span className={i.turnover < 0.5 ? "font-semibold text-cjorange-600" : "text-slate-600"}>
-                        {Math.round(i.turnover * 100)}%
-                      </span>
+                      {turnoverValue(i) == null ? (
+                        <span className="text-xs text-slate-400" title="RDS에 판매량 기반 회전율 데이터가 없습니다.">정보 없음</span>
+                      ) : (
+                        <span className={turnoverValue(i) < 0.5 ? "font-semibold text-cjorange-600" : "text-slate-600"}>
+                          {Math.round(turnoverValue(i) * 100)}%
+                        </span>
+                      )}
                     </td>
                     <td className="px-3 py-3.5 text-right">
                       {i.expected_loss > 0
