@@ -134,7 +134,7 @@ export default function Inventory({ storeId, onToast, policy }) {
                       </div>
                       <p className="mt-0.5 text-xs text-slate-400">정가 {won(i.regular_price)}원 · 원가 {won(i.cost)}원</p>
                     </td>
-                    <td className="px-3 py-3.5"><DayTag d={Math.min(i.days_until_expiry, 2)} /></td>
+                    <td className="px-3 py-3.5"><DayTag d={i.days_until_expiry} /></td>
                     <td className="px-3 py-3.5 text-right font-medium">{i.stock_quantity}개</td>
                     <td className="px-3 py-3.5 text-right">
                       {turnoverValue(i) == null ? (
