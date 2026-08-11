@@ -47,6 +47,8 @@ def sample_row():
         "current_stock_quantity": 10,
         "reserved_quantity": 2,
         "stock_quantity": 8,
+        "daily_sold_quantity": 4,
+        "daily_waste_quantity": 1,
         "cost": 1000,
         "regular_price": 1500,
         "current_discount_rate": 20,
@@ -63,7 +65,10 @@ class WebApiTests(unittest.TestCase):
             self.assertEqual(inventory[0]["current_discount_rate"], 0.2)
             self.assertFalse(inventory[0]["recommendation_available"])
             self.assertEqual(inventory[0]["category"], "축산")
-            self.assertIsNone(inventory[0]["turnover"])
+            self.assertAlmostEqual(inventory[0]["turnover"], 4 / 15)
+            self.assertTrue(inventory[0]["turnover_available"])
+            self.assertEqual(inventory[0]["daily_sold_quantity"], 4)
+            self.assertEqual(inventory[0]["daily_waste_quantity"], 1)
             self.assertEqual(inventory[0]["expected_loss"], 8000)
 
             summary = main.summary("S01")
@@ -83,6 +88,9 @@ class WebApiTests(unittest.TestCase):
             inventory = main.inventory("S01")
         self.assertEqual(inventory[0]["category"], "청과")
         self.assertEqual(inventory[0]["category_code"], "produce")
+
+    def test_turnover_is_zero_when_no_stock_activity(self):
+        self.assertEqual(main._turnover(0, 0, 0), 0.0)
 
 
 if __name__ == "__main__":

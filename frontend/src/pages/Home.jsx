@@ -208,7 +208,6 @@ export default function Home({
   const cal = d?.calendar;
   // 모델 준비 전에는 기존 추천 데모를 유지하되, RDS 실재고와 혼동하지 않게 표시합니다.
   const modelReady = d?.model_status !== "NOT_READY" || USE_RECOMMENDATIONS_MOCK;
-  const recommendationDemo = d?.model_status === "NOT_READY" && USE_RECOMMENDATIONS_MOCK;
 
   /* ---- 승인 상태가 반영된 실시간 KPI ---- */
   const kpi = useMemo(() => {
@@ -503,16 +502,6 @@ export default function Home({
              value={modelReady ? man(kpi.residual) : 0} unit={modelReady ? "만원" : "건"} icon={Trash2}
              sub={modelReady ? `미조치 대비 ${kpi.baseRisk ? Math.round((1 - kpi.residual / kpi.baseRisk) * 100) : 0}% 감소` : "모델 준비 후 제공됩니다"} />
       </div>
-
-      {recommendationDemo && !loading && (
-        <div className="rounded-2xl border border-cjblue-200 bg-cjblue-50 px-5 py-4 text-sm text-cjblue-800">
-          <p className="font-bold">AWS RDS 실재고 연결 · 할인 추천은 기존 데모 유지</p>
-          <p className="mt-1 text-xs leading-relaxed text-cjblue-700">
-            P001~P038 재고 요약은 RDS에서 조회합니다. 아래 할인 추천·예상 매출·승인 흐름은 모델 연결 전까지 기존 Mock 계산을 사용합니다.
-            RDS 최신 스냅샷: {d?.snapshot_date ?? "확인 중"} · 상품 {d?.product_count ?? 0}종 · 판매 가능 재고 {d?.total_stock_quantity ?? 0}개
-          </p>
-        </div>
-      )}
 
       <div className="grid gap-4 lg:grid-cols-5">
         {/* 오늘의 손실 흐름 — KPI 4종과 정확히 연결되는 워터폴 */}

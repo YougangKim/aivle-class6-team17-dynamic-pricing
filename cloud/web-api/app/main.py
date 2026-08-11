@@ -61,6 +61,8 @@ SELECT
     SUM(i.current_stock_qty) AS current_stock_quantity,
     SUM(i.reserved_qty) AS reserved_quantity,
     SUM(i.available_qty) AS stock_quantity,
+    SUM(COALESCE(i.daily_sold_qty, 0)) AS daily_sold_quantity,
+    SUM(COALESCE(i.daily_waste_qty, 0)) AS daily_waste_quantity,
     MAX(i.unit_cost) AS cost,
     MAX(i.unit_price) AS regular_price,
     MAX(i.discount_rate) AS current_discount_rate,
@@ -89,6 +91,14 @@ def _category_label(value: Any) -> str:
     return CATEGORY_LABELS.get(category.lower(), category)
 
 
+def _turnover(current_stock: Any, daily_sold: Any, daily_waste: Any) -> float:
+    current = float(current_stock or 0)
+    sold = float(daily_sold or 0)
+    waste = float(daily_waste or 0)
+    denominator = current + sold + waste
+    return sold / denominator if denominator > 0 else 0.0
+
+
 def load_inventory(store_id: str) -> list[dict[str, Any]]:
     _validate_store(store_id)
     try:
@@ -109,12 +119,17 @@ def load_inventory(store_id: str) -> list[dict[str, Any]]:
             "stock_quantity": int(row["stock_quantity"]),
             "current_stock_quantity": int(row["current_stock_quantity"]),
             "reserved_quantity": int(row["reserved_quantity"]),
+            "daily_sold_quantity": int(row["daily_sold_quantity"]),
+            "daily_waste_quantity": int(row["daily_waste_quantity"]),
             "cost": float(row["cost"]),
             "regular_price": float(row["regular_price"]),
             "current_discount_rate": _normalize_rate(row["current_discount_rate"]),
-            # 현재 RDS 스키마에는 판매량 기반 회전율이 없으므로 값을 만들지 않습니다.
-            "turnover": None,
-            "turnover_available": False,
+            "turnover": _turnover(
+                row["current_stock_quantity"],
+                row["daily_sold_quantity"],
+                row["daily_waste_quantity"],
+            ),
+            "turnover_available": True,
             "expected_loss": (
                 float(row["stock_quantity"]) * float(row["cost"])
                 if int(row["days_until_expiry"]) <= 2
