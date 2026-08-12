@@ -47,11 +47,23 @@ def _drain_result_queue() -> None:
         sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=message["ReceiptHandle"])
 
 
-def _dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
-    policy = {
-        (row["product_id"], int(row["dte_index"])): float(row["discount_rate"])
-        for row in ((result.get("model_a_output") or {}).get("policy_long") or [])
+def _policy_rates(result: dict[str, Any]) -> dict[tuple[str, int], float]:
+    model_a = result.get("model_a_output") or {}
+    policy_long = model_a.get("policy_long") or []
+    if policy_long:
+        return {
+            (row["product_id"], int(row["dte_index"])): float(row["discount_rate"])
+            for row in policy_long
+        }
+    return {
+        (f"P{product_index + 1:03d}", dte_index): float(rate)
+        for product_index, row in enumerate(model_a.get("policy_matrix") or [])
+        for dte_index, rate in enumerate(row)
     }
+
+
+def _dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
+    policy = _policy_rates(result)
     metrics = ((result.get("model_b_output") or {}).get("selected") or {}).get("product_metrics") or []
     return [
         {
@@ -86,12 +98,12 @@ def recommendations(store_id: str) -> list[dict[str, Any]]:
 def _recommended_items(result: dict[str, Any]) -> list[ApprovalItem]:
     return [
         ApprovalItem(
-            product_id=row["product_id"],
-            dte_index=int(row["dte_index"]),
-            approved_rate=float(row["discount_rate"]),
+            product_id=product_id,
+            dte_index=dte_index,
+            approved_rate=rate,
         )
-        for row in ((result.get("model_a_output") or {}).get("policy_long") or [])
-        if row.get("active_inventory_flag") and float(row.get("discount_rate", 0)) > 0
+        for (product_id, dte_index), rate in _policy_rates(result).items()
+        if rate > 0
     ]
 
 
