@@ -202,7 +202,30 @@ export async function getSummary(storeId) {
 }
 export async function getRecommendations(storeId) {
   if (USE_RECOMMENDATIONS_MOCK) { await delay(700); return mockRecs(storeId); }
-  return call(`/recommendations?store_id=${encodeURIComponent(storeId)}`);
+  const [recommendations, inventory] = await Promise.all([
+    call(`/recommendations?store_id=${encodeURIComponent(storeId)}`),
+    call(`/inventory?store_id=${encodeURIComponent(storeId)}`),
+  ]);
+  const inventoryByProduct = new Map(inventory.map((item) => [item.product_id, item]));
+  const selectedByProduct = new Map();
+  recommendations.forEach((rec) => {
+    const current = selectedByProduct.get(rec.product_id);
+    if (!current || rec.dte_index < current.dte_index) selectedByProduct.set(rec.product_id, rec);
+  });
+  return [...selectedByProduct.values()].map((rec) => {
+    const item = inventoryByProduct.get(rec.product_id) ?? {};
+    return {
+      ...item,
+      ...rec,
+      days_until_expiry: rec.dte_index,
+      stock_quantity: rec.initial_available_qty,
+      expected_loss: rec.expected_waste_loss,
+      sell_probability: rec.sell_through_rate,
+      expected_gain: rec.expected_profit,
+      recommendation_available: true,
+      ai_reason: `예상 판매 ${rec.expected_sales_qty.toFixed(1)}개 · 예상 소진율 ${Math.round(rec.sell_through_rate * 100)}% · 예상 폐기손실 ${Math.round(rec.expected_waste_loss).toLocaleString()}원`,
+    };
+  });
 }
 export async function getInventory(storeId) {
   if (USE_INVENTORY_MOCK) {
@@ -210,14 +233,56 @@ export async function getInventory(storeId) {
     const policy = loadPolicy(storeId);
     return MOCK_INVENTORY_RAW.map((i) => withRecommendation(i, dayCap(i.days_until_expiry, policy), policy.max_discount));
   }
-  return call(`/inventory?store_id=${encodeURIComponent(storeId)}`);
+  const [inventory, recommendations] = await Promise.all([
+    call(`/inventory?store_id=${encodeURIComponent(storeId)}`),
+    call(`/recommendations?store_id=${encodeURIComponent(storeId)}`),
+  ]);
+  const recommendationByProduct = new Map();
+  recommendations.forEach((rec) => {
+    const current = recommendationByProduct.get(rec.product_id);
+    if (!current || rec.dte_index < current.dte_index) recommendationByProduct.set(rec.product_id, rec);
+  });
+  return inventory.map((item) => {
+    const rec = recommendationByProduct.get(item.product_id);
+    return rec ? {
+      ...item,
+      recommended_rate: rec.recommended_rate,
+      recommendation_available: true,
+      expected_loss: rec.expected_waste_loss,
+      sell_probability: rec.sell_through_rate,
+    } : item;
+  });
 }
 export async function approve(storeId, items) {
-  if (USE_MOCK) {
+  if (USE_RECOMMENDATIONS_MOCK) {
     await delay(900);
     return { approved: items.length, esl_sent: Math.max(items.length - 1, 0), esl_failed: items.length ? 1 : 0 };
   }
-  return call("/approve", { method: "POST", body: JSON.stringify({ store_id: storeId, items }) });
+  const byRequest = items.reduce((groups, item) => {
+    const group = groups.get(item.request_id) ?? [];
+    group.push(item);
+    groups.set(item.request_id, group);
+    return groups;
+  }, new Map());
+  const results = [];
+  for (const [requestId, requestItems] of byRequest) {
+    results.push(await call(`/recommendations/${encodeURIComponent(requestId)}/approve`, {
+      method: "POST",
+      body: JSON.stringify({
+        items: requestItems.map((item) => ({
+          product_id: item.product_id,
+          dte_index: item.dte_index,
+          approved_rate: item.approved_rate,
+        })),
+      }),
+    }));
+  }
+  return { approved: results.reduce((sum, result) => sum + result.updated_items, 0), results };
+}
+
+export async function rejectRecommendation(requestId) {
+  if (USE_RECOMMENDATIONS_MOCK) return { request_id: requestId, status: "REJECTED" };
+  return call(`/recommendations/${encodeURIComponent(requestId)}/reject`, { method: "POST" });
 }
 
 /* ==================================================================

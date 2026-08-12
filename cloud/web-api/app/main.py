@@ -11,9 +11,11 @@ from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import connect_rds
+from .recommendations import router as recommendations_router
 
 
 app = FastAPI(title="FreshWatch WEB API", version="1.0.0")
+app.include_router(recommendations_router)
 
 allowed_origins = [
     value.strip()
@@ -201,12 +203,6 @@ def summary(store_id: str = Query(pattern=r"^S\d{2}$")) -> dict[str, Any]:
         },
         "calendar": None,
     }
-
-
-@app.get("/api/recommendations")
-def recommendations(store_id: str = Query(pattern=r"^S\d{2}$")) -> list[Any]:
-    _validate_store(store_id)
-    return []
 
 
 @app.get("/api/recommendations/skipped")

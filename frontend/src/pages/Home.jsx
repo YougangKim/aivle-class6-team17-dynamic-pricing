@@ -300,7 +300,7 @@ export default function Home({
     if (targets.length === 0) return;
     setSending(true);
     try {
-      const payload = targets.map((i) => ({ product_id: i.product_id, approved_rate: capOf(i) / 100, recommended_rate: i.recommended_rate }));
+      const payload = targets.map((i) => ({ request_id: i.request_id, product_id: i.product_id, dte_index: i.dte_index, approved_rate: capOf(i) / 100, recommended_rate: i.recommended_rate }));
       await approve(storeId, payload);
       const r = onApprove(targets.map((i) => ({ ...i, rate: capOf(i) })));
       onToast({
@@ -318,7 +318,7 @@ export default function Home({
     try {
       const targets = pending.filter((i) => selected.has(i.product_id));
       const payload = targets.map((i) => ({
-        product_id: i.product_id, approved_rate: rateOf(i) / 100, recommended_rate: i.recommended_rate,
+        request_id: i.request_id, product_id: i.product_id, dte_index: i.dte_index, approved_rate: rateOf(i) / 100, recommended_rate: i.recommended_rate,
       }));
       await approve(storeId, payload);
       const r = onApprove(targets.map((i) => ({ ...i, rate: rateOf(i) })));
