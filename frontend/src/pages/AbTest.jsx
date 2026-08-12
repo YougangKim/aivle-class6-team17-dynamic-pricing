@@ -70,7 +70,7 @@ export default function AbTest() {
                 <XAxis dataKey="w" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#8b95a5" }} />
                 <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#8b95a5" }} tickFormatter={(v) => `${v}%`} domain={[2, 5.4]} />
                 <Tooltip contentStyle={tip} formatter={(v, n) => [`${v}%`, n === "적용" ? "적용 점포" : "대조 점포"]} />
-                <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} formatter={(v) => (v === "적용" ? "적용 점포 (서울역·양평)" : "대조 점포 (잠실·청량리)")} />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: 12 }} formatter={(v) => (v === "적용" ? "적용 점포 (서울역·양평)" : "대조 점포 (잠실)")} />
                 <Line type="monotone" dataKey="적용" stroke="#E4002B" strokeWidth={2.6} dot={{ r: 2.5 }} activeDot={{ r: 5 }} />
                 <Line type="monotone" dataKey="대조" stroke="#cbd5e1" strokeWidth={2.4} strokeDasharray="5 4" dot={{ r: 2.5 }} />
               </LineChart>

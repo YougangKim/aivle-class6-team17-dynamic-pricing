@@ -89,9 +89,10 @@ export default function App() {
   const [rejectTarget, setRejectTarget] = useState(null);   // { items: [...], round }
   const recommendationRevision = useRef("");
 
-  const handleItemsLoaded = (nextItems) => {
-    const nextRevision = [...new Set(nextItems.map((item) => item.request_id).filter(Boolean))].sort().join("|");
-    if (recommendationRevision.current && nextRevision && recommendationRevision.current !== nextRevision) {
+  const handleItemsLoaded = (nextItems, loadedStoreId) => {
+    const requestIds = [...new Set(nextItems.map((item) => item.request_id).filter(Boolean))].sort().join("|");
+    const nextRevision = `${loadedStoreId}:${requestIds || "EMPTY"}`;
+    if (recommendationRevision.current && recommendationRevision.current !== nextRevision) {
       setApproved(new Map());
       setPendingMgr(new Map());
       setRates({});
@@ -99,7 +100,7 @@ export default function App() {
       setRestaged(new Map());
       setClosedFlow(new Map());
     }
-    if (nextRevision) recommendationRevision.current = nextRevision;
+    recommendationRevision.current = nextRevision;
     setItems(nextItems);
   };
 

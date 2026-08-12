@@ -115,9 +115,12 @@ export default function Home({
   const s = useAsync(() => getSummary(storeId), [storeId, pDep]);
   const r = useAsync(() => getRecommendations(storeId), [storeId, pDep]);
   useEffect(() => {
-    const timer = setInterval(r.reload, 30000);
+    const timer = setInterval(() => {
+      r.reload();
+      s.reload();
+    }, 30000);
     return () => clearInterval(timer);
-  }, [r.reload]);
+  }, [r.reload, s.reload]);
   const [filter, setFilter] = useState("all");
   const [sel, setSel] = useState(null);
   const [sending, setSending] = useState(false);
@@ -196,8 +199,18 @@ export default function Home({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [r.data, approved, pendingMgr, clock, pathStartMin, policy]);
 
-  const all = r.data ?? [];
-  useEffect(() => { if (r.data) onItemsLoaded(r.data); }, [r.data]); // eslint-disable-line
+  const all = r.loading ? [] : (r.data ?? []);
+  const policyRevision = `${storeId}:${[...new Set((r.data ?? []).map((item) => item.request_id).filter(Boolean))].sort().join("|") || "EMPTY"}`;
+  useEffect(() => {
+    if (r.data && !r.loading) onItemsLoaded(r.data, storeId);
+  }, [r.data, r.loading, storeId]); // eslint-disable-line
+  useEffect(() => {
+    setFilter("all");
+    setRates({});
+    setSel(null);
+    setDetail(null);
+    setShowSkipped(false);
+  }, [policyRevision]); // eslint-disable-line
   /* 정책이 바뀌면 직접 조정해둔 값이 새 상한을 넘을 수 있으므로 초기화합니다 */
   useEffect(() => { setRates({}); setSel(null); }, [pDep]); // eslint-disable-line
   /* 승인·결재대기뿐 아니라 반려 후속 처리(재계산·재검토·종결) 중인 건도 대기열에서 제외합니다 */
@@ -663,7 +676,7 @@ export default function Home({
                         className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
                           filter === f.key ? "bg-slate-900 text-white shadow-sm" : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300"
                         }`}>
-                  {f.label} {n}
+                  {f.label} : {n}개
                 </button>
               );
             })}
