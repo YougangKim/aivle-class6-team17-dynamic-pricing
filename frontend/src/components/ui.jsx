@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BRAND } from "../lib/brand";
 
 /* ---------- 브랜드 심볼 ----------
@@ -223,5 +223,6 @@ export function useAsync(fn, deps = []) {
     return () => { alive = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [...deps, tick]);
-  return { ...state, reload: () => setTick((t) => t + 1) };
+  const reload = useCallback(() => setTick((t) => t + 1), []);
+  return { ...state, reload };
 }

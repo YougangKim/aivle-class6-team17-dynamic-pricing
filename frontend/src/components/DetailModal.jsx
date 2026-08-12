@@ -8,6 +8,20 @@ import { profitCurve, getForecast, pricePath, rateAt, DEFAULT_POLICY, ESL_MIN_DE
 import { won, man, discounted } from "../lib/format";
 import { Skeleton, Button, DayTag, useAsync } from "./ui";
 
+const axisWon = (value) => {
+  const amount = Number(value || 0);
+  const absolute = Math.abs(amount);
+  if (absolute >= 10000) return `${Number((amount / 10000).toFixed(absolute < 100000 ? 1 : 0))}만`;
+  if (absolute >= 1000) return `${Number((amount / 1000).toFixed(1))}천`;
+  return `${Number(amount.toFixed(absolute < 10 ? 1 : 0))}원`;
+};
+
+const profitDomain = ([dataMin, dataMax]) => {
+  const span = Math.max(dataMax - dataMin, Math.abs(dataMin) * 0.1, Math.abs(dataMax) * 0.1, 1);
+  const padding = span * 0.12;
+  return [Math.floor(dataMin - padding), Math.ceil(dataMax + padding)];
+};
+
 const hhmm = (m) => `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
 
 const tip = { borderRadius: 12, border: "1px solid #cbd5e1", fontSize: 12, boxShadow: "0 4px 14px rgba(0,0,0,.10)", background: "#ffffff", color: "#0f172a" };
@@ -137,14 +151,14 @@ export default function DetailModal({ item, rate, onRate, onClose, onApprove, on
             </p>
             <div className="h-56 rounded-2xl border border-slate-200 p-3">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={curve} margin={{ top: 10, right: 12, left: -8, bottom: 0 }}
+                <LineChart data={curve} margin={{ top: 10, right: 12, left: 4, bottom: 0 }}
                            onMouseMove={(s) => s?.activePayload && setHover(s.activePayload[0].payload)}
                            onMouseLeave={() => setHover(null)}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" strokeOpacity={0.5} />
                   <XAxis dataKey="rate" tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#8b95a5" }} tickFormatter={(v) => `${v}%`} />
-                  <YAxis tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#8b95a5" }} tickFormatter={(v) => `${Math.round(v / 10000)}만`} />
+                  <YAxis domain={profitDomain} allowDecimals tickLine={false} axisLine={false} tick={{ fontSize: 11, fill: "#8b95a5" }} tickFormatter={axisWon} />
                   <Tooltip contentStyle={tip}
-                           formatter={(v) => [`${man(v)}만원`, "기대 손익"]}
+                           formatter={(v) => [axisWon(v), "기대 손익"]}
                            labelFormatter={(l) => `할인율 ${l}%`} />
                   <ReferenceLine y={0} stroke="#cbd5e1" strokeDasharray="4 4" />
                   {cap < 40 && <ReferenceArea x1={cap} x2={40} fill="#0f172a" fillOpacity={0.06}

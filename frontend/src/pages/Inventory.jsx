@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Search, PackageSearch, ArrowUpDown } from "lucide-react";
 import { Panel, DayTag, Skeleton, ErrorBox, Empty, useAsync } from "../components/ui";
 import DetailModal from "../components/DetailModal";
@@ -31,6 +31,19 @@ export default function Inventory({ storeId, onToast, policy }) {
   const [sort, setSort] = useState("risk");
   const [detail, setDetail] = useState(null);
   const [rates, setRates] = useState({});
+
+  const policyRevision = useMemo(
+    () => [...new Set((data ?? []).map((item) => item.request_id).filter(Boolean))].sort().join("|"),
+    [data],
+  );
+  useEffect(() => {
+    setRates({});
+    setDetail(null);
+  }, [policyRevision]);
+  useEffect(() => {
+    const timer = setInterval(reload, 30000);
+    return () => clearInterval(timer);
+  }, [reload]);
 
   const items = useMemo(
     () => (data ?? []).map((item) => ({ ...item, category: categoryLabel(item.category) })),

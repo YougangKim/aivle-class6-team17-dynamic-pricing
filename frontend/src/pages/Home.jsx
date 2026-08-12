@@ -114,6 +114,10 @@ export default function Home({
   const pDep = policyDep(policy);
   const s = useAsync(() => getSummary(storeId), [storeId, pDep]);
   const r = useAsync(() => getRecommendations(storeId), [storeId, pDep]);
+  useEffect(() => {
+    const timer = setInterval(r.reload, 30000);
+    return () => clearInterval(timer);
+  }, [r.reload]);
   const [filter, setFilter] = useState("all");
   const [sel, setSel] = useState(null);
   const [sending, setSending] = useState(false);
