@@ -18,7 +18,7 @@ export default function Hq({ onPickStore }) {
         <Kpi loading={loading} index={0} label="운영 점포" value={d?.total_stores} unit="개점" icon={Building2} sub="수도권 파일럿" />
         <Kpi loading={loading} index={1} tone="ok" label="누적 절감액" value={d && man(d.total_saved)} unit="만원" icon={Wallet} sub="5개월 누적" />
         <Kpi loading={loading} index={2} label="평균 폐기율" value={d && (d.avg_waste_rate * 100).toFixed(1)} unit="%" icon={TrendingDown} sub="도입 전 4.9%" />
-        <Kpi loading={loading} index={3} label="추천 채택률" value={d && pct(d.adoption_rate)} unit="%" icon={CheckCircle2} sub="4개점 평균" />
+        <Kpi loading={loading} index={3} label="추천 채택률" value={d && pct(d.adoption_rate)} unit="%" icon={CheckCircle2} sub="3개점 평균" />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">

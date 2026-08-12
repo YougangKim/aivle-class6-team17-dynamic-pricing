@@ -33,8 +33,8 @@ export default function Inventory({ storeId, onToast, policy }) {
   const [rates, setRates] = useState({});
 
   const policyRevision = useMemo(
-    () => [...new Set((data ?? []).map((item) => item.request_id).filter(Boolean))].sort().join("|"),
-    [data],
+    () => `${storeId}:${[...new Set((data ?? []).map((item) => item.request_id).filter(Boolean))].sort().join("|") || "EMPTY"}`,
+    [data, storeId],
   );
   useEffect(() => {
     setRates({});
@@ -46,8 +46,8 @@ export default function Inventory({ storeId, onToast, policy }) {
   }, [reload]);
 
   const items = useMemo(
-    () => (data ?? []).map((item) => ({ ...item, category: categoryLabel(item.category) })),
-    [data],
+    () => (loading ? [] : (data ?? [])).map((item) => ({ ...item, category: categoryLabel(item.category) })),
+    [data, loading],
   );
   const rateOf = (i) => rates[i.product_id] ?? Math.round((i.recommended_rate ?? 0) * 100);
 

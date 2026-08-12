@@ -8,12 +8,12 @@ export const USE_RECOMMENDATIONS_MOCK = import.meta.env.VITE_USE_RECOMMENDATIONS
 const USE_INVENTORY_MOCK = import.meta.env.VITE_USE_INVENTORY_MOCK !== "false";
 const BASE = import.meta.env.VITE_API_BASE_URL || "/api";
 const delay = (ms) => new Promise((r) => setTimeout(r, ms));
+const ACTIVE_STORE_IDS = new Set(["S01", "S02", "S03"]);
 
 const STORES = [
   { store_id: "S01", name: "롯데마트 서울역점", area_type: "complex" },
   { store_id: "S02", name: "롯데마트 양평점", area_type: "residence" },
   { store_id: "S03", name: "롯데마트 잠실점", area_type: "office" },
-  { store_id: "S04", name: "롯데마트 청량리점", area_type: "residence" },
 ];
 
 /* 원천 사실만 보관합니다 — 추천 할인율·판매확률·손익은 프라이싱 엔진이 계산합니다.
@@ -31,7 +31,7 @@ const BASE_RECS = [
   { product_id: "P022", product_name: "모둠 쌈채소",       category: "청과",   days_until_expiry: 1, stock_quantity: 11, cost: 2200,  regular_price: 3500,  turnover: 0.70, esl_applicable: true },
 ];
 
-const STORE_FACTOR = { S01: 1, S02: 0.86, S03: 0.78, S04: 0.92 };
+const STORE_FACTOR = { S01: 1, S02: 0.86, S03: 0.78 };
 
 /* 잔여일별 할인 상한 — 정책 설정 화면에서 바꾸면 추천값이 실제로 달라집니다 */
 export function dayCap(days, policy) {
@@ -178,7 +178,11 @@ const MOCK_KPI = {
 };
 
 async function call(path, options) {
-  const res = await fetch(BASE + path, { headers: { "Content-Type": "application/json" }, ...options });
+  const res = await fetch(BASE + path, {
+    cache: "no-store",
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
+    ...options,
+  });
   if (!res.ok) throw new Error(`API ${res.status}`);
   return res.json();
 }
@@ -196,11 +200,13 @@ export async function login(id, pw, storeId) {
     if (pw.length < 4) throw new Error("비밀번호가 올바르지 않습니다.");
     return { user: { id, name: "임종욱", role: "신선1부문 관리자" }, stores: STORES, storeId: storeId ?? "S01" };
   }
-  return call("/login", { method: "POST", body: JSON.stringify({ id, pw, store_id: storeId }) });
+  const result = await call("/login", { method: "POST", body: JSON.stringify({ id, pw, store_id: storeId }) });
+  const stores = (result.stores ?? []).filter((store) => ACTIVE_STORE_IDS.has(store.store_id));
+  return { ...result, stores, storeId: ACTIVE_STORE_IDS.has(result.storeId) ? result.storeId : "S01" };
 }
 export async function getStores() {
   if (USE_MOCK) { await delay(150); return STORES; }
-  return call("/stores");
+  return (await call("/stores")).filter((store) => ACTIVE_STORE_IDS.has(store.store_id));
 }
 export async function getSummary(storeId) {
   if (USE_SUMMARY_MOCK) { await delay(600); return mockSummary(storeId); }
@@ -208,9 +214,10 @@ export async function getSummary(storeId) {
 }
 export async function getRecommendations(storeId) {
   if (USE_RECOMMENDATIONS_MOCK) { await delay(700); return mockRecs(storeId); }
+  const revision = Date.now();
   const [rawRecommendations, inventory] = await Promise.all([
-    call(`/recommendations?store_id=${encodeURIComponent(storeId)}`),
-    call(`/inventory?store_id=${encodeURIComponent(storeId)}`),
+    call(`/recommendations?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
+    call(`/inventory?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
   ]);
   const recommendations = latestPolicyRows(rawRecommendations);
   const inventoryByProduct = new Map(inventory.map((item) => [item.product_id, item]));
@@ -240,9 +247,10 @@ export async function getInventory(storeId) {
     const policy = loadPolicy(storeId);
     return MOCK_INVENTORY_RAW.map((i) => withRecommendation(i, dayCap(i.days_until_expiry, policy), policy.max_discount));
   }
+  const revision = Date.now();
   const [inventory, rawRecommendations] = await Promise.all([
-    call(`/inventory?store_id=${encodeURIComponent(storeId)}`),
-    call(`/recommendations?store_id=${encodeURIComponent(storeId)}`),
+    call(`/inventory?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
+    call(`/recommendations?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
   ]);
   const recommendations = latestPolicyRows(rawRecommendations);
   const recommendationByProduct = new Map();
@@ -429,15 +437,14 @@ export async function getHistory(storeId) {
 
 /* ---------- 본사 뷰 ---------- */
 const MOCK_HQ = {
-  total_saved: 41200000, total_stores: 4, avg_waste_rate: 0.034, adoption_rate: 0.89,
+  total_saved: 32300000, total_stores: 3, avg_waste_rate: 0.034, adoption_rate: 0.89,
   stores: [
     { store_id: "S01", name: "롯데마트 서울역점", area: "복합", waste_rate: 0.031, saved: 12400000, approval_rate: 0.91, pending: 10, trend: -1.8 },
     { store_id: "S02", name: "롯데마트 양평점", area: "주거", waste_rate: 0.029, saved: 10800000, approval_rate: 0.94, pending: 9, trend: -2.1 },
     { store_id: "S03", name: "롯데마트 잠실점", area: "오피스", waste_rate: 0.042, saved: 9100000, approval_rate: 0.82, pending: 8, trend: -0.9 },
-    { store_id: "S04", name: "롯데마트 청량리점", area: "주거", waste_rate: 0.035, saved: 8900000, approval_rate: 0.88, pending: 9, trend: -1.4 },
   ],
   rollout: [
-    { phase: "파일럿", stores: 4, status: "done", desc: "수도권 4개점 · 3개월" },
+    { phase: "파일럿", stores: 3, status: "done", desc: "수도권 3개점 · 3개월" },
     { phase: "확산 1차", stores: 30, status: "current", desc: "수도권 전 점포" },
     { phase: "확산 2차", stores: 110, status: "planned", desc: "전국 롯데마트" },
   ],
@@ -563,9 +570,9 @@ export async function getEsg(scope = "store") {
 /* ---------- 효과 검증 (A/B) ---------- */
 const MOCK_AB = {
   period: "2026-05-01 ~ 2026-07-20 (12주)",
-  design: "수도권 4개점 중 2개점 적용(처치군) · 2개점 미적용(대조군) · 상권·매출규모 매칭",
+  design: "수도권 3개점 중 2개점 적용(처치군) · 1개점 미적용(대조군) · 상권·매출규모 매칭",
   treatment: { stores: ["서울역점", "양평점"], waste_rate: 0.030, margin_rate: 0.121, conversion: 0.68 },
-  control: { stores: ["잠실점", "청량리점"], waste_rate: 0.047, margin_rate: 0.118, conversion: 0.44 },
+  control: { stores: ["잠실점"], waste_rate: 0.047, margin_rate: 0.118, conversion: 0.44 },
   weekly: [
     { w: "1주", 적용: 4.6, 대조: 4.8 }, { w: "2주", 적용: 4.3, 대조: 4.9 },
     { w: "3주", 적용: 4.0, 대조: 4.7 }, { w: "4주", 적용: 3.8, 대조: 4.8 },
