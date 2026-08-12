@@ -83,6 +83,7 @@ WorkingDirectory=/opt/aivle/web-api/current
 Environment=AWS_REGION=ap-northeast-2
 Environment=DB_SECRET_ARN=aivle-rds-service-secret
 Environment=DB_SSLMODE=require
+Environment=RESULT_QUEUE_URL=https://sqs.ap-northeast-2.amazonaws.com/188876037193/aivle-dev-pricing-result-queue
 ExecStart=/opt/aivle/web-api/current/.venv/bin/uvicorn app.main:app --host 127.0.0.1 --port 8000
 Restart=always
 RestartSec=5
