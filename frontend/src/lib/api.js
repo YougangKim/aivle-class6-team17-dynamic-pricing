@@ -183,6 +183,12 @@ async function call(path, options) {
   return res.json();
 }
 
+function latestPolicyRows(rows) {
+  if (!Array.isArray(rows) || rows.length === 0) return [];
+  const latestRequestId = rows[0].request_id;
+  return rows.filter((row) => row.request_id === latestRequestId);
+}
+
 export async function login(id, pw, storeId) {
   if (USE_MOCK) {
     await delay(650);
@@ -202,10 +208,11 @@ export async function getSummary(storeId) {
 }
 export async function getRecommendations(storeId) {
   if (USE_RECOMMENDATIONS_MOCK) { await delay(700); return mockRecs(storeId); }
-  const [recommendations, inventory] = await Promise.all([
+  const [rawRecommendations, inventory] = await Promise.all([
     call(`/recommendations?store_id=${encodeURIComponent(storeId)}`),
     call(`/inventory?store_id=${encodeURIComponent(storeId)}`),
   ]);
+  const recommendations = latestPolicyRows(rawRecommendations);
   const inventoryByProduct = new Map(inventory.map((item) => [item.product_id, item]));
   const selectedByProduct = new Map();
   recommendations.forEach((rec) => {
@@ -233,10 +240,11 @@ export async function getInventory(storeId) {
     const policy = loadPolicy(storeId);
     return MOCK_INVENTORY_RAW.map((i) => withRecommendation(i, dayCap(i.days_until_expiry, policy), policy.max_discount));
   }
-  const [inventory, recommendations] = await Promise.all([
+  const [inventory, rawRecommendations] = await Promise.all([
     call(`/inventory?store_id=${encodeURIComponent(storeId)}`),
     call(`/recommendations?store_id=${encodeURIComponent(storeId)}`),
   ]);
+  const recommendations = latestPolicyRows(rawRecommendations);
   const recommendationByProduct = new Map();
   recommendations.forEach((rec) => {
     const current = recommendationByProduct.get(rec.product_id);
@@ -246,11 +254,20 @@ export async function getInventory(storeId) {
     const rec = recommendationByProduct.get(item.product_id);
     return rec ? {
       ...item,
+      request_id: rec.request_id,
+      dte_index: rec.dte_index,
       recommended_rate: rec.recommended_rate,
       recommendation_available: true,
       expected_loss: rec.expected_waste_loss,
       sell_probability: rec.sell_through_rate,
-    } : item;
+    } : {
+      ...item,
+      request_id: undefined,
+      recommended_rate: 0,
+      recommendation_available: false,
+      expected_loss: 0,
+      sell_probability: 0,
+    };
   });
 }
 export async function approve(storeId, items) {

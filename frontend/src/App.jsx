@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   AlertTriangle, Boxes, BarChart3, Bell, LogOut, Menu, X, ChevronDown, Settings, TabletSmartphone,
   Smartphone, History as HistoryIcon, Building2, Leaf, FlaskConical, SlidersHorizontal,
@@ -87,6 +87,21 @@ export default function App() {
   const [restaged, setRestaged] = useState(new Map());
   const [closedFlow, setClosedFlow] = useState(new Map());
   const [rejectTarget, setRejectTarget] = useState(null);   // { items: [...], round }
+  const recommendationRevision = useRef("");
+
+  const handleItemsLoaded = (nextItems) => {
+    const nextRevision = [...new Set(nextItems.map((item) => item.request_id).filter(Boolean))].sort().join("|");
+    if (recommendationRevision.current && nextRevision && recommendationRevision.current !== nextRevision) {
+      setApproved(new Map());
+      setPendingMgr(new Map());
+      setRates({});
+      setRepricing(new Map());
+      setRestaged(new Map());
+      setClosedFlow(new Map());
+    }
+    if (nextRevision) recommendationRevision.current = nextRevision;
+    setItems(nextItems);
+  };
 
   const handleApprove = (list) => {
     const direct = list.filter((i) => i.rate <= policy.two_step_over);
@@ -506,7 +521,7 @@ export default function App() {
         <main className="flex-1 p-5 lg:p-8">
           {tab === "home" && (
             <Home storeId={storeId} onToast={fire} approved={approved} onApprove={handleApprove}
-                  rates={rates} setRates={setRates} onItemsLoaded={setItems}
+                  rates={rates} setRates={setRates} onItemsLoaded={handleItemsLoaded}
                   role={role} pendingMgr={pendingMgr} onMgrDecision={handleMgrDecision}
                   repricing={repricing} restaged={restaged} closedFlow={closedFlow}
                   onOpenReject={openReject} onAcceptRestaged={acceptRestaged}
