@@ -5,6 +5,7 @@ from unittest.mock import patch
 from fastapi import HTTPException
 
 from app import main
+from app import recommendations
 
 
 class FakeCursor:
@@ -22,6 +23,9 @@ class FakeCursor:
 
     def fetchall(self):
         return self.rows
+
+    def fetchone(self):
+        return self.rows[0] if self.rows else None
 
 
 class FakeConnection:
@@ -91,6 +95,16 @@ class WebApiTests(unittest.TestCase):
 
     def test_turnover_is_zero_when_no_stock_activity(self):
         self.assertEqual(main._turnover(0, 0, 0), 0.0)
+
+    def test_baseline_result_clears_dashboard_recommendations(self):
+        result = {
+            "request_id": "S02-187",
+            "store_id": "S02",
+            "acceptance": {"selection_status": "BASELINE_RETAINED"},
+            "model_a_output": {"policy_matrix": [[0.2, 0.2, 0.2, 0.2]]},
+            "model_b_output": {"selected": {"product_metrics": [{"product_id": "P001", "dte_index": 0}]}},
+        }
+        self.assertEqual(recommendations._dashboard_items(result), [])
 
 
 if __name__ == "__main__":

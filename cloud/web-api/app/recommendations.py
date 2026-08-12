@@ -32,17 +32,31 @@ def _drain_result_queue() -> None:
     response = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=10, WaitTimeSeconds=0)
     for message in response.get("Messages", []):
         result = json.loads(message["Body"])
-        if (result.get("acceptance") or {}).get("selection_status") == "OPTIMIZED_SELECTED":
-            with connect_rds() as connection:
-                with connection.cursor() as cursor:
+        is_optimized = (result.get("acceptance") or {}).get("selection_status") == "OPTIMIZED_SELECTED"
+        status = "PENDING" if is_optimized else "REJECTED"
+        with connect_rds() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO pricing_ops.pricing_recommendation
+                        (request_id, store_id, result_json, status, decided_at)
+                    VALUES (%s, %s, %s::jsonb, %s,
+                            CASE WHEN %s = 'PENDING' THEN NULL ELSE now() END)
+                    ON CONFLICT (request_id) DO NOTHING
+                    RETURNING request_id
+                    """,
+                    (result["request_id"], result["store_id"], json.dumps(result), status, status),
+                )
+                if cursor.fetchone():
                     cursor.execute(
                         """
-                        INSERT INTO pricing_ops.pricing_recommendation
-                            (request_id, store_id, result_json)
-                        VALUES (%s, %s, %s::jsonb)
-                        ON CONFLICT (request_id) DO NOTHING
+                        UPDATE pricing_ops.pricing_recommendation
+                        SET status = 'REJECTED', decided_at = now()
+                        WHERE store_id = %s
+                          AND status = 'PENDING'
+                          AND request_id <> %s
                         """,
-                        (result["request_id"], result["store_id"], json.dumps(result)),
+                        (result["store_id"], result["request_id"]),
                     )
         sqs.delete_message(QueueUrl=queue_url, ReceiptHandle=message["ReceiptHandle"])
 
@@ -63,6 +77,8 @@ def _policy_rates(result: dict[str, Any]) -> dict[tuple[str, int], float]:
 
 
 def _dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
+    if (result.get("acceptance") or {}).get("selection_status") != "OPTIMIZED_SELECTED":
+        return []
     policy = _policy_rates(result)
     metrics = ((result.get("model_b_output") or {}).get("selected") or {}).get("product_metrics") or []
     return [
@@ -88,6 +104,7 @@ def recommendations(store_id: str) -> list[dict[str, Any]]:
                 FROM pricing_ops.pricing_recommendation
                 WHERE store_id = %s AND status = 'PENDING'
                 ORDER BY created_at DESC
+                LIMIT 1
                 """,
                 (store_id,),
             )
