@@ -210,7 +210,32 @@ export async function getStores() {
 }
 export async function getSummary(storeId) {
   if (USE_SUMMARY_MOCK) { await delay(600); return mockSummary(storeId); }
-  return call(`/summary?store_id=${encodeURIComponent(storeId)}`);
+  const revision = Date.now();
+  const [summary, inventory] = await Promise.all([
+    call(`/summary?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
+    call(`/inventory?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
+  ]);
+  const riskItems = inventory.filter((item) => item.days_until_expiry <= 2);
+  const byCategory = new Map();
+  const riskAmount = riskItems.reduce((total, item) => {
+    const amount = item.stock_quantity * item.cost;
+    byCategory.set(item.category, (byCategory.get(item.category) ?? 0) + amount);
+    return total + amount;
+  }, 0);
+  return {
+    ...summary,
+    snapshot_date: inventory[0]?.snapshot_date ?? summary.snapshot_date,
+    product_count: inventory.length,
+    total_stock_quantity: inventory.reduce((total, item) => total + item.stock_quantity, 0),
+    pending: riskItems.length,
+    d_day: inventory.filter((item) => item.days_until_expiry <= 0).length,
+    d_1: inventory.filter((item) => item.days_until_expiry === 1).length,
+    d_2: inventory.filter((item) => item.days_until_expiry === 2).length,
+    risk_amount: Math.round(riskAmount),
+    by_category: [...byCategory]
+      .map(([name, value]) => ({ name, value: +(value / 10000).toFixed(1) }))
+      .sort((a, b) => b.value - a.value),
+  };
 }
 export async function getRecommendations(storeId) {
   if (USE_RECOMMENDATIONS_MOCK) { await delay(700); return mockRecs(storeId); }
@@ -273,7 +298,6 @@ export async function getInventory(storeId) {
       request_id: undefined,
       recommended_rate: 0,
       recommendation_available: false,
-      expected_loss: 0,
       sell_probability: 0,
     };
   });

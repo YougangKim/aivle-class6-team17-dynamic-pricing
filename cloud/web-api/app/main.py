@@ -7,7 +7,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 import psycopg
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Response
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import connect_rds
@@ -101,6 +101,11 @@ def _turnover(current_stock: Any, daily_sold: Any, daily_waste: Any) -> float:
     return sold / denominator if denominator > 0 else 0.0
 
 
+def _disable_cache(response: Response) -> None:
+    response.headers["Cache-Control"] = "no-store, no-cache, max-age=0, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+
+
 def load_inventory(store_id: str) -> list[dict[str, Any]]:
     _validate_store(store_id)
     try:
@@ -164,12 +169,18 @@ def ready() -> dict[str, str]:
 
 
 @app.get("/api/inventory")
-def inventory(store_id: str = Query(pattern=r"^S\d{2}$")) -> list[dict[str, Any]]:
+def inventory(
+    response: Response, store_id: str = Query(pattern=r"^S\d{2}$")
+) -> list[dict[str, Any]]:
+    _disable_cache(response)
     return load_inventory(store_id)
 
 
 @app.get("/api/summary")
-def summary(store_id: str = Query(pattern=r"^S\d{2}$")) -> dict[str, Any]:
+def summary(
+    response: Response, store_id: str = Query(pattern=r"^S\d{2}$")
+) -> dict[str, Any]:
+    _disable_cache(response)
     items = load_inventory(store_id)
     risk_items = [item for item in items if item["days_until_expiry"] <= 2]
     risk_amount = sum(item["stock_quantity"] * item["cost"] for item in risk_items)

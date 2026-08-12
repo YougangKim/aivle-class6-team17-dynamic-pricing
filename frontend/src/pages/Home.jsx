@@ -224,21 +224,21 @@ export default function Home({
   const d = s.data;
   const cal = d?.calendar;
   // 모델 준비 전에는 기존 추천 데모를 유지하되, RDS 실재고와 혼동하지 않게 표시합니다.
-  const modelReady = d?.model_status !== "NOT_READY" || USE_RECOMMENDATIONS_MOCK;
+  const modelReady = d?.model_status !== "NOT_READY";
 
   /* ---- 승인 상태가 반영된 실시간 KPI ---- */
   const kpi = useMemo(() => {
+    const inventoryRisk = d?.risk_amount ?? 0;
     if (!modelReady) {
-      const risk = d?.risk_amount ?? 0;
       return {
-        risk,
+        risk: inventoryRisk,
         revenue: 0,
-        residual: risk,
+        residual: inventoryRisk,
         byCat: d?.by_category ?? [],
-        baseRisk: risk,
+        baseRisk: inventoryRisk,
       };
     }
-    const risk = pending.reduce((sum, i) => sum + i.expected_loss, 0);
+    const risk = inventoryRisk;
     let revenue = 0, residual = 0;
     all.forEach((i) => {
       const a = approved.get(i.product_id);
@@ -253,7 +253,7 @@ export default function Home({
     const byCat = Object.entries(
       pending.reduce((a, i) => ({ ...a, [i.category]: (a[i.category] || 0) + i.expected_loss }), {})
     ).map(([name, value]) => ({ name, value: +(value / 10000).toFixed(1) })).sort((a, b) => b.value - a.value);
-    return { risk, revenue, residual, byCat, baseRisk: all.reduce((s2, i) => s2 + i.expected_loss, 0) };
+    return { risk, revenue, residual, byCat, baseRisk: inventoryRisk };
   }, [all, approved, pending, modelReady, d]);
 
   /* 손실 흐름(워터폴) — risk = 회수 + 잔여 */
