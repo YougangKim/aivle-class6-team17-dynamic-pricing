@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import {
   AlertTriangle, Boxes, BarChart3, Bell, LogOut, Menu, X, ChevronDown, Settings, TabletSmartphone,
   Smartphone, History as HistoryIcon, Building2, Leaf, FlaskConical, SlidersHorizontal,
@@ -34,6 +34,8 @@ const NAV = [
   { key: "ab", label: "효과 검증", icon: FlaskConical, desc: "적용·대조 점포 비교 실험", group: "본사" },
   { key: "sim", label: "정책 시뮬레이터", icon: SlidersHorizontal, desc: "할인 정책 변경 영향 분석", group: "본사" },
 ];
+
+const policyItemKey = (item) => `${item.product_id}:${item.dte_index}`;
 
 export default function App() {
   const [auth, setAuth] = useState(null);
@@ -92,7 +94,7 @@ export default function App() {
   const handleItemsLoaded = (nextItems, loadedStoreId) => {
     const requestIds = [...new Set(nextItems.map((item) => item.request_id).filter(Boolean))].sort().join("|");
     const nextRevision = `${loadedStoreId}:${requestIds || "EMPTY"}`;
-    if (recommendationRevision.current && recommendationRevision.current !== nextRevision) {
+    if (nextItems.length > 0 && recommendationRevision.current && recommendationRevision.current !== nextRevision) {
       setApproved(new Map());
       setPendingMgr(new Map());
       setRates({});
@@ -110,14 +112,18 @@ export default function App() {
     if (direct.length) {
       setApproved((prev) => {
         const next = new Map(prev);
-        direct.forEach((i) => next.set(i.product_id, { rate: i.rate, name: i.product_name, esl: i.esl_applicable, regular_price: i.regular_price, approved_at: nowHms() }));
+        direct.forEach((i) => next.set(policyItemKey(i), {
+          ...i,
+          approved_rate: i.rate / 100,
+          approved_at: nowHms(),
+        }));
         return next;
       });
     }
     if (escalate.length) {
       setPendingMgr((prev) => {
         const next = new Map(prev);
-        escalate.forEach((i) => next.set(i.product_id, { ...i, requested_by: auth?.user?.name ?? "담당자" }));
+        escalate.forEach((i) => next.set(policyItemKey(i), { ...i, requested_by: auth?.user?.name ?? "담당자" }));
         return next;
       });
     }
@@ -134,7 +140,11 @@ export default function App() {
         if (item) {
           setApproved((a) => {
             const m = new Map(a);
-            m.set(id, { rate: item.rate, name: item.product_name, esl: item.esl_applicable, regular_price: item.regular_price, approved_at: nowHms() });
+            m.set(id, {
+              ...item,
+              approved_rate: item.rate / 100,
+              approved_at: nowHms(),
+            });
             return m;
           });
         }
@@ -143,6 +153,14 @@ export default function App() {
       return next;
     });
   };
+
+  const handleManagerItemsLoaded = useCallback((nextItems, loadedStoreId) => {
+    if (loadedStoreId !== storeId) return;
+    setPendingMgr(new Map(nextItems.map((item) => [
+      policyItemKey(item),
+      { ...item, requested_by: item.requested_by ?? "담당자" },
+    ])));
+  }, [storeId]);
 
   const dropFrom = (setter, ids) =>
     setter((prev) => {
@@ -524,6 +542,7 @@ export default function App() {
             <Home storeId={storeId} onToast={fire} approved={approved} onApprove={handleApprove}
                   rates={rates} setRates={setRates} onItemsLoaded={handleItemsLoaded}
                   role={role} pendingMgr={pendingMgr} onMgrDecision={handleMgrDecision}
+                  onManagerItemsLoaded={handleManagerItemsLoaded}
                   repricing={repricing} restaged={restaged} closedFlow={closedFlow}
                   onOpenReject={openReject} onAcceptRestaged={acceptRestaged}
                   onFinalizeManual={finalizeManual}

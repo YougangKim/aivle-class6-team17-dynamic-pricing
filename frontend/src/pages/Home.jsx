@@ -11,7 +11,7 @@ import {
 import { Panel, Kpi, DayTag, UrgencyBar, Skeleton, ErrorBox, Empty, Button, useAsync } from "../components/ui";
 import DetailModal from "../components/DetailModal";
 import RepriceFlow from "../components/RepriceFlow";
-import { getSummary, getRecommendations, approve, getSkipped, policyDep, dayCap, pricePath, rateAt, nextStep, USE_RECOMMENDATIONS_MOCK } from "../lib/api";
+import { getSummary, getRecommendations, approve, requestManagerApproval, approveByManager, getSkipped, getCompleted, getManagerPending, policyDep, dayCap, pricePath, rateAt, nextStep, USE_RECOMMENDATIONS_MOCK } from "../lib/api";
 import { won, man, discounted } from "../lib/format";
 
 const tip = { borderRadius: 12, border: "1px solid #cbd5e1", fontSize: 12, boxShadow: "0 4px 14px rgba(0,0,0,.10)", background: "#ffffff", color: "#0f172a" };
@@ -21,6 +21,62 @@ const FILTERS = [
   { key: "축산", label: "축산" }, { key: "수산", label: "수산" }, { key: "청과", label: "청과" },
   { key: "유제품", label: "유제품" }, { key: "즉석", label: "즉석" },
 ];
+
+const itemKey = (item) => `${item.product_id}:${item.dte_index}`;
+const pct = (value) => `${Math.round((Number(value) || 0) * 100)}%`;
+
+function CurrentTimeLabel({ viewBox }) {
+  if (!viewBox) return null;
+  return (
+    <text x={viewBox.x + 8} y={viewBox.y + 14} fill="#E4002B" fontSize={11} textAnchor="start">
+      현재
+    </text>
+  );
+}
+
+function comparisonLines(item) {
+  const comparison = item.comparison ?? {};
+  const noDiscount = comparison.no_discount ?? {};
+  const standard = comparison.standard_markdown ?? {};
+  const ai = comparison.ai_candidate ?? {};
+  const number = (value) => typeof value === "number" && Number.isFinite(value) ? value : null;
+  const standardProfit = number(standard.expected_profit);
+  const noDiscountProfit = number(noDiscount.expected_profit);
+  const aiProfit = number(ai.expected_profit);
+  const standardRate = Number(standard.discount_rate) || 0;
+  const control = standardProfit == null || noDiscountProfit == null
+    ? standardRate === 0
+      ? { label: "마감 할인·할인 미적용", profit: null }
+      : { label: "마감 할인", profit: null, name: "마감 할인" }
+    : standardProfit === noDiscountProfit
+      ? { label: "마감 할인·할인 미적용", profit: standardProfit }
+      : standardProfit > noDiscountProfit
+        ? { label: "마감 할인", profit: standardProfit, name: "마감 할인" }
+        : { label: "할인 미적용", profit: noDiscountProfit, name: "할인 미적용" };
+  const policyLine = `AI ${pct(ai.discount_rate)} · 마감할인 ${pct(standard.discount_rate)} · 할인 미적용 비교 결과`;
+  if (control && aiProfit != null) {
+    const delta = control.profit - aiProfit;
+    const controlAmount = won(Math.round(control.profit));
+    const aiAmount = won(Math.round(aiProfit));
+    if (delta === 0) return { policyLine, comparisonLine: `예상이익 ${aiAmount}으로 동일` };
+    return {
+      policyLine,
+      comparisonLine: delta > 0
+        ? `${control.name ? `${control.name}${control.name === "할인 미적용" ? " 시" : ""}` : control.label} 예상이익 ${controlAmount} · AI ${aiAmount} · 유지 시 ${won(Math.round(delta))} 이득`
+        : `AI 예상이익 ${aiAmount} · ${control.name ?? control.label} ${controlAmount} · AI 적용 시 ${won(Math.round(-delta))} 이득`,
+    };
+  }
+  return {
+    policyLine,
+    comparisonLine: !control.name
+      ? "마감 할인과 할인 미적용의 예상이익이 동일"
+      : item.decision === "STANDARD_MARKDOWN"
+      ? "마감 할인 유지가 AI 후보보다 우세"
+      : item.decision === "NO_DISCOUNT"
+        ? "할인 미적용 유지가 AI 후보보다 우세"
+        : "AI 후보와 비교 기준의 개별 금액은 다음 모델 결과에서 표시",
+  };
+}
 
 function Row({ item, selected, onToggle, rate, onRate, onOpen, threshold, cap, onReject, canApprove }) {
   const recRate = Math.round(item.recommended_rate * 100);
@@ -105,7 +161,7 @@ function Row({ item, selected, onToggle, rate, onRate, onOpen, threshold, cap, o
 
 export default function Home({
   storeId, onToast, approved, onApprove, rates, setRates, onItemsLoaded, role,
-  pendingMgr, onMgrDecision, policy, threshold,
+  pendingMgr, onMgrDecision, onManagerItemsLoaded, policy, threshold,
   /* 반려 이후 흐름 — App이 상태를 소유하고 Home은 화면만 그립니다 */
   repricing, restaged, closedFlow, onOpenReject, onAcceptRestaged, onFinalizeManual, onDiscard,
 }) {
@@ -115,14 +171,24 @@ export default function Home({
   const s = useAsync(() => getSummary(storeId), [storeId, pDep]);
   const r = useAsync(() => getRecommendations(storeId), [storeId, pDep]);
   const skipped = useAsync(() => getSkipped(storeId), [storeId]);
+  const completed = useAsync(() => getCompleted(storeId), [storeId]);
+  const managerPending = useAsync(() => getManagerPending(storeId), [storeId]);
+  const reloadRecommendations = r.reload;
   useEffect(() => {
     const timer = setInterval(() => {
       r.reload();
       s.reload();
       skipped.reload();
+      completed.reload();
+      managerPending.reload();
     }, 60000);
     return () => clearInterval(timer);
-  }, [r.reload, s.reload, skipped.reload]);
+  }, [r.reload, s.reload, skipped.reload, completed.reload, managerPending.reload]);
+  useEffect(() => {
+    if (!USE_RECOMMENDATIONS_MOCK && managerPending.data && !managerPending.loading) {
+      onManagerItemsLoaded(managerPending.data, storeId);
+    }
+  }, [managerPending.data, managerPending.loading, onManagerItemsLoaded, storeId]);
   const [filter, setFilter] = useState("all");
   const [sel, setSel] = useState(null);
   const [sending, setSending] = useState(false);
@@ -181,8 +247,8 @@ export default function Home({
   const pathInfo = useMemo(() => {
     const targets = (r.data ?? []).filter(
       (i) => i.days_until_expiry === 0 &&
-        !approved.has(i.product_id) && !pendingMgr.has(i.product_id) &&
-        !repricing?.has(i.product_id) && !restaged?.has(i.product_id) && !closedFlow?.has(i.product_id)
+        !approved.has(itemKey(i)) && !pendingMgr.has(itemKey(i)) &&
+        !repricing?.has(itemKey(i)) && !restaged?.has(itemKey(i)) && !closedFlow?.has(itemKey(i))
     );
     const paths = targets.map((i) => ({ item: i, path: pathOf(i) })).filter((x) => !x.path.flat);
     if (!paths.length) return null;
@@ -201,6 +267,11 @@ export default function Home({
   }, [r.data, approved, pendingMgr, clock, pathStartMin, policy]);
 
   const all = r.loading ? [] : (r.data ?? []);
+  const completedItems = useMemo(() => {
+    const byCell = new Map((completed.data ?? []).map((item) => [itemKey(item), item]));
+    approved.forEach((item, key) => byCell.set(key, { ...byCell.get(key), ...item }));
+    return [...byCell.values()];
+  }, [completed.data, approved]);
   const policyRevision = `${storeId}:${[...new Set((r.data ?? []).map((item) => item.request_id).filter(Boolean))].sort().join("|") || "EMPTY"}`;
   useEffect(() => {
     if (r.data && !r.loading) onItemsLoaded(r.data, storeId);
@@ -215,13 +286,15 @@ export default function Home({
   /* 정책이 바뀌면 직접 조정해둔 값이 새 상한을 넘을 수 있으므로 초기화합니다 */
   useEffect(() => { setRates({}); setSel(null); }, [pDep]); // eslint-disable-line
   /* 승인·결재대기뿐 아니라 반려 후속 처리(재계산·재검토·종결) 중인 건도 대기열에서 제외합니다 */
-  const inFlow = (id) =>
-    approved.has(id) || pendingMgr.has(id) ||
-    !!repricing?.has(id) || !!restaged?.has(id) || !!closedFlow?.has(id);
-  const pending = all.filter((i) => !inFlow(i.product_id));
-  const selected = sel ?? new Set(pending.map((i) => i.product_id));
+  const inFlow = (item) => {
+    const key = itemKey(item);
+    return approved.has(key) || pendingMgr.has(key) ||
+      !!repricing?.has(key) || !!restaged?.has(key) || !!closedFlow?.has(key);
+  };
+  const pending = all.filter((i) => !inFlow(i));
+  const selected = sel ?? new Set(pending.map(itemKey));
   const rateOf = (i) =>
-    Math.min(capOf(i), rates[i.product_id] ?? (closingMode ? closingRate(i) : Math.round(i.recommended_rate * 100)));
+    Math.min(capOf(i), rates[itemKey(i)] ?? (closingMode ? closingRate(i) : Math.round(i.recommended_rate * 100)));
   const d = s.data;
   const cal = d?.calendar;
   // 모델 준비 전에는 기존 추천 데모를 유지하되, RDS 실재고와 혼동하지 않게 표시합니다.
@@ -242,7 +315,7 @@ export default function Home({
     const risk = inventoryRisk;
     let revenue = 0, residual = 0;
     all.forEach((i) => {
-      const a = approved.get(i.product_id);
+      const a = approved.get(itemKey(i));
       if (a) {
         const sold = i.stock_quantity * i.sell_probability;
         revenue += sold * discounted(i.regular_price, a.rate / 100);
@@ -264,7 +337,7 @@ export default function Home({
     const recovered = Math.max(risk - residual, 0);
     return [
       { name: "오늘 폐기 위험", base: 0, val: +risk.toFixed(1), color: "#E4002B" },
-      { name: "추천 적용 회수", base: +residual.toFixed(1), val: +recovered.toFixed(1), color: "#059669" },
+      { name: "추천 적용 회수", base: 0, val: +recovered.toFixed(1), color: "#059669" },
       { name: "잔여 폐기손실", base: 0, val: +residual.toFixed(1), color: "#cbd5e1" },
     ];
   }, [kpi]);
@@ -273,7 +346,12 @@ export default function Home({
   const closingHour = 22;
   const nowHour = d ? parseInt(d.context.store_time.split(":")[0], 10) : 18;
   const nowLabel = `${nowHour}시`;
-  const totalStock = pending.reduce((sum, i) => sum + i.stock_quantity, 0);
+  const forecastItems = useMemo(() => {
+    const byCell = new Map();
+    [...all, ...completedItems].forEach((item) => byCell.set(itemKey(item), item));
+    return [...byCell.values()];
+  }, [all, completedItems]);
+  const totalStock = forecastItems.reduce((sum, i) => sum + i.stock_quantity, 0);
   const sellCurve = useMemo(() => {
     const hours = [];
     for (let h = 9; h <= closingHour; h++) {
@@ -313,17 +391,50 @@ export default function Home({
     setSel(next);
   };
 
+  const requestApproval = async (targets) => {
+    const withRates = targets.map((item) => ({ ...item, rate: item.rate ?? rateOf(item) }));
+    const direct = withRates.filter((item) => item.rate <= threshold);
+    const manager = withRates.filter((item) => item.rate > threshold);
+    const payload = (items) => items.map((item) => ({
+      request_id: item.request_id,
+      product_id: item.product_id,
+      dte_index: item.dte_index,
+      approved_rate: item.rate / 100,
+    }));
+    if (direct.length) await approve(storeId, payload(direct), { finalize: manager.length === 0 });
+    if (manager.length) await requestManagerApproval(storeId, payload(manager));
+    onApprove(withRates);
+    await Promise.all([completed.reload(), reloadRecommendations(), managerPending.reload()]);
+    return { direct: direct.length, escalate: manager.length };
+  };
+
+  const approveManagerItems = async (items) => {
+    setSending(true);
+    try {
+      await approveByManager(storeId, items.map((item) => ({
+        request_id: item.request_id,
+        product_id: item.product_id,
+        dte_index: item.dte_index,
+        approved_rate: item.rate / 100,
+      })));
+      onMgrDecision(items.map(itemKey), true);
+      await Promise.all([completed.reload(), reloadRecommendations(), managerPending.reload(), s.reload()]);
+      onToast({ title: `${items.length}건 최종 승인`, desc: "RDS 할인율과 ESL 반영 요청을 완료했습니다." });
+    } catch (e) {
+      onToast({ tone: "error", title: "최종 승인 실패", desc: e.message });
+    }
+    setSending(false);
+  };
+
   const applyClosingAll = async () => {
     const targets = pending.filter((i) => i.days_until_expiry === 0);
     if (targets.length === 0) return;
     setSending(true);
     try {
-      const payload = targets.map((i) => ({ request_id: i.request_id, product_id: i.product_id, dte_index: i.dte_index, approved_rate: capOf(i) / 100, recommended_rate: i.recommended_rate }));
-      await approve(storeId, payload);
-      const r = onApprove(targets.map((i) => ({ ...i, rate: capOf(i) })));
+      const r = await requestApproval(targets.map((item) => ({ ...item, rate: capOf(item) })));
       onToast({
         title: `D-Day ${targets.length}건 상한 적용`,
-        desc: r?.escalate ? `40% 할인 ${r.escalate}건은 점장 최종 승인 대기` : "ESL 전송 요청됨",
+        desc: r.escalate ? `${r.escalate}건은 점장 최종 승인 대기` : "RDS 할인율과 ESL 반영 요청을 완료했습니다.",
       });
     } catch (e) {
       onToast({ tone: "error", title: "적용 실패", desc: e.message });
@@ -334,20 +445,16 @@ export default function Home({
   const submit = async () => {
     setSending(true);
     try {
-      const targets = pending.filter((i) => selected.has(i.product_id));
-      const payload = targets.map((i) => ({
-        request_id: i.request_id, product_id: i.product_id, dte_index: i.dte_index, approved_rate: rateOf(i) / 100, recommended_rate: i.recommended_rate,
-      }));
-      await approve(storeId, payload);
-      const r = onApprove(targets.map((i) => ({ ...i, rate: rateOf(i) })));
+      const targets = pending.filter((i) => selected.has(itemKey(i)));
+      const r = await requestApproval(targets);
       setSel(null);
-      if (r?.escalate) {
+      if (r.escalate) {
         onToast({
           title: `${r.direct}건 승인 완료 · ${r.escalate}건 점장 결재 요청`,
-          desc: `${threshold}% 초과 할인은 점장 최종 승인 후 반영됩니다`,
+          desc: `${threshold}% 초과 할인은 점장 최종 승인 전에는 RDS에 반영되지 않습니다.`,
         });
       } else {
-        onToast({ title: `${r?.direct ?? targets.length}건 승인 완료`, desc: "ESL 전송 요청됨" });
+        onToast({ title: `${r.direct}건 승인 완료`, desc: "RDS 할인율과 ESL 반영 요청을 완료했습니다." });
       }
     } catch (e) {
       onToast({ tone: "error", title: "승인 실패", desc: e.message });
@@ -555,7 +662,7 @@ export default function Home({
           <div className="h-56">
             {loading ? <Skeleton className="h-full w-full" /> : (
               <ResponsiveContainer width="100%" height="100%">
-                <ComposedChart data={sellCurve} margin={{ top: 10, right: 8, left: -20, bottom: 0 }}>
+                <ComposedChart data={sellCurve} margin={{ top: 28, right: 8, left: -20, bottom: 0 }}>
                   <defs>
                     <linearGradient id="gGap" x1="0" y1="0" x2="0" y2="1">
                       <stop offset="0%" stopColor="#059669" stopOpacity={0.22} />
@@ -572,7 +679,7 @@ export default function Home({
                   <Line type="monotone" dataKey="할인 미적용" stroke="#cbd5e1" strokeWidth={2.2} strokeDasharray="5 4" dot={false} />
                   <Line type="monotone" dataKey="추천 적용" stroke="#059669" strokeWidth={2.6} dot={false} activeDot={{ r: 5 }} />
                   <ReferenceLine x={nowLabel} stroke="#E4002B" strokeWidth={1.6}
-                                 label={{ value: "현재", position: "top", fontSize: 11, fill: "#E4002B" }} />
+                                 label={<CurrentTimeLabel />} />
                 </ComposedChart>
               </ResponsiveContainer>
             )}
@@ -600,7 +707,7 @@ export default function Home({
                         className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50">
                   전체 반려
                 </button>
-                <button onClick={() => { onMgrDecision([...pendingMgr.keys()], true); onToast({ title: `${pendingMgr.size}건 최종 승인`, desc: "ESL 전송 요청됨" }); }}
+                <button onClick={() => approveManagerItems([...pendingMgr.values()])} disabled={sending}
                         className="rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white active:scale-95">
                   전체 승인
                 </button>
@@ -610,7 +717,7 @@ export default function Home({
             )}
           </div>
           {[...pendingMgr.values()].map((i) => (
-            <div key={i.product_id} className="flex flex-wrap items-center gap-3 border-b border-slate-100 px-5 py-3 last:border-0">
+            <div key={itemKey(i)} className="flex flex-wrap items-center gap-3 border-b border-slate-100 px-5 py-3 last:border-0">
               <UserCheck size={14} className="shrink-0 text-slate-400" />
               <span className="w-44 shrink-0 truncate text-sm font-semibold">{i.product_name}</span>
               <span className="rounded-md bg-brand-50 px-2 py-0.5 text-xs font-bold text-brand-600">−{i.rate}%</span>
@@ -627,7 +734,7 @@ export default function Home({
                           title="반려 · AI 재추천 요청">
                     <X size={13} />
                   </button>
-                  <button onClick={() => { onMgrDecision([i.product_id], true); onToast({ title: "최종 승인", desc: i.product_name }); }}
+                  <button onClick={() => approveManagerItems([i])} disabled={sending}
                           className="rounded-lg bg-brand-600 p-1.5 text-white active:scale-95" title="승인">
                     <Check size={13} strokeWidth={3} />
                   </button>
@@ -666,7 +773,8 @@ export default function Home({
               </span>
             )}
           </h2>
-          <div className="flex flex-wrap gap-1.5">
+          <div className="flex flex-wrap items-center gap-1.5" role="tablist" aria-label="승인 대기 상품 잔여일 분류">
+            <span className="mr-1 text-[11px] font-semibold text-slate-400">잔여일 탭</span>
             {FILTERS.map((f) => {
               const n = f.key === "all" ? pending.length
                 : f.key.startsWith("d") ? pending.filter((i) => i.days_until_expiry === +f.key[1]).length
@@ -718,9 +826,9 @@ export default function Home({
             <Empty icon={Tag} title="해당 조건의 추천이 없습니다" desc="다른 필터를 선택해보세요." />
           ) : (
             shown.map((i) => (
-              <Row key={i.product_id} item={i} selected={selected.has(i.product_id)}
-                   onToggle={() => toggle(i.product_id)} rate={rateOf(i)} cap={capOf(i)}
-                   onRate={(v) => setRates({ ...rates, [i.product_id]: Math.min(v, capOf(i)) })}
+              <Row key={itemKey(i)} item={i} selected={selected.has(itemKey(i))}
+                   onToggle={() => toggle(itemKey(i))} rate={rateOf(i)} cap={capOf(i)}
+                   onRate={(v) => setRates({ ...rates, [itemKey(i)]: Math.min(v, capOf(i)) })}
                    onOpen={() => setDetail(i)} threshold={threshold}
                    canApprove={canApprove}
                    onReject={() => onOpenReject([{ ...i, rate: rateOf(i) }], 0)} />
@@ -733,7 +841,7 @@ export default function Home({
             <p className="text-sm text-slate-600">
               {pending.length}건 중 <b className="text-slate-900">{selected.size}건</b> 선택 · 예상 매출{" "}
               <b className="text-emerald-600">
-                {man(pending.filter((i) => selected.has(i.product_id))
+                {man(pending.filter((i) => selected.has(itemKey(i)))
                   .reduce((sum, i) => sum + i.stock_quantity * i.sell_probability * discounted(i.regular_price, rateOf(i) / 100), 0))}만원
               </b>
             </p>
@@ -749,7 +857,32 @@ export default function Home({
       </div>
 
       {/* AI가 추천하지 않은 상품 */}
-      <div>
+      <div className="grid gap-4 xl:grid-cols-2">
+        <section className="overflow-hidden rounded-2xl border border-emerald-200 bg-white">
+          <div className="flex items-center gap-2 border-b border-emerald-100 bg-emerald-50 px-5 py-3.5">
+            <Check size={15} className="text-emerald-600" />
+            <span className="flex-1 text-sm font-semibold text-emerald-800">AI 다이나믹 프라이싱 · 승인완료 상품</span>
+            <span className="text-xs font-semibold text-emerald-600">{completedItems.length}건</span>
+          </div>
+          <div className="max-h-[30rem] overflow-y-auto">
+            {completedItems.length === 0 ? (
+              <p className="px-5 py-6 text-center text-xs text-slate-400">이 화면에서 승인한 상품이 아직 없습니다.</p>
+            ) : completedItems.map((item) => (
+              <div key={itemKey(item)} className="flex items-center gap-3 border-b border-slate-100 px-5 py-3 last:border-0">
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-slate-800">{item.product_name}</p>
+                  <p className="mt-0.5 text-xs text-slate-500"><DayTag d={item.days_until_expiry} /> <span className="ml-1.5">재고 {item.stock_quantity}개</span></p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-bold text-emerald-700">{pct(item.approved_rate)} 적용</p>
+                  <p className="mt-0.5 text-[11px] text-slate-400">ESL 반영 요청 완료</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <div>
         <button onClick={() => setShowSkipped(!showSkipped)}
                 className="flex w-full items-center gap-2 rounded-2xl border border-slate-200 bg-white px-5 py-3.5 text-left transition-colors hover:bg-slate-50">
           <EyeOff size={15} className="shrink-0 text-slate-400" />
@@ -765,11 +898,17 @@ export default function Home({
               {(skipped.data ?? []).map((k) => {
                 const tone = k.type === "block" ? "bg-cjorange-50 text-cjorange-700" : k.type === "skip" ? "bg-slate-100 text-slate-500" : "bg-emerald-50 text-emerald-700";
                 const label = k.type === "block" ? "규칙 차단" : k.type === "skip" ? "효익 낮음" : "조치 불필요";
+                const comparison = comparisonLines(k);
                 return (
-                  <div key={k.product_id} className="flex flex-wrap items-center gap-3 border-b border-slate-100 px-5 py-3 last:border-0">
-                    <span className="w-40 shrink-0 text-sm font-semibold">{k.product_name}</span>
-                    <span className={`shrink-0 rounded-md px-2 py-0.5 text-[11px] font-bold ${tone}`}>{label}</span>
-                    <span className="min-w-0 flex-1 text-xs text-slate-500">{k.reason}</span>
+                  <div key={itemKey(k)} className="grid gap-x-3 gap-y-2 border-b border-slate-100 px-5 py-3 last:border-0 md:grid-cols-[10rem_auto_auto_1fr] md:items-start">
+                    <span className="text-sm font-semibold">{k.product_name}</span>
+                    <DayTag d={k.dte_index ?? k.days_until_expiry ?? 3} />
+                    <span className={`w-fit rounded-md px-2 py-0.5 text-[11px] font-bold ${tone}`}>{label}</span>
+                    <div className="min-w-0 space-y-1 text-xs leading-relaxed">
+                      <p className="font-semibold text-slate-700">{comparison.policyLine}</p>
+                      <p className="text-slate-600">{comparison.comparisonLine}</p>
+                      <p className="text-slate-400">{k.reason}</p>
+                    </div>
                   </div>
                 );
               })}
@@ -779,17 +918,27 @@ export default function Home({
             </p>
           </div>
         </div>
+        </div>
       </div>
 
       {detail && (
         <DetailModal item={detail} rate={rateOf(detail)} threshold={threshold} policy={policy}
           canApprove={canApprove}
-          onRate={(v) => setRates({ ...rates, [detail.product_id]: Math.min(v, capOf(detail)) })}
+          onRate={(v) => setRates({ ...rates, [itemKey(detail)]: Math.min(v, capOf(detail)) })}
           onClose={() => setDetail(null)}
-          onApprove={() => {
-            onApprove([{ ...detail, rate: rateOf(detail) }]);
-            setDetail(null);
-            onToast({ title: "승인 완료", desc: `${detail.product_name} · ESL 반영 요청됨` });
+          onApprove={async () => {
+            setSending(true);
+            try {
+              const result = await requestApproval([{ ...detail, rate: rateOf(detail) }]);
+              setDetail(null);
+              onToast({
+                title: result.escalate ? "점장 최종 승인 요청" : "승인 완료",
+                desc: result.escalate ? "점장 최종 승인 전에는 RDS에 반영되지 않습니다." : "RDS 할인율과 ESL 반영 요청을 완료했습니다.",
+              });
+            } catch (e) {
+              onToast({ tone: "error", title: "승인 실패", desc: e.message });
+            }
+            setSending(false);
           }}
           onReject={() => {
             onOpenReject([{ ...detail, rate: rateOf(detail) }], 0);

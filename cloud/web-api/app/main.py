@@ -59,7 +59,11 @@ SELECT
     i.product_id,
     p.product_name,
     p.category,
-    MIN(i.days_to_expiry) AS days_until_expiry,
+    CASE
+        WHEN i.days_to_expiry <= 0 THEN 0
+        WHEN i.days_to_expiry >= 3 THEN 3
+        ELSE i.days_to_expiry
+    END AS dte_index,
     SUM(i.current_stock_qty) AS current_stock_quantity,
     SUM(i.reserved_qty) AS reserved_quantity,
     SUM(i.available_qty) AS stock_quantity,
@@ -73,8 +77,16 @@ SELECT
 FROM filtered_inventory i
 JOIN product_price.product p ON p.product_id = i.product_id
 WHERE i.available_qty > 0
-GROUP BY i.product_id, p.product_name, p.category
-ORDER BY i.product_id
+GROUP BY
+    i.product_id,
+    p.product_name,
+    p.category,
+    CASE
+        WHEN i.days_to_expiry <= 0 THEN 0
+        WHEN i.days_to_expiry >= 3 THEN 3
+        ELSE i.days_to_expiry
+    END
+ORDER BY i.product_id, dte_index
 """
 
 
@@ -122,7 +134,8 @@ def load_inventory(store_id: str) -> list[dict[str, Any]]:
             "product_name": str(row["product_name"]),
             "category": _category_label(row["category"]),
             "category_code": str(row["category"]),
-            "days_until_expiry": int(row["days_until_expiry"]),
+            "dte_index": int(row["dte_index"]),
+            "days_until_expiry": int(row["dte_index"]),
             "stock_quantity": int(row["stock_quantity"]),
             "current_stock_quantity": int(row["current_stock_quantity"]),
             "reserved_quantity": int(row["reserved_quantity"]),
@@ -192,7 +205,7 @@ def summary(
         "data_source": "AWS_RDS",
         "model_status": "NOT_READY",
         "snapshot_date": items[0]["snapshot_date"] if items else None,
-        "product_count": len(items),
+        "product_count": len({item["product_id"] for item in items}),
         "total_stock_quantity": sum(item["stock_quantity"] for item in items),
         "pending": len(risk_items),
         "d_day": sum(item["days_until_expiry"] <= 0 for item in items),
