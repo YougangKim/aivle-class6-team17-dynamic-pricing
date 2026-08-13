@@ -152,7 +152,7 @@ def load_inventory(store_id: str) -> list[dict[str, Any]]:
             "turnover_available": True,
             "expected_loss": (
                 float(row["stock_quantity"]) * float(row["cost"])
-                if int(row["days_until_expiry"]) <= 2
+                if int(row["dte_index"]) <= 2
                 else 0.0
             ),
             "recommended_rate": 0.0,
