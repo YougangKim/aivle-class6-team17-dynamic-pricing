@@ -51,8 +51,7 @@ def _drain_result_queue() -> None:
     response = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=10, WaitTimeSeconds=0)
     for message in response.get("Messages", []):
         result = _result_from_message(message["Body"])
-        is_optimized = _selection_status(result) == "OPTIMIZED_SELECTED"
-        status = "PENDING" if is_optimized else "REJECTED"
+        status = "PENDING" if _dashboard_items(result) else "REJECTED"
         with connect_rds() as connection:
             with connection.cursor() as cursor:
                 cursor.execute(
@@ -116,9 +115,12 @@ def _with_comparison(result: dict[str, Any], item: dict[str, Any]) -> dict[str, 
     no_discount = _product_metrics(result, "no_discount").get(key, {})
     standard = _product_metrics(result, "standard_markdown").get(key, {})
     ai = _product_metrics(result, "ai_candidate").get(key, {})
+    if not ai and (item.get("decision") == "AI" or item.get("approval_required")):
+        ai = selected
     ai_rate = float(item.get("ai_discount_rate") or 0.0)
     no_discount_profit = float(item.get("no_discount_expected_profit") or no_discount.get("expected_profit") or 0.0)
-    ai_profit = no_discount_profit if ai_rate == 0.0 else float(item.get("ai_expected_profit") or ai.get("expected_profit") or 0.0)
+    raw_ai_profit = item.get("ai_expected_profit") if item.get("ai_expected_profit") is not None else ai.get("expected_profit")
+    ai_profit = no_discount_profit if ai_rate == 0.0 else (float(raw_ai_profit) if raw_ai_profit is not None else None)
     return {
         **selected,
         **item,
@@ -154,6 +156,8 @@ def _ai_outperforms_controls(result: dict[str, Any], row: dict[str, Any]) -> boo
     no_discount = _product_metrics(result, "no_discount").get(key, {})
     standard = _product_metrics(result, "standard_markdown").get(key, {})
     ai = _product_metrics(result, "ai_candidate").get(key, {})
+    if not ai and (row.get("decision") == "AI" or row.get("approval_required")):
+        ai = _product_metrics(result, "selected").get(key, {})
     has_profit_comparison = any(
         name in row
         for name in ("ai_expected_profit", "no_discount_expected_profit", "standard_markdown_expected_profit")
@@ -162,7 +166,10 @@ def _ai_outperforms_controls(result: dict[str, Any], row: dict[str, Any]) -> boo
         return bool(row.get("approval_required"))
     no_discount_profit = float(row.get("no_discount_expected_profit") or no_discount.get("expected_profit") or 0.0)
     ai_rate = float(row.get("ai_discount_rate") or 0.0)
-    ai_profit = no_discount_profit if ai_rate == 0.0 else float(row.get("ai_expected_profit") or ai.get("expected_profit") or 0.0)
+    raw_ai_profit = row.get("ai_expected_profit") if row.get("ai_expected_profit") is not None else ai.get("expected_profit")
+    if ai_rate > 0.0 and raw_ai_profit is None:
+        return False
+    ai_profit = no_discount_profit if ai_rate == 0.0 else float(raw_ai_profit)
     standard_profit = float(row.get("standard_markdown_expected_profit") or standard.get("expected_profit") or 0.0)
     return ai_profit > max(no_discount_profit, standard_profit)
 
@@ -318,7 +325,7 @@ def recommendations(store_id: str) -> list[dict[str, Any]]:
                 """
                 SELECT result_json
                 FROM pricing_ops.pricing_recommendation
-                WHERE store_id = %s AND status = 'PENDING'
+                WHERE store_id = %s
                 ORDER BY created_at DESC
                 LIMIT 1
                 """,
@@ -452,7 +459,7 @@ def approve(request_id: str, approval: ApprovalRequest) -> dict[str, Any]:
             recommendation = cursor.fetchone()
             if not recommendation:
                 raise HTTPException(status_code=404, detail="추천 결과가 없습니다.")
-            if recommendation["status"] != "PENDING":
+            if recommendation["status"] != "PENDING" and not _dashboard_items(recommendation["result_json"]):
                 raise HTTPException(status_code=409, detail="이미 처리된 추천입니다.")
 
             items = approval.items or _recommended_items(recommendation["result_json"])
@@ -500,7 +507,7 @@ def request_manager_approval(request_id: str, approval: ApprovalRequest) -> dict
             recommendation = cursor.fetchone()
             if not recommendation:
                 raise HTTPException(status_code=404, detail="추천 결과가 없습니다.")
-            if recommendation["status"] != "PENDING":
+            if recommendation["status"] != "PENDING" and not _dashboard_items(recommendation["result_json"]):
                 raise HTTPException(status_code=409, detail="이미 처리된 추천입니다.")
             result = recommendation["result_json"]
             result["manager_pending_items"] = _merge_approval_rows(
@@ -510,7 +517,9 @@ def request_manager_approval(request_id: str, approval: ApprovalRequest) -> dict
             cursor.execute(
                 """
                 UPDATE pricing_ops.pricing_recommendation
-                SET result_json = %s::jsonb
+                SET result_json = %s::jsonb,
+                    status = 'PENDING',
+                    decided_at = NULL
                 WHERE request_id = %s
                 """,
                 (json.dumps(result), request_id),
