@@ -106,6 +106,22 @@ class WebApiTests(unittest.TestCase):
         }
         self.assertEqual(recommendations._dashboard_items(result), [])
 
+    def test_approval_stages_keep_manager_items_out_of_rds_pending_list(self):
+        result = {
+            "request_id": "S01-200",
+            "store_id": "S01",
+            "acceptance": {"selection_status": "OPTIMIZED_SELECTED"},
+            "dashboard": {"items": [
+                {"product_id": "P001", "dte_index": 0, "approval_required": True, "selected_discount_rate": 0.10},
+                {"product_id": "P002", "dte_index": 1, "approval_required": True, "selected_discount_rate": 0.30},
+            ]},
+            "approved_items": [{"product_id": "P001", "dte_index": 0, "approved_rate": 0.10}],
+            "manager_pending_items": [{"product_id": "P002", "dte_index": 1, "approved_rate": 0.30}],
+        }
+        self.assertEqual(recommendations._pending_dashboard_items(result), [])
+        manager_items = recommendations._manager_pending_dashboard_items(result)
+        self.assertEqual([(item["product_id"], item["approved_rate"]) for item in manager_items], [("P002", 0.30)])
+
 
 if __name__ == "__main__":
     unittest.main()

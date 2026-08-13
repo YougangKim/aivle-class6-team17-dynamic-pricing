@@ -193,6 +193,8 @@ function latestPolicyRows(rows) {
   return rows.filter((row) => row.request_id === latestRequestId);
 }
 
+const inventoryCellKey = (item) => `${item.product_id}:${item.dte_index}`;
+
 export async function login(id, pw, storeId) {
   if (USE_MOCK) {
     await delay(650);
@@ -225,7 +227,7 @@ export async function getSummary(storeId) {
   return {
     ...summary,
     snapshot_date: inventory[0]?.snapshot_date ?? summary.snapshot_date,
-    product_count: inventory.length,
+    product_count: new Set(inventory.map((item) => item.product_id)).size,
     total_stock_quantity: inventory.reduce((total, item) => total + item.stock_quantity, 0),
     pending: riskItems.length,
     d_day: inventory.filter((item) => item.days_until_expiry <= 0).length,
@@ -245,14 +247,9 @@ export async function getRecommendations(storeId) {
     call(`/inventory?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
   ]);
   const recommendations = latestPolicyRows(rawRecommendations);
-  const inventoryByProduct = new Map(inventory.map((item) => [item.product_id, item]));
-  const selectedByProduct = new Map();
-  recommendations.forEach((rec) => {
-    const current = selectedByProduct.get(rec.product_id);
-    if (!current || rec.dte_index < current.dte_index) selectedByProduct.set(rec.product_id, rec);
-  });
-  return [...selectedByProduct.values()].map((rec) => {
-    const item = inventoryByProduct.get(rec.product_id) ?? {};
+  const inventoryByCell = new Map(inventory.map((item) => [inventoryCellKey(item), item]));
+  return recommendations.map((rec) => {
+    const item = inventoryByCell.get(inventoryCellKey(rec)) ?? {};
     return {
       ...item,
       ...rec,
@@ -278,13 +275,9 @@ export async function getInventory(storeId) {
     call(`/recommendations?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
   ]);
   const recommendations = latestPolicyRows(rawRecommendations);
-  const recommendationByProduct = new Map();
-  recommendations.forEach((rec) => {
-    const current = recommendationByProduct.get(rec.product_id);
-    if (!current || rec.dte_index < current.dte_index) recommendationByProduct.set(rec.product_id, rec);
-  });
+  const recommendationByCell = new Map(recommendations.map((rec) => [inventoryCellKey(rec), rec]));
   return inventory.map((item) => {
-    const rec = recommendationByProduct.get(item.product_id);
+    const rec = recommendationByCell.get(inventoryCellKey(item));
     return rec ? {
       ...item,
       request_id: rec.request_id,
@@ -302,28 +295,60 @@ export async function getInventory(storeId) {
     };
   });
 }
-export async function approve(storeId, items) {
-  if (USE_RECOMMENDATIONS_MOCK) {
-    await delay(900);
-    return { approved: items.length, esl_sent: Math.max(items.length - 1, 0), esl_failed: items.length ? 1 : 0 };
-  }
-  const byRequest = items.reduce((groups, item) => {
+function groupApprovalItems(items) {
+  return items.reduce((groups, item) => {
     const group = groups.get(item.request_id) ?? [];
     group.push(item);
     groups.set(item.request_id, group);
     return groups;
   }, new Map());
+}
+
+function approvalPayload(items, finalize) {
+  return {
+    items: items.map((item) => ({
+      product_id: item.product_id,
+      dte_index: item.dte_index,
+      approved_rate: item.approved_rate,
+    })),
+    ...(finalize === undefined ? {} : { finalize }),
+  };
+}
+
+export async function approve(storeId, items, { finalize = true } = {}) {
+  if (USE_RECOMMENDATIONS_MOCK) {
+    await delay(900);
+    return { approved: items.length, esl_sent: Math.max(items.length - 1, 0), esl_failed: items.length ? 1 : 0 };
+  }
   const results = [];
-  for (const [requestId, requestItems] of byRequest) {
+  for (const [requestId, requestItems] of groupApprovalItems(items)) {
     results.push(await call(`/recommendations/${encodeURIComponent(requestId)}/approve`, {
       method: "POST",
-      body: JSON.stringify({
-        items: requestItems.map((item) => ({
-          product_id: item.product_id,
-          dte_index: item.dte_index,
-          approved_rate: item.approved_rate,
-        })),
-      }),
+      body: JSON.stringify(approvalPayload(requestItems, finalize)),
+    }));
+  }
+  return { approved: results.reduce((sum, result) => sum + result.updated_items, 0), results };
+}
+
+export async function requestManagerApproval(storeId, items) {
+  if (USE_RECOMMENDATIONS_MOCK) { await delay(450); return { requested: items.length }; }
+  const results = [];
+  for (const [requestId, requestItems] of groupApprovalItems(items)) {
+    results.push(await call(`/recommendations/${encodeURIComponent(requestId)}/manager-request`, {
+      method: "POST",
+      body: JSON.stringify(approvalPayload(requestItems)),
+    }));
+  }
+  return { requested: results.reduce((sum, result) => sum + result.requested_items, 0), results };
+}
+
+export async function approveByManager(storeId, items) {
+  if (USE_RECOMMENDATIONS_MOCK) { await delay(700); return { approved: items.length }; }
+  const results = [];
+  for (const [requestId, requestItems] of groupApprovalItems(items)) {
+    results.push(await call(`/recommendations/${encodeURIComponent(requestId)}/manager-approve`, {
+      method: "POST",
+      body: JSON.stringify(approvalPayload(requestItems)),
     }));
   }
   return { approved: results.reduce((sum, result) => sum + result.updated_items, 0), results };
@@ -650,10 +675,10 @@ export async function getSkipped(storeId) {
   if (USE_RECOMMENDATIONS_MOCK) {
     await delay(450);
     return [
-      { product_id: "P002", product_name: "한우 채끝 300g", category: "축산", reason: "잔여 3일 · 예상 소진율 92%로 조치 불필요", type: "ok" },
-      { product_id: "P020", product_name: "고등어 2마리", category: "수산", reason: "잔여 2일 · 회전율 정상 범위", type: "ok" },
-      { product_id: "P055", product_name: "즉석 도시락", category: "즉석", reason: "재고 2개 미만 · 할인 효과 대비 관리비용 큼", type: "skip" },
-      { product_id: "P061", product_name: "수입 체리 500g", category: "청과", reason: "행사 진행 중 · 중복 할인 방지 규칙 적용", type: "block" },
+      { product_id: "P002", dte_index: 3, product_name: "한우 채끝 300g", category: "축산", reason: "잔여 3일 · 예상 소진율 92%로 조치 불필요", type: "ok", comparison: { ai_candidate: { discount_rate: 0, expected_profit: 184000 }, no_discount: { discount_rate: 0, expected_profit: 191000 }, standard_markdown: { discount_rate: 0, expected_profit: 191000 } } },
+      { product_id: "P020", dte_index: 3, product_name: "고등어 2마리", category: "수산", reason: "잔여 2일 · 회전율 정상 범위", type: "ok", comparison: { ai_candidate: { discount_rate: 0.02, expected_profit: 72000 }, no_discount: { discount_rate: 0, expected_profit: 76000 }, standard_markdown: { discount_rate: 0, expected_profit: 76000 } } },
+      { product_id: "P055", dte_index: 3, product_name: "즉석 도시락", category: "즉석", reason: "재고 2개 미만 · 할인 효과 대비 관리비용 큼", type: "skip", comparison: { ai_candidate: { discount_rate: 0.02, expected_profit: 11800 }, no_discount: { discount_rate: 0, expected_profit: 12600 }, standard_markdown: { discount_rate: 0, expected_profit: 12600 } } },
+      { product_id: "P061", dte_index: 3, product_name: "수입 체리 500g", category: "청과", reason: "행사 진행 중 · 중복 할인 방지 규칙 적용", type: "block", comparison: { ai_candidate: { discount_rate: 0.08, expected_profit: 68000 }, no_discount: { discount_rate: 0, expected_profit: 71000 }, standard_markdown: { discount_rate: 0, expected_profit: 71000 } } },
     ];
   }
   const revision = Date.now();
@@ -661,10 +686,41 @@ export async function getSkipped(storeId) {
     call(`/recommendations/skipped?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
     call(`/inventory?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
   ]);
-  const inventoryByProduct = new Map(inventory.map((item) => [item.product_id, item]));
+  const inventoryByCell = new Map(inventory.map((item) => [inventoryCellKey(item), item]));
   return skipped.map((item) => ({
-    ...inventoryByProduct.get(item.product_id),
+    ...inventoryByCell.get(inventoryCellKey(item)),
     ...item,
+  }));
+}
+
+export async function getCompleted(storeId) {
+  if (USE_RECOMMENDATIONS_MOCK) return [];
+  const revision = Date.now();
+  const [completed, inventory] = await Promise.all([
+    call(`/recommendations/completed?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
+    call(`/inventory?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
+  ]);
+  const inventoryByCell = new Map(inventory.map((item) => [inventoryCellKey(item), item]));
+  return completed.map((item) => ({
+    ...inventoryByCell.get(inventoryCellKey(item)),
+    ...item,
+    days_until_expiry: item.dte_index,
+  }));
+}
+
+export async function getManagerPending(storeId) {
+  if (USE_RECOMMENDATIONS_MOCK) return [];
+  const revision = Date.now();
+  const [pending, inventory] = await Promise.all([
+    call(`/recommendations/manager-pending?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
+    call(`/inventory?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
+  ]);
+  const inventoryByCell = new Map(inventory.map((item) => [inventoryCellKey(item), item]));
+  return pending.map((item) => ({
+    ...inventoryByCell.get(inventoryCellKey(item)),
+    ...item,
+    days_until_expiry: item.dte_index,
+    rate: Math.round(item.approved_rate * 100),
   }));
 }
 
