@@ -44,38 +44,16 @@ function comparisonLines(item) {
   const noDiscountProfit = number(noDiscount.expected_profit);
   const aiProfit = number(ai.expected_profit);
   const standardRate = Number(standard.discount_rate) || 0;
-  const control = standardProfit == null || noDiscountProfit == null
-    ? standardRate === 0
-      ? { label: "마감 할인·할인 미적용", profit: null }
-      : { label: "마감 할인", profit: null, name: "마감 할인" }
-    : standardProfit === noDiscountProfit
-      ? { label: "마감 할인·할인 미적용", profit: standardProfit }
-      : standardProfit > noDiscountProfit
-        ? { label: "마감 할인", profit: standardProfit, name: "마감 할인" }
-        : { label: "할인 미적용", profit: noDiscountProfit, name: "할인 미적용" };
-  const policyLine = `AI ${pct(ai.discount_rate)} · 마감할인 ${pct(standard.discount_rate)} · 할인 미적용 비교 결과`;
-  if (control && aiProfit != null) {
-    const delta = control.profit - aiProfit;
-    const controlAmount = won(Math.round(control.profit));
-    const aiAmount = won(Math.round(aiProfit));
-    if (delta === 0) return { policyLine, comparisonLine: `예상이익 ${aiAmount}으로 동일` };
-    return {
-      policyLine,
-      comparisonLine: delta > 0
-        ? `${control.name ? `${control.name}${control.name === "할인 미적용" ? " 시" : ""}` : control.label} 예상이익 ${controlAmount} · AI ${aiAmount} · 유지 시 ${won(Math.round(delta))} 이득`
-        : `AI 예상이익 ${aiAmount} · ${control.name ?? control.label} ${controlAmount} · AI 적용 시 ${won(Math.round(-delta))} 이득`,
-    };
-  }
-  return {
-    policyLine,
-    comparisonLine: !control.name
-      ? "마감 할인과 할인 미적용의 예상이익이 동일"
-      : item.decision === "STANDARD_MARKDOWN"
-      ? "마감 할인 유지가 AI 후보보다 우세"
-      : item.decision === "NO_DISCOUNT"
-        ? "할인 미적용 유지가 AI 후보보다 우세"
-        : "AI 후보와 비교 기준의 개별 금액은 다음 모델 결과에서 표시",
-  };
+  const policyLine = standardRate === 0
+    ? `AI ${pct(ai.discount_rate)} · 할인 미적용 비교 결과`
+    : `AI ${pct(ai.discount_rate)} · 마감할인 ${pct(standard.discount_rate)} · 할인 미적용 비교 결과`;
+  const profits = [
+    { label: "AI", value: aiProfit },
+    ...(standardRate > 0 ? [{ label: "마감 할인", value: standardProfit }] : []),
+    { label: "할인 미적용", value: noDiscountProfit },
+  ].filter((entry) => entry.value != null);
+  const bestProfit = profits.length ? Math.max(...profits.map((entry) => entry.value)) : null;
+  return { policyLine, profits, bestProfit };
 }
 
 function Row({ item, selected, onToggle, rate, onRate, onOpen, threshold, cap, onReject, canApprove }) {
@@ -897,7 +875,7 @@ export default function Home({
             <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white">
               {(skipped.data ?? []).map((k) => {
                 const tone = k.type === "block" ? "bg-cjorange-50 text-cjorange-700" : k.type === "skip" ? "bg-slate-100 text-slate-500" : "bg-emerald-50 text-emerald-700";
-                const label = k.type === "block" ? "규칙 차단" : k.type === "skip" ? "효익 낮음" : "조치 불필요";
+                const label = k.type === "block" ? "규칙 차단" : k.type === "skip" ? "비교 정책 유지" : "조치 불필요";
                 const comparison = comparisonLines(k);
                 return (
                   <div key={itemKey(k)} className="grid gap-x-3 gap-y-2 border-b border-slate-100 px-5 py-3 last:border-0 md:grid-cols-[10rem_auto_auto_1fr] md:items-start">
@@ -906,7 +884,18 @@ export default function Home({
                     <span className={`w-fit rounded-md px-2 py-0.5 text-[11px] font-bold ${tone}`}>{label}</span>
                     <div className="min-w-0 space-y-1 text-xs leading-relaxed">
                       <p className="font-semibold text-slate-700">{comparison.policyLine}</p>
-                      <p className="text-slate-600">{comparison.comparisonLine}</p>
+                      <p className="text-slate-600">
+                        {comparison.profits.length > 0
+                          ? comparison.profits.map((entry, index) => (
+                            <span key={entry.label}>
+                              {index > 0 && " · "}
+                              <span className={entry.value === comparison.bestProfit ? "font-bold text-slate-900" : ""}>
+                                {entry.label} 예상이익 {won(Math.round(entry.value))}원
+                              </span>
+                            </span>
+                          ))
+                          : "정책별 예상이익 정보 없음"}
+                      </p>
                       <p className="text-slate-400">{k.reason}</p>
                     </div>
                   </div>

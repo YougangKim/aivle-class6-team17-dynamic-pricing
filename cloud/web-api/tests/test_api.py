@@ -47,7 +47,7 @@ def sample_row():
         "product_id": "P001",
         "product_name": "테스트 상품",
         "category": "축산",
-        "days_until_expiry": 1,
+        "dte_index": 1,
         "current_stock_quantity": 10,
         "reserved_quantity": 2,
         "stock_quantity": 8,

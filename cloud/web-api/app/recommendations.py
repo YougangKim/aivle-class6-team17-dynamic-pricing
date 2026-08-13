@@ -144,20 +144,40 @@ def _with_comparison(result: dict[str, Any], item: dict[str, Any]) -> dict[str, 
     }
 
 
+def _ai_outperforms_controls(result: dict[str, Any], row: dict[str, Any]) -> bool:
+    key = (str(row["product_id"]), int(row["dte_index"]))
+    no_discount = _product_metrics(result, "no_discount").get(key, {})
+    standard = _product_metrics(result, "standard_markdown").get(key, {})
+    ai = _product_metrics(result, "ai_candidate").get(key, {})
+    has_profit_comparison = any(
+        name in row
+        for name in ("ai_expected_profit", "no_discount_expected_profit", "standard_markdown_expected_profit")
+    ) or any("expected_profit" in metric for metric in (ai, no_discount, standard))
+    if not has_profit_comparison:
+        return bool(row.get("approval_required"))
+    ai_profit = float(row.get("ai_expected_profit") or ai.get("expected_profit") or 0.0)
+    no_discount_profit = float(row.get("no_discount_expected_profit") or no_discount.get("expected_profit") or 0.0)
+    standard_profit = float(row.get("standard_markdown_expected_profit") or standard.get("expected_profit") or 0.0)
+    return ai_profit > max(no_discount_profit, standard_profit)
+
+
 def _dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
     dashboard = result.get("dashboard") or {}
     if "items" in dashboard:
-        if _selection_status(result) != "OPTIMIZED_SELECTED":
-            return []
         return [
             _with_comparison(result, {
                 "request_id": result["request_id"],
                 "store_id": result["store_id"],
                 **row,
-                "recommended_rate": float(row["selected_discount_rate"]),
+                "selected_discount_rate": float(row.get("ai_discount_rate") or 0.0),
+                "recommended_rate": float(row.get("ai_discount_rate") or 0.0),
+                "approval_required": True,
+                "decision": "AI",
+                "type": "ok",
+                "reason_code": "AI_RECOMMENDED",
             })
             for row in dashboard["items"]
-            if row.get("approval_required")
+            if _ai_outperforms_controls(result, row)
         ]
     if (result.get("acceptance") or {}).get("selection_status") != "OPTIMIZED_SELECTED":
         return []
@@ -176,7 +196,7 @@ def _dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 _SKIP_REASONS = {
-    "AI_DISCOUNT_AT_OR_BELOW_3_PERCENT": "AI 할인 효과는 있으나 3% 이하라 승인 대기열에는 올리지 않았습니다.",
+    "AI_DISCOUNT_AT_OR_BELOW_3_PERCENT": "AI 예상이익이 비교 정책보다 높지 않아 승인 대상에서 제외했습니다.",
     "STANDARD_MARKDOWN_OUTPERFORMED_AI": "표준 유통기한 할인안이 AI 할인안보다 더 적합합니다.",
     "NO_DISCOUNT_OUTPERFORMED_MARKDOWN_AND_AI": "할인 없이 판매하는 편이 표준 할인과 AI 할인보다 적합합니다.",
     "FINAL_POLICY_NOT_BETTER_THAN_BOTH_CONTROLS": "개별 AI 후보는 있었지만 점포 전체 기준정책보다 우수하지 않아 승인 대상에서 제외했습니다.",
@@ -187,10 +207,9 @@ def _skipped_dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
     dashboard = result.get("dashboard") or {}
     if "items" not in dashboard:
         return []
-    optimized = _selection_status(result) == "OPTIMIZED_SELECTED"
     items = []
     for row in dashboard["items"]:
-        if row.get("approval_required") and optimized:
+        if _ai_outperforms_controls(result, row):
             continue
         item = dict(row)
         if row.get("approval_required"):
