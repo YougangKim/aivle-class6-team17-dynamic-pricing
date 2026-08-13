@@ -41,7 +41,7 @@ export default function Inventory({ storeId, onToast, policy }) {
     setDetail(null);
   }, [policyRevision]);
   useEffect(() => {
-    const timer = setInterval(reload, 30000);
+    const timer = setInterval(reload, 60000);
     return () => clearInterval(timer);
   }, [reload]);
 

@@ -656,7 +656,16 @@ export async function getSkipped(storeId) {
       { product_id: "P061", product_name: "수입 체리 500g", category: "청과", reason: "행사 진행 중 · 중복 할인 방지 규칙 적용", type: "block" },
     ];
   }
-  return call(`/recommendations/skipped?store_id=${encodeURIComponent(storeId)}`);
+  const revision = Date.now();
+  const [skipped, inventory] = await Promise.all([
+    call(`/recommendations/skipped?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
+    call(`/inventory?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
+  ]);
+  const inventoryByProduct = new Map(inventory.map((item) => [item.product_id, item]));
+  return skipped.map((item) => ({
+    ...inventoryByProduct.get(item.product_id),
+    ...item,
+  }));
 }
 
 /* ---------- 모델 성능 ---------- */
