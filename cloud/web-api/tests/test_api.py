@@ -106,6 +106,35 @@ class WebApiTests(unittest.TestCase):
         }
         self.assertEqual(recommendations._dashboard_items(result), [])
 
+    def test_zero_ai_discount_matches_no_discount_and_is_hidden(self):
+        result = {
+            "request_id": "S01-201", "store_id": "S01",
+            "dashboard": {"items": [{
+                "product_id": "P001", "dte_index": 3,
+                "ai_discount_rate": 0.0, "standard_discount_rate": 0.0,
+                "ai_expected_profit": 0.0, "no_discount_expected_profit": 475.0,
+                "standard_markdown_expected_profit": 475.0,
+            }]},
+        }
+        self.assertEqual(recommendations._dashboard_items(result), [])
+        self.assertEqual(recommendations._skipped_dashboard_items(result), [])
+
+    def test_profitable_ai_candidate_moves_to_approval_queue(self):
+        result = {
+            "request_id": "S01-202", "store_id": "S01",
+            "dashboard": {"items": [{
+                "product_id": "P001", "dte_index": 0,
+                "ai_discount_rate": 0.11, "standard_discount_rate": 0.40,
+                "ai_expected_profit": 1.0, "no_discount_expected_profit": -15380.0,
+                "standard_markdown_expected_profit": -20000.0,
+                "approval_required": False, "type": "skip",
+            }]},
+        }
+        pending = recommendations._dashboard_items(result)
+        self.assertEqual(len(pending), 1)
+        self.assertEqual(pending[0]["recommended_rate"], 0.11)
+        self.assertEqual(recommendations._skipped_dashboard_items(result), [])
+
     def test_approval_stages_keep_manager_items_out_of_rds_pending_list(self):
         result = {
             "request_id": "S01-200",

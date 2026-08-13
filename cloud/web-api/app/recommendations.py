@@ -115,6 +115,10 @@ def _with_comparison(result: dict[str, Any], item: dict[str, Any]) -> dict[str, 
     selected = _product_metrics(result, "selected").get(key, {})
     no_discount = _product_metrics(result, "no_discount").get(key, {})
     standard = _product_metrics(result, "standard_markdown").get(key, {})
+    ai = _product_metrics(result, "ai_candidate").get(key, {})
+    ai_rate = float(item.get("ai_discount_rate") or 0.0)
+    no_discount_profit = float(item.get("no_discount_expected_profit") or no_discount.get("expected_profit") or 0.0)
+    ai_profit = no_discount_profit if ai_rate == 0.0 else float(item.get("ai_expected_profit") or ai.get("expected_profit") or 0.0)
     return {
         **selected,
         **item,
@@ -122,7 +126,7 @@ def _with_comparison(result: dict[str, Any], item: dict[str, Any]) -> dict[str, 
             "no_discount": {
                 "discount_rate": 0.0,
                 **no_discount,
-                "expected_profit": float(item.get("no_discount_expected_profit") or no_discount.get("expected_profit") or 0.0),
+                "expected_profit": no_discount_profit,
             },
             "standard_markdown": {
                 "discount_rate": float(item.get("standard_discount_rate") or 0.0),
@@ -130,9 +134,10 @@ def _with_comparison(result: dict[str, Any], item: dict[str, Any]) -> dict[str, 
                 "expected_profit": float(item.get("standard_markdown_expected_profit") or standard.get("expected_profit") or 0.0),
             },
             "ai_candidate": {
-                "discount_rate": float(item.get("ai_discount_rate") or 0.0),
+                "discount_rate": ai_rate,
+                **ai,
                 "score_7_to_3": float(item.get("ai_score_7_to_3") or 0.0),
-                "expected_profit": float(item.get("ai_expected_profit") or 0.0),
+                "expected_profit": ai_profit,
             },
             "selected": {
                 "discount_rate": float(item.get("selected_discount_rate") or 0.0),
@@ -155,10 +160,22 @@ def _ai_outperforms_controls(result: dict[str, Any], row: dict[str, Any]) -> boo
     ) or any("expected_profit" in metric for metric in (ai, no_discount, standard))
     if not has_profit_comparison:
         return bool(row.get("approval_required"))
-    ai_profit = float(row.get("ai_expected_profit") or ai.get("expected_profit") or 0.0)
     no_discount_profit = float(row.get("no_discount_expected_profit") or no_discount.get("expected_profit") or 0.0)
+    ai_rate = float(row.get("ai_discount_rate") or 0.0)
+    ai_profit = no_discount_profit if ai_rate == 0.0 else float(row.get("ai_expected_profit") or ai.get("expected_profit") or 0.0)
     standard_profit = float(row.get("standard_markdown_expected_profit") or standard.get("expected_profit") or 0.0)
     return ai_profit > max(no_discount_profit, standard_profit)
+
+
+def _plain_no_discount_is_best(result: dict[str, Any], row: dict[str, Any]) -> bool:
+    if float(row.get("ai_discount_rate") or 0.0) != 0.0:
+        return False
+    key = (str(row["product_id"]), int(row["dte_index"]))
+    no_discount = _product_metrics(result, "no_discount").get(key, {})
+    standard = _product_metrics(result, "standard_markdown").get(key, {})
+    no_discount_profit = float(row.get("no_discount_expected_profit") or no_discount.get("expected_profit") or 0.0)
+    standard_profit = float(row.get("standard_markdown_expected_profit") or standard.get("expected_profit") or 0.0)
+    return no_discount_profit >= standard_profit
 
 
 def _dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
@@ -198,7 +215,7 @@ def _dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
 _SKIP_REASONS = {
     "AI_DISCOUNT_AT_OR_BELOW_3_PERCENT": "AI 예상이익이 비교 정책보다 높지 않아 승인 대상에서 제외했습니다.",
     "STANDARD_MARKDOWN_OUTPERFORMED_AI": "표준 유통기한 할인안이 AI 할인안보다 더 적합합니다.",
-    "NO_DISCOUNT_OUTPERFORMED_MARKDOWN_AND_AI": "할인 없이 판매하는 편이 표준 할인과 AI 할인보다 적합합니다.",
+    "NO_DISCOUNT_OUTPERFORMED_MARKDOWN_AND_AI": "할인 미적용 정책의 예상이익이 마감 할인과 AI 할인보다 높습니다.",
     "FINAL_POLICY_NOT_BETTER_THAN_BOTH_CONTROLS": "개별 AI 후보는 있었지만 점포 전체 기준정책보다 우수하지 않아 승인 대상에서 제외했습니다.",
 }
 
@@ -210,6 +227,8 @@ def _skipped_dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
     items = []
     for row in dashboard["items"]:
         if _ai_outperforms_controls(result, row):
+            continue
+        if _plain_no_discount_is_best(result, row):
             continue
         item = dict(row)
         if row.get("approval_required"):
