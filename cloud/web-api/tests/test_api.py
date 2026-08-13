@@ -135,6 +135,22 @@ class WebApiTests(unittest.TestCase):
         self.assertEqual(pending[0]["recommended_rate"], 0.11)
         self.assertEqual(recommendations._skipped_dashboard_items(result), [])
 
+    def test_missing_ai_metrics_are_not_treated_as_zero_profit(self):
+        result = {
+            "request_id": "S02-203", "store_id": "S02",
+            "dashboard": {"items": [{
+                "product_id": "P003", "dte_index": 0,
+                "ai_discount_rate": 0.19, "standard_discount_rate": 0.40,
+                "decision": "STANDARD_MARKDOWN", "approval_required": False,
+            }]},
+            "model_b_output": {
+                "no_discount": {"product_metrics": [{"product_id": "P003", "dte_index": 0, "expected_profit": -100.0}]},
+                "standard_markdown": {"product_metrics": [{"product_id": "P003", "dte_index": 0, "expected_profit": -120.0}]},
+                "selected": {"product_metrics": [{"product_id": "P003", "dte_index": 0, "expected_profit": -120.0}]},
+            },
+        }
+        self.assertEqual(recommendations._dashboard_items(result), [])
+
     def test_approval_stages_keep_manager_items_out_of_rds_pending_list(self):
         result = {
             "request_id": "S01-200",
