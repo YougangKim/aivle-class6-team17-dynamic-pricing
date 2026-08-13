@@ -114,19 +114,20 @@ export default function Home({
   const pDep = policyDep(policy);
   const s = useAsync(() => getSummary(storeId), [storeId, pDep]);
   const r = useAsync(() => getRecommendations(storeId), [storeId, pDep]);
+  const skipped = useAsync(() => getSkipped(storeId), [storeId]);
   useEffect(() => {
     const timer = setInterval(() => {
       r.reload();
       s.reload();
-    }, 30000);
+      skipped.reload();
+    }, 60000);
     return () => clearInterval(timer);
-  }, [r.reload, s.reload]);
+  }, [r.reload, s.reload, skipped.reload]);
   const [filter, setFilter] = useState("all");
   const [sel, setSel] = useState(null);
   const [sending, setSending] = useState(false);
   const [detail, setDetail] = useState(null);
   const [showSkipped, setShowSkipped] = useState(false);
-  const skipped = useAsync(() => getSkipped(storeId), [storeId]);
 
   /* ---- 매장 시계 : 대한민국 표준시(KST) 실시간 동기화 ---- */
   const CLOSE_MIN = 22 * 60;

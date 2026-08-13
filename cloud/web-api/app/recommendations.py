@@ -24,6 +24,24 @@ class ApprovalRequest(BaseModel):
     items: list[ApprovalItem] = Field(default_factory=list)
 
 
+def _result_from_message(body: str) -> dict[str, Any]:
+    result = json.loads(body)
+    output = result.get("output") if isinstance(result, dict) else None
+    if isinstance(output, str):
+        return json.loads(output)
+    return output if isinstance(output, dict) else result
+
+
+def _selection_status(result: dict[str, Any]) -> str:
+    acceptance = result.get("acceptance") or {}
+    if acceptance.get("selection_status"):
+        return str(acceptance["selection_status"])
+    dashboard = result.get("dashboard") or {}
+    if "items" in dashboard:
+        return "OPTIMIZED_SELECTED" if any(item.get("approval_required") for item in dashboard["items"]) else "BASELINE_RETAINED"
+    return str((result.get("acceptance") or {}).get("selection_status") or "BASELINE_RETAINED")
+
+
 def _drain_result_queue() -> None:
     queue_url = os.getenv("RESULT_QUEUE_URL", "").strip()
     if not queue_url:
@@ -31,8 +49,8 @@ def _drain_result_queue() -> None:
     sqs = boto3.client("sqs", region_name=os.getenv("AWS_REGION", "ap-northeast-2"))
     response = sqs.receive_message(QueueUrl=queue_url, MaxNumberOfMessages=10, WaitTimeSeconds=0)
     for message in response.get("Messages", []):
-        result = json.loads(message["Body"])
-        is_optimized = (result.get("acceptance") or {}).get("selection_status") == "OPTIMIZED_SELECTED"
+        result = _result_from_message(message["Body"])
+        is_optimized = _selection_status(result) == "OPTIMIZED_SELECTED"
         status = "PENDING" if is_optimized else "REJECTED"
         with connect_rds() as connection:
             with connection.cursor() as cursor:
@@ -62,6 +80,13 @@ def _drain_result_queue() -> None:
 
 
 def _policy_rates(result: dict[str, Any]) -> dict[tuple[str, int], float]:
+    dashboard = result.get("dashboard") or {}
+    if "items" in dashboard:
+        return {
+            (str(row["product_id"]), int(row["dte_index"])): float(row["selected_discount_rate"])
+            for row in dashboard["items"]
+            if row.get("approval_required")
+        }
     model_a = result.get("model_a_output") or {}
     policy_long = model_a.get("policy_long") or []
     if policy_long:
@@ -77,6 +102,25 @@ def _policy_rates(result: dict[str, Any]) -> dict[tuple[str, int], float]:
 
 
 def _dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
+    dashboard = result.get("dashboard") or {}
+    if "items" in dashboard:
+        if _selection_status(result) != "OPTIMIZED_SELECTED":
+            return []
+        selected_metrics = {
+            (str(row["product_id"]), int(row["dte_index"])): row
+            for row in ((result.get("model_b_output") or {}).get("selected") or {}).get("product_metrics") or []
+        }
+        return [
+            {
+                "request_id": result["request_id"],
+                "store_id": result["store_id"],
+                **selected_metrics.get((str(row["product_id"]), int(row["dte_index"])), {}),
+                **row,
+                "recommended_rate": float(row["selected_discount_rate"]),
+            }
+            for row in dashboard["items"]
+            if row.get("approval_required")
+        ]
     if (result.get("acceptance") or {}).get("selection_status") != "OPTIMIZED_SELECTED":
         return []
     policy = _policy_rates(result)
@@ -91,6 +135,41 @@ def _dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
         for row in metrics
         if policy.get((row["product_id"], int(row["dte_index"])), 0.0) > 0
     ]
+
+
+_SKIP_REASONS = {
+    "AI_DISCOUNT_AT_OR_BELOW_3_PERCENT": "AI 할인 효과는 있으나 3% 이하라 승인 대기열에는 올리지 않았습니다.",
+    "STANDARD_MARKDOWN_OUTPERFORMED_AI": "표준 유통기한 할인안이 AI 할인안보다 더 적합합니다.",
+    "NO_DISCOUNT_OUTPERFORMED_MARKDOWN_AND_AI": "할인 없이 판매하는 편이 표준 할인과 AI 할인보다 적합합니다.",
+    "FINAL_POLICY_NOT_BETTER_THAN_BOTH_CONTROLS": "개별 AI 후보는 있었지만 점포 전체 기준정책보다 우수하지 않아 승인 대상에서 제외했습니다.",
+}
+
+
+def _skipped_dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
+    dashboard = result.get("dashboard") or {}
+    if "items" not in dashboard:
+        return []
+    optimized = _selection_status(result) == "OPTIMIZED_SELECTED"
+    items = []
+    for row in dashboard["items"]:
+        if row.get("approval_required") and optimized:
+            continue
+        item = dict(row)
+        if row.get("approval_required"):
+            item.update({
+                "approval_required": False,
+                "type": "skip",
+                "reason_code": "FINAL_POLICY_NOT_BETTER_THAN_BOTH_CONTROLS",
+                "selected_discount_rate": float(row["standard_discount_rate"])
+                if float(row["standard_markdown_score_7_to_3"]) > 0 else 0.0,
+            })
+        items.append({
+            "request_id": result["request_id"],
+            "store_id": result["store_id"],
+            **item,
+            "reason": _SKIP_REASONS.get(str(item.get("reason_code")), "AI 추천 조건을 충족하지 않았습니다."),
+        })
+    return items
 
 
 @router.get("/recommendations")
@@ -110,6 +189,25 @@ def recommendations(store_id: str) -> list[dict[str, Any]]:
             )
             rows = cursor.fetchall()
     return [item for row in rows for item in _dashboard_items(row["result_json"])]
+
+
+@router.get("/recommendations/skipped")
+def skipped_recommendations(store_id: str) -> list[dict[str, Any]]:
+    _drain_result_queue()
+    with connect_rds() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                SELECT result_json
+                FROM pricing_ops.pricing_recommendation
+                WHERE store_id = %s
+                ORDER BY created_at DESC
+                LIMIT 1
+                """,
+                (store_id,),
+            )
+            rows = cursor.fetchall()
+    return [item for row in rows for item in _skipped_dashboard_items(row["result_json"])]
 
 
 def _recommended_items(result: dict[str, Any]) -> list[ApprovalItem]:

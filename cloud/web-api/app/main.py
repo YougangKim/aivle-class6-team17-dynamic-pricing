@@ -214,9 +214,3 @@ def summary(
         },
         "calendar": None,
     }
-
-
-@app.get("/api/recommendations/skipped")
-def skipped_recommendations(store_id: str = Query(pattern=r"^S\d{2}$")) -> list[Any]:
-    _validate_store(store_id)
-    return []
