@@ -305,21 +305,24 @@ export default function Home({
     projectedItems.forEach((i) => {
       const selected = i.comparison?.ai_candidate ?? i.comparison?.selected;
       const selectedRevenue = Number(selected?.expected_revenue);
-      if (Number.isFinite(selectedRevenue)) {
+      const sales = Number(selected?.expected_sales_qty ?? i.expected_sales_qty ?? i.stock_quantity * i.sell_probability);
+      const regularPrice = Number(i.regular_price ?? i.price);
+      const rate = Number(i.approved_rate ?? (Number.isFinite(i.rate) ? i.rate / 100 : i.recommended_rate ?? 0));
+      if (Number.isFinite(selectedRevenue) && selectedRevenue > 0) {
         revenue += selectedRevenue;
-      } else {
-        const sales = Number(selected?.expected_sales_qty);
-        const regularPrice = Number(i.regular_price ?? i.price);
-        const rate = Number(i.approved_rate ?? i.recommended_rate ?? 0);
-        if (Number.isFinite(sales) && Number.isFinite(regularPrice)) {
-          revenue += sales * regularPrice * (1 - rate);
-        }
+      } else if (Number.isFinite(sales) && Number.isFinite(regularPrice)) {
+        revenue += sales * regularPrice * (1 - rate);
       }
     });
     const recovered = projectedItems.reduce((sum, i) => {
       const baseline = Number(i.comparison?.no_discount?.expected_profit);
       const selected = Number((i.comparison?.ai_candidate ?? i.comparison?.selected)?.expected_profit);
-      return sum + (Number.isFinite(baseline) && Number.isFinite(selected) ? Math.max(selected - baseline, 0) : 0);
+      if (Number.isFinite(baseline) && Number.isFinite(selected) && (baseline !== 0 || selected !== 0)) {
+        return sum + Math.max(selected - baseline, 0);
+      }
+      const risk = Number(i.expected_loss);
+      const fallbackRisk = Number(i.stock_quantity ?? 0) * Number(i.cost ?? 0);
+      return sum + (Number.isFinite(risk) ? risk : fallbackRisk) * Number(i.sell_probability ?? 0);
     }, 0);
     const residual = Math.max(risk - recovered, 0);
     const byCat = Object.entries(
