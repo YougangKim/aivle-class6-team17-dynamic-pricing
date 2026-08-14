@@ -94,7 +94,7 @@ export default function Inventory({ storeId, onToast, policy }) {
         </div>
         <div className="flex flex-wrap gap-1.5">
           {CATS.map((c) => (
-            <button key={c} onClick={() => setCat(c)}
+            <button type="button" key={c} onClick={() => setCat(c)}
                     className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-all ${
                       cat === c ? "bg-slate-900 text-white" : "border border-slate-200 bg-white text-slate-600 hover:border-slate-300"
                     }`}>
@@ -112,7 +112,7 @@ export default function Inventory({ storeId, onToast, policy }) {
         <div className="flex items-center gap-1.5 text-xs">
           <ArrowUpDown size={13} className="text-slate-400" />
           {[["risk", "위험도순"], ["expiry", "유통기한순"], ["stock", "재고많은순"], ["turnover", "회전느린순"]].map(([k, l]) => (
-            <button key={k} onClick={() => setSort(k)} aria-pressed={sort === k}
+            <button type="button" key={k} onClick={() => setSort(k)} aria-pressed={sort === k}
                     className={`rounded-lg px-2.5 py-1 font-semibold transition-colors ${
                       sort === k ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-700"
                     }`}>
@@ -163,7 +163,7 @@ export default function Inventory({ storeId, onToast, policy }) {
                       )}
                     </td>
                     <td className="px-3 py-3.5 text-right">
-                      {i.expected_loss > 0
+                      {i.days_until_expiry === 0 && i.expected_loss > 0
                         ? <span className="font-semibold text-brand-600">{man(i.expected_loss)}만원</span>
                         : <span className="text-slate-300">—</span>}
                     </td>

@@ -152,7 +152,7 @@ def load_inventory(store_id: str) -> list[dict[str, Any]]:
             "turnover_available": True,
             "expected_loss": (
                 float(row["stock_quantity"]) * float(row["cost"])
-                if int(row["dte_index"]) <= 2
+                if int(row["dte_index"]) == 0
                 else 0.0
             ),
             "recommended_rate": 0.0,
@@ -195,7 +195,7 @@ def summary(
 ) -> dict[str, Any]:
     _disable_cache(response)
     items = load_inventory(store_id)
-    risk_items = [item for item in items if item["days_until_expiry"] <= 2]
+    risk_items = [item for item in items if item["days_until_expiry"] == 0]
     risk_amount = sum(item["stock_quantity"] * item["cost"] for item in risk_items)
     category_amounts: defaultdict[str, float] = defaultdict(float)
     for item in risk_items:

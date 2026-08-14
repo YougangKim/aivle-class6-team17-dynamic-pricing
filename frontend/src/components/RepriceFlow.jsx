@@ -136,7 +136,7 @@ export default function RepriceFlow({
                 </div>
                 <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
                   {labelOf(rec.reason_code)} 반영 · 할인 상한 {rec.previous_rate}% → {rec.cap}% ·{" "}
-                  {rec.new_rate}% 적용 시 예상이익 {won(rec.expected_profit)}원 · 예상 소진율 {rec.prob}%
+                  {rec.new_rate}% 적용 시 예상이익 {won(Math.round(rec.expected_profit))}원 · 예상 소진율 {rec.prob}%
                 </p>
                 {rec.memo && <p className="mt-1 text-[11px] text-slate-400">점장 메모 · “{rec.memo}”</p>}
                 {rec.gain_delta < 0 && (

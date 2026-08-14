@@ -301,35 +301,19 @@ export default function Home({
       };
     }
     const risk = inventoryRisk;
-    let revenue = 0;
-    projectedItems.forEach((i) => {
-      const selected = i.comparison?.ai_candidate ?? i.comparison?.selected;
-      const selectedRevenue = Number(selected?.expected_revenue);
-      const sales = Number(selected?.expected_sales_qty ?? i.expected_sales_qty ?? i.stock_quantity * i.sell_probability);
-      const regularPrice = Number(i.regular_price ?? i.price);
-      const rate = Number(i.approved_rate ?? (Number.isFinite(i.rate) ? i.rate / 100 : i.recommended_rate ?? 0));
-      if (Number.isFinite(selectedRevenue) && selectedRevenue > 0) {
-        revenue += selectedRevenue;
-      } else if (Number.isFinite(sales) && Number.isFinite(regularPrice)) {
-        revenue += sales * regularPrice * (1 - rate);
-      }
-    });
-    const recovered = projectedItems.reduce((sum, i) => {
-      const baseline = Number(i.comparison?.no_discount?.expected_profit);
-      const selected = Number((i.comparison?.ai_candidate ?? i.comparison?.selected)?.expected_profit);
-      if (Number.isFinite(baseline) && Number.isFinite(selected) && (baseline !== 0 || selected !== 0)) {
-        return sum + Math.max(selected - baseline, 0);
-      }
-      const risk = Number(i.expected_loss);
-      const fallbackRisk = Number(i.stock_quantity ?? 0) * Number(i.cost ?? 0);
-      return sum + (Number.isFinite(risk) ? risk : fallbackRisk) * Number(i.sell_probability ?? 0);
-    }, 0);
+
+    const recovered = completedItems.reduce(
+      (sum, i) => sum + Number(i.expected_loss ?? i.expected_waste_loss ?? 0),
+      0,
+    );
     const residual = Math.max(risk - recovered, 0);
     const byCat = Object.entries(
       pending.reduce((a, i) => ({ ...a, [i.category]: (a[i.category] || 0) + i.expected_loss }), {})
     ).map(([name, value]) => ({ name, value: +(value / 10000).toFixed(1) })).sort((a, b) => b.value - a.value);
-    return { risk, revenue, residual, byCat, baseRisk: inventoryRisk };
-  }, [projectedItems, pending, modelReady, d]);
+
+    return { risk, revenue: recovered, residual, byCat, baseRisk: inventoryRisk };
+  }, [completedItems, pending, modelReady, d]);
+
 
   /* 손실 흐름(워터폴) — risk = 회수 + 잔여 */
   const waterfall = useMemo(() => {
@@ -623,7 +607,9 @@ export default function Home({
              sub={kpi.byCat.length ? `${kpi.byCat[0].name} 최대 · 미조치 기준` : "전량 조치 완료"} />
         <Kpi loading={loading} index={2} tone="ok" label={modelReady ? "예상 매출" : "판매 가능 재고"}
              value={modelReady ? man(kpi.revenue) : (d?.total_stock_quantity ?? 0)} unit={modelReady ? "만원" : "개"} icon={Wallet}
-             sub={modelReady ? (projectedItems.length ? `선택·승인 ${projectedItems.length}건 기준` : "승인 시 집계됩니다") : `RDS 상품 ${d?.product_count ?? 0}종`} />
+
+             sub={modelReady ? (completedItems.length ? `승인완료 ${completedItems.length}건 기준` : "승인 시 집계됩니다") : `RDS 상품 ${d?.product_count ?? 0}종`} />
+
         <Kpi loading={loading} index={3} label="AI 추천"
              value={pending.length} unit="건" icon={Trash2}
              sub={pending.length ? `승인 대기열 ${pending.length}건` : "현재 추천 없음"} />
