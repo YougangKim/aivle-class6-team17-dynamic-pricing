@@ -62,6 +62,20 @@ def sample_row():
 
 
 class WebApiTests(unittest.TestCase):
+    def test_reprice_changes_only_target_cell(self):
+        matrix = [[0.10, 0.20, 0.30, 0.40] for _ in range(38)]
+        candidate = recommendations._candidate_matrix(matrix, "P002", 1, 0.15)
+        self.assertEqual(candidate[1][1], 0.15)
+        self.assertEqual(candidate[0], matrix[0])
+        self.assertEqual(matrix[1][1], 0.20)
+
+    def test_reprice_reason_reduces_cap(self):
+        item = recommendations.RepriceItem(
+            product_id="P001", dte_index=0, previous_rate=0.40,
+            reason_code="margin_guard", round=1,
+        )
+        self.assertEqual(recommendations._reprice_cap(item), 0.25)
+
     def test_inventory_and_summary(self):
         with patch.object(main, "connect_rds", return_value=FakeConnection([sample_row()])):
             inventory = main.inventory("S01")
@@ -150,6 +164,41 @@ class WebApiTests(unittest.TestCase):
             },
         }
         self.assertEqual(recommendations._dashboard_items(result), [])
+
+
+    def test_skip_reason_uses_displayed_profit_comparison(self):
+        result = {
+            "request_id": "S02-204", "store_id": "S02",
+            "dashboard": {"items": [{
+                "product_id": "P001", "dte_index": 0,
+                "ai_discount_rate": 0.01, "standard_discount_rate": 0.40,
+                "ai_expected_profit": -215032.0,
+                "standard_markdown_expected_profit": -216134.0,
+                "no_discount_expected_profit": -215024.0,
+                "reason_code": "STANDARD_MARKDOWN_OUTPERFORMED_AI",
+            }]},
+        }
+        skipped = recommendations._skipped_dashboard_items(result)
+        self.assertEqual(len(skipped), 1)
+        self.assertEqual(skipped[0]["reason_code"], "NO_DISCOUNT_OUTPERFORMED_MARKDOWN_AND_AI")
+        self.assertEqual(skipped[0]["selected_discount_rate"], 0.0)
+        self.assertIn("할인 미적용 정책", skipped[0]["reason"])
+
+    def test_skip_reason_keeps_standard_when_standard_profit_is_best(self):
+        result = {
+            "request_id": "S02-205", "store_id": "S02",
+            "dashboard": {"items": [{
+                "product_id": "P001", "dte_index": 0,
+                "ai_discount_rate": 0.10, "standard_discount_rate": 0.40,
+                "ai_expected_profit": -120.0,
+                "standard_markdown_expected_profit": -90.0,
+                "no_discount_expected_profit": -100.0,
+            }]},
+        }
+        skipped = recommendations._skipped_dashboard_items(result)
+        self.assertEqual(skipped[0]["reason_code"], "STANDARD_MARKDOWN_OUTPERFORMED_AI")
+        self.assertEqual(skipped[0]["selected_discount_rate"], 0.40)
+
 
     def test_approval_stages_keep_manager_items_out_of_rds_pending_list(self):
         result = {

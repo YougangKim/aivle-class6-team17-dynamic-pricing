@@ -7,6 +7,7 @@ import { REJECT_REASONS, MAX_REPRICE_ROUNDS } from "../lib/api";
 import { won, man, discounted } from "../lib/format";
 
 const labelOf = (code) => REJECT_REASONS.find((r) => r.code === code)?.label ?? "기타";
+const flowKey = (item) => `${item.product_id}:${item.dte_index}`;
 
 /* 반려 이후 업무 흐름을 한 줄로 보여주는 단계 표시 */
 function Stepper({ stage }) {
@@ -83,7 +84,7 @@ export default function RepriceFlow({
 
       {/* ---- ① AI 재계산 중 ---- */}
       {calcList.map((i) => (
-        <div key={i.product_id} className="border-b border-slate-100 px-5 py-4 last:border-0">
+        <div key={flowKey(i)} className="border-b border-slate-100 px-5 py-4 last:border-0">
           <div className="flex flex-wrap items-center gap-3">
             <Loader2 size={15} className="shrink-0 animate-spin text-cjblue-600" />
             <span className="w-44 shrink-0 truncate text-sm font-semibold">{i.product_name}</span>
@@ -111,7 +112,7 @@ export default function RepriceFlow({
         const price = discounted(i.regular_price, rec.new_rate / 100);
         const noAction = rec.new_rate === 0;
         return (
-          <div key={i.product_id} className="border-b border-slate-100 px-5 py-4 last:border-0">
+          <div key={flowKey(i)} className="border-b border-slate-100 px-5 py-4 last:border-0">
             <div className="flex flex-wrap items-start gap-3">
               <Sparkles size={15} className="mt-0.5 shrink-0 text-cjblue-600" />
               <div className="min-w-0 flex-1">
@@ -133,7 +134,10 @@ export default function RepriceFlow({
                     </span>
                   )}
                 </div>
-                <p className="mt-1.5 text-xs leading-relaxed text-slate-500">{rec.ai_note}</p>
+                <p className="mt-1.5 text-xs leading-relaxed text-slate-500">
+                  {labelOf(rec.reason_code)} 반영 · 할인 상한 {rec.previous_rate}% → {rec.cap}% ·{" "}
+                  {rec.new_rate}% 적용 시 예상이익 {won(rec.expected_profit)}원 · 예상 소진율 {rec.prob}%
+                </p>
                 {rec.memo && <p className="mt-1 text-[11px] text-slate-400">점장 메모 · “{rec.memo}”</p>}
                 {rec.gain_delta < 0 && (
                   <p className="mt-1 flex items-center gap-1 text-[11px] font-medium text-cjorange-700">
@@ -166,7 +170,7 @@ export default function RepriceFlow({
               )}
               {canApprove && (
                 <>
-                  <button onClick={() => onDiscard(i.product_id)}
+                  <button onClick={() => onDiscard(flowKey(i))}
                           className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-500 hover:bg-slate-50">
                     <Ban size={12} className="mr-1 inline" /> 할인 미적용
                   </button>
@@ -176,7 +180,7 @@ export default function RepriceFlow({
                   </button>
                 </>
               )}
-              <button onClick={() => onAccept(i.product_id)} disabled={noAction || (rec.needs_manager && !canApprove)}
+              <button onClick={() => onAccept(flowKey(i))} disabled={noAction || (rec.needs_manager && !canApprove)}
                       title={rec.needs_manager && !canApprove ? "점장 계정으로 로그인해야 승인할 수 있습니다" : ""}
                       className="rounded-xl bg-brand-600 px-4 py-2 text-xs font-bold text-white transition-transform active:scale-95 disabled:pointer-events-none disabled:opacity-40">
                 <Check size={12} strokeWidth={3} className="mr-1 inline" />
@@ -190,9 +194,10 @@ export default function RepriceFlow({
       {/* ---- ③ 강제 종결 ---- */}
       {closedList.map((i) => {
         const manual = i.mode === "manual";
-        const rate = draft[i.product_id] ?? i.rate ?? 0;
+        const key = flowKey(i);
+        const rate = draft[key] ?? i.rate ?? 0;
         return (
-          <div key={i.product_id} className="flex flex-wrap items-center gap-3 border-b border-slate-100 bg-slate-50/60 px-5 py-3.5 last:border-0">
+          <div key={key} className="flex flex-wrap items-center gap-3 border-b border-slate-100 bg-slate-50/60 px-5 py-3.5 last:border-0">
             {manual ? <UserCheck size={14} className="shrink-0 text-slate-500" /> : <Ban size={14} className="shrink-0 text-slate-400" />}
             <span className="w-44 shrink-0 truncate text-sm font-semibold">{i.product_name}</span>
             {manual ? (
@@ -202,16 +207,16 @@ export default function RepriceFlow({
                   재추천 {MAX_REPRICE_ROUNDS}회 소진 · 점장이 직접 할인율을 확정합니다
                 </span>
                 <span className="flex shrink-0 items-center gap-1.5">
-                  <button onClick={() => setDraft({ ...draft, [i.product_id]: Math.max(0, rate - 1) })}
+                  <button onClick={() => setDraft({ ...draft, [key]: Math.max(0, rate - 1) })}
                           className="rounded-lg border border-slate-200 bg-white px-1.5 py-1 text-slate-500 hover:bg-slate-100">
                     <Minus size={12} />
                   </button>
                   <span className="w-12 text-center text-sm font-bold">−{rate}%</span>
-                  <button onClick={() => setDraft({ ...draft, [i.product_id]: Math.min(i.cap ?? 40, rate + 1) })}
+                  <button onClick={() => setDraft({ ...draft, [key]: Math.min(i.cap ?? 40, rate + 1) })}
                           className="rounded-lg border border-slate-200 bg-white px-1.5 py-1 text-slate-500 hover:bg-slate-100">
                     <Plus size={12} />
                   </button>
-                  <button onClick={() => onFinalizeManual(i.product_id, rate)} disabled={!canApprove}
+                  <button onClick={() => onFinalizeManual(key, rate)} disabled={!canApprove}
                           className="ml-1 rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-bold text-white active:scale-95 disabled:opacity-40">
                     확정
                   </button>
