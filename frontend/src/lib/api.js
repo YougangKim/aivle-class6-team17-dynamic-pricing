@@ -430,7 +430,7 @@ export function repriceUnderConstraint(item, { previousRate, reasonCode, policy,
 
 /* 재추천 요청 — entries: [{ item, previous_rate, reason_code, memo, round }] */
 export async function requestReprice(storeId, entries) {
-  if (USE_MOCK) {
+  if (USE_RECOMMENDATIONS_MOCK) {
     await delay(1500);
     const policy = loadPolicy(storeId);
     return entries.map((e) => ({
