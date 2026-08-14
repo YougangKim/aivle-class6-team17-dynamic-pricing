@@ -22,6 +22,10 @@ const turnoverValue = (item) => {
   const value = Number(item.turnover);
   return item.turnover != null && Number.isFinite(value) ? value : null;
 };
+const numericValue = (value, fallback = 0) => {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : fallback;
+};
 
 export default function Inventory({ storeId, onToast, policy }) {
   /* 정책이 바뀌면 추천 할인율이 달라지므로 다시 불러옵니다 */
@@ -56,9 +60,9 @@ export default function Inventory({ storeId, onToast, policy }) {
     if (cat !== "전체") r = r.filter((i) => i.category === cat);
     if (q.trim()) r = r.filter((i) => i.product_name.includes(q.trim()));
     const by = {
-      risk: (a, b) => b.expected_loss - a.expected_loss,
-      expiry: (a, b) => a.days_until_expiry - b.days_until_expiry,
-      stock: (a, b) => b.stock_quantity - a.stock_quantity,
+      risk: (a, b) => numericValue(b.expected_loss) - numericValue(a.expected_loss),
+      expiry: (a, b) => numericValue(a.days_until_expiry, Number.MAX_SAFE_INTEGER) - numericValue(b.days_until_expiry, Number.MAX_SAFE_INTEGER),
+      stock: (a, b) => numericValue(b.stock_quantity) - numericValue(a.stock_quantity),
       turnover: (a, b) => {
         const av = turnoverValue(a);
         const bv = turnoverValue(b);
@@ -108,7 +112,7 @@ export default function Inventory({ storeId, onToast, policy }) {
         <div className="flex items-center gap-1.5 text-xs">
           <ArrowUpDown size={13} className="text-slate-400" />
           {[["risk", "위험도순"], ["expiry", "유통기한순"], ["stock", "재고많은순"], ["turnover", "회전느린순"]].map(([k, l]) => (
-            <button key={k} onClick={() => setSort(k)}
+            <button key={k} onClick={() => setSort(k)} aria-pressed={sort === k}
                     className={`rounded-lg px-2.5 py-1 font-semibold transition-colors ${
                       sort === k ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-700"
                     }`}>

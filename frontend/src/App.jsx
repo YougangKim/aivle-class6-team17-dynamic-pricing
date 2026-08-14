@@ -21,7 +21,7 @@ import { Toast, BrandMark } from "./components/ui";
 import { BRAND } from "./lib/brand";
 import {
   getNotifications, ROLES, loadPolicy,
-  requestReprice, closeRepriceFlow, REJECT_REASONS,
+  requestReprice, closeRepriceFlow, requestManagerApproval, approveReprice, getRepricePending, REJECT_REASONS,
 } from "./lib/api";
 
 const NAV = [
@@ -162,6 +162,13 @@ export default function App() {
     ])));
   }, [storeId]);
 
+  useEffect(() => {
+    if (!auth) return;
+    getRepricePending(storeId)
+      .then((rows) => setRestaged(new Map(rows.map((item) => [policyItemKey(item), item]))))
+      .catch(() => {});
+  }, [auth, storeId]);
+
   const dropFrom = (setter, ids) =>
     setter((prev) => {
       const next = new Map(prev);
@@ -213,13 +220,13 @@ export default function App() {
     const round = (rejectTarget?.round ?? 0) + 1;
     setRejectTarget(null);
     if (!list.length) return;
-    const ids = list.map((i) => i.product_id);
+    const ids = list.map(policyItemKey);
 
     dropFrom(setPendingMgr, ids);
     dropFrom(setRestaged, ids);
     setRepricing((prev) => {
       const next = new Map(prev);
-      list.forEach((i) => next.set(i.product_id, { ...i, reason_code: code, memo, round }));
+      list.forEach((i) => next.set(policyItemKey(i), { ...i, reason_code: code, memo, round }));
       return next;
     });
     fire({
@@ -232,12 +239,13 @@ export default function App() {
         storeId,
         list.map((i) => ({ item: i, previous_rate: i.rate, reason_code: code, memo, round }))
       );
-      const byId = new Map(res.map((r) => [r.product_id, r]));
+      const byId = new Map(res.map((r) => [policyItemKey(r), r]));
       setRestaged((prev) => {
         const next = new Map(prev);
         list.forEach((i) => {
-          const r = byId.get(i.product_id);
-          if (r) next.set(i.product_id, { ...i, round, reprice: r });
+          const key = policyItemKey(i);
+          const r = byId.get(key);
+          if (r) next.set(key, { ...i, round, reprice: r });
         });
         return next;
       });
@@ -246,7 +254,7 @@ export default function App() {
       /* 실패 시 결재 대기 상태로 되돌립니다 — 건이 증발하지 않게 */
       setPendingMgr((prev) => {
         const next = new Map(prev);
-        list.forEach((i) => next.set(i.product_id, i));
+        list.forEach((i) => next.set(policyItemKey(i), i));
         return next;
       });
       fire({ tone: "error", title: "재추천 실패", desc: e.message });
@@ -260,13 +268,13 @@ export default function App() {
     const list = targets ?? rejectTarget?.items ?? [];
     setRejectTarget(null);
     if (!list.length) return;
-    const ids = list.map((i) => i.product_id);
+    const ids = list.map(policyItemKey);
     dropFrom(setPendingMgr, ids);
     dropFrom(setRestaged, ids);
     setClosedFlow((prev) => {
       const next = new Map(prev);
       list.forEach((i) =>
-        next.set(i.product_id, {
+        next.set(policyItemKey(i), {
           ...i, mode,
           rate: mode === "manual" ? Math.max(0, (i.rate ?? 0) - 5) : 0,
           cap: i.policy_cap ?? policy.max_discount,
@@ -274,32 +282,44 @@ export default function App() {
       );
       return next;
     });
-    try { await closeRepriceFlow(storeId, { mode, product_ids: ids }); } catch { /* 기록 실패해도 화면 상태는 유지 */ }
+    try { await closeRepriceFlow(storeId, { mode, item_keys: ids }); } catch { /* 기록 실패해도 화면 상태는 유지 */ }
     fire(mode === "manual"
       ? { title: `${list.length}건 수동 가격 지정으로 전환`, desc: "점장이 직접 할인율을 입력해 확정합니다" }
       : { title: `${list.length}건 할인 미적용 종결`, desc: "정가 유지 · 미판매분 폐기 처리" });
   };
 
   /* 담당자 재검토 승인 — 새 할인율이 임계값을 넘으면 다시 점장 결재로 */
-  const acceptRestaged = (id) => {
+  const acceptRestaged = async (id) => {
     const item = restaged.get(id);
     if (!item) return;
     const rate = item.reprice.new_rate;
-    dropFrom(setRestaged, [id]);
-    if (rate > policy.two_step_over) {
-      setPendingMgr((prev) => {
-        const next = new Map(prev);
-        next.set(id, { ...item, rate, round: item.round, requested_by: auth?.user?.name ?? "담당자" });
-        return next;
-      });
-      fire({ title: "점장 재결재 요청", desc: `${item.product_name} · ${rate}% (${policy.two_step_over}% 초과)` });
-    } else {
-      setApproved((prev) => {
-        const next = new Map(prev);
-        next.set(id, { rate, name: item.product_name, esl: item.esl_applicable, regular_price: item.regular_price, approved_at: nowHms() });
-        return next;
-      });
-      fire({ title: "재검토 승인 완료", desc: `${item.product_name} · ${rate}% ESL 반영 요청됨` });
+    const approvalItem = {
+      request_id: item.request_id,
+      product_id: item.product_id,
+      dte_index: item.dte_index,
+      approved_rate: rate / 100,
+    };
+    try {
+      if (rate > policy.two_step_over) {
+        await requestManagerApproval(storeId, [approvalItem]);
+        setPendingMgr((prev) => {
+          const next = new Map(prev);
+          next.set(id, { ...item, rate, round: item.round, requested_by: auth?.user?.name ?? "담당자" });
+          return next;
+        });
+        fire({ title: "점장 재결재 요청", desc: `${item.product_name} · ${rate}% (${policy.two_step_over}% 초과)` });
+      } else {
+        await approveReprice(storeId, [approvalItem]);
+        setApproved((prev) => {
+          const next = new Map(prev);
+          next.set(id, { rate, name: item.product_name, esl: item.esl_applicable, regular_price: item.regular_price, approved_at: nowHms() });
+          return next;
+        });
+        fire({ title: "재추천 승인 완료", desc: `${item.product_name} · ${rate}% RDS 반영 완료` });
+      }
+      dropFrom(setRestaged, [id]);
+    } catch (error) {
+      fire({ title: "재추천 승인 실패", desc: error.message });
     }
   };
 

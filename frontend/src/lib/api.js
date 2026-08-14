@@ -354,6 +354,18 @@ export async function approveByManager(storeId, items) {
   return { approved: results.reduce((sum, result) => sum + result.updated_items, 0), results };
 }
 
+export async function approveReprice(storeId, items) {
+  if (USE_RECOMMENDATIONS_MOCK) { await delay(700); return { approved: items.length }; }
+  const results = [];
+  for (const [requestId, requestItems] of groupApprovalItems(items)) {
+    results.push(await call(`/recommendations/${encodeURIComponent(requestId)}/reprice-approve`, {
+      method: "POST",
+      body: JSON.stringify(approvalPayload(requestItems)),
+    }));
+  }
+  return { approved: results.reduce((sum, result) => sum + result.updated_items, 0), results };
+}
+
 export async function rejectRecommendation(requestId) {
   if (USE_RECOMMENDATIONS_MOCK) return { request_id: requestId, status: "REJECTED" };
   return call(`/recommendations/${encodeURIComponent(requestId)}/reject`, { method: "POST" });
@@ -432,19 +444,32 @@ export async function requestReprice(storeId, entries) {
       }),
     }));
   }
-  return call("/recommendations/reprice", {
-    method: "POST",
-    body: JSON.stringify({
-      store_id: storeId,
-      items: entries.map((e) => ({
-        product_id: e.item.product_id,
-        previous_rate: e.previous_rate / 100,
-        reason_code: e.reason_code,
-        memo: e.memo ?? "",
-        round: e.round,
-      })),
-    }),
-  });
+  const grouped = entries.reduce((groups, entry) => {
+    const requestId = entry.item.request_id;
+    if (!requestId) throw new Error("재추천 원본 request_id가 없습니다.");
+    const group = groups.get(requestId) ?? [];
+    group.push(entry);
+    groups.set(requestId, group);
+    return groups;
+  }, new Map());
+  const results = [];
+  for (const [requestId, requestEntries] of grouped) {
+    results.push(...await call(`/recommendations/${encodeURIComponent(requestId)}/reprice`, {
+      method: "POST",
+      body: JSON.stringify({
+        store_id: storeId,
+        items: requestEntries.map((e) => ({
+          product_id: e.item.product_id,
+          dte_index: e.item.dte_index,
+          previous_rate: e.previous_rate / 100,
+          reason_code: e.reason_code,
+          memo: e.memo ?? "",
+          round: e.round,
+        })),
+      }),
+    }));
+  }
+  return results;
 }
 
 /* 강제 종결 기록 — 수동 가격 지정 / 할인 미적용(폐기 처리) */
@@ -722,6 +747,11 @@ export async function getManagerPending(storeId) {
     days_until_expiry: item.dte_index,
     rate: Math.round(item.approved_rate * 100),
   }));
+}
+
+export async function getRepricePending(storeId) {
+  if (USE_RECOMMENDATIONS_MOCK) return [];
+  return call(`/recommendations/reprice-pending?store_id=${encodeURIComponent(storeId)}&_=${Date.now()}`);
 }
 
 /* ---------- 모델 성능 ---------- */

@@ -275,8 +275,8 @@ export default function Home({
     Math.min(capOf(i), rates[itemKey(i)] ?? (closingMode ? closingRate(i) : Math.round(i.recommended_rate * 100)));
   const d = s.data;
   const cal = d?.calendar;
-  // 모델 준비 전에는 기존 추천 데모를 유지하되, RDS 실재고와 혼동하지 않게 표시합니다.
-  const modelReady = d?.model_status !== "NOT_READY";
+  // summary 상태가 늦게 갱신돼도 실제 추천 결과가 있으면 모델 결과로 처리합니다.
+  const modelReady = d?.model_status !== "NOT_READY" || all.length > 0 || completedItems.length > 0;
 
   /* ---- 승인 상태가 반영된 실시간 KPI ---- */
   const kpi = useMemo(() => {
@@ -291,22 +291,23 @@ export default function Home({
       };
     }
     const risk = inventoryRisk;
-    let revenue = 0, residual = 0;
-    all.forEach((i) => {
-      const a = approved.get(itemKey(i));
-      if (a) {
-        const sold = i.stock_quantity * i.sell_probability;
-        revenue += sold * discounted(i.regular_price, a.rate / 100);
-        residual += (i.stock_quantity - sold) * i.cost;
-      } else {
-        residual += i.expected_loss;
-      }
+    let revenue = 0;
+    completedItems.forEach((i) => {
+      const selected = i.comparison?.ai_candidate ?? i.comparison?.selected;
+      const selectedRevenue = Number(selected?.expected_revenue);
+      if (Number.isFinite(selectedRevenue)) revenue += selectedRevenue;
     });
+    const recovered = completedItems.reduce((sum, i) => {
+      const baseline = Number(i.comparison?.no_discount?.expected_profit);
+      const selected = Number((i.comparison?.ai_candidate ?? i.comparison?.selected)?.expected_profit);
+      return sum + (Number.isFinite(baseline) && Number.isFinite(selected) ? Math.max(selected - baseline, 0) : 0);
+    }, 0);
+    const residual = Math.max(risk - recovered, 0);
     const byCat = Object.entries(
       pending.reduce((a, i) => ({ ...a, [i.category]: (a[i.category] || 0) + i.expected_loss }), {})
     ).map(([name, value]) => ({ name, value: +(value / 10000).toFixed(1) })).sort((a, b) => b.value - a.value);
     return { risk, revenue, residual, byCat, baseRisk: inventoryRisk };
-  }, [all, approved, pending, modelReady, d]);
+  }, [completedItems, pending, modelReady, d]);
 
   /* 손실 흐름(워터폴) — risk = 회수 + 잔여 */
   const waterfall = useMemo(() => {
@@ -601,9 +602,9 @@ export default function Home({
         <Kpi loading={loading} index={2} tone="ok" label={modelReady ? "예상 매출" : "판매 가능 재고"}
              value={modelReady ? man(kpi.revenue) : (d?.total_stock_quantity ?? 0)} unit={modelReady ? "만원" : "개"} icon={Wallet}
              sub={modelReady ? (approved.size ? `승인 ${approved.size}건에서 발생` : "승인 시 집계됩니다") : `RDS 상품 ${d?.product_count ?? 0}종`} />
-        <Kpi loading={loading} index={3} label={modelReady ? "예상 폐기손실" : "AI 추천"}
-             value={modelReady ? man(kpi.residual) : 0} unit={modelReady ? "만원" : "건"} icon={Trash2}
-             sub={modelReady ? `미조치 대비 ${kpi.baseRisk ? Math.round((1 - kpi.residual / kpi.baseRisk) * 100) : 0}% 감소` : "모델 준비 후 제공됩니다"} />
+        <Kpi loading={loading} index={3} label="AI 추천"
+             value={pending.length} unit="건" icon={Trash2}
+             sub={pending.length ? `승인 대기열 ${pending.length}건` : "현재 추천 없음"} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-5">
