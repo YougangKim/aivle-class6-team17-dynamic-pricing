@@ -278,16 +278,6 @@ export default function Home({
   // summary 상태가 늦게 갱신돼도 실제 추천 결과가 있으면 모델 결과로 처리합니다.
   const modelReady = d?.model_status !== "NOT_READY" || all.length > 0 || completedItems.length > 0;
 
-  /* 상단 KPI도 하단 선택 요약과 같은 기준을 사용합니다.
-     완료 항목과 현재 선택한 대기 항목을 합쳐 "승인 시" 효과를 보여줍니다. */
-  const projectedItems = useMemo(() => {
-    const byCell = new Map(completedItems.map((item) => [itemKey(item), item]));
-    pending.forEach((item) => {
-      if (selected.has(itemKey(item))) byCell.set(itemKey(item), item);
-    });
-    return [...byCell.values()];
-  }, [completedItems, pending, selected]);
-
   /* ---- 승인 상태가 반영된 실시간 KPI ---- */
   const kpi = useMemo(() => {
     const inventoryRisk = d?.risk_amount ?? 0;
@@ -301,7 +291,6 @@ export default function Home({
       };
     }
     const risk = inventoryRisk;
-
     const recovered = completedItems.reduce(
       (sum, i) => sum + Number(i.expected_loss ?? i.expected_waste_loss ?? 0),
       0,
@@ -310,15 +299,12 @@ export default function Home({
     const byCat = Object.entries(
       pending.reduce((a, i) => ({ ...a, [i.category]: (a[i.category] || 0) + i.expected_loss }), {})
     ).map(([name, value]) => ({ name, value: +(value / 10000).toFixed(1) })).sort((a, b) => b.value - a.value);
-
     const revenue = [...completedItems, ...pending].reduce(
       (sum, i) => sum + Number(i.expected_loss ?? i.expected_waste_loss ?? 0),
       0,
     );
     return { risk, revenue, residual, byCat, baseRisk: inventoryRisk };
-
   }, [completedItems, pending, modelReady, d]);
-
 
   /* 손실 흐름(워터폴) — risk = 회수 + 잔여 */
   const waterfall = useMemo(() => {
@@ -612,9 +598,7 @@ export default function Home({
              sub={kpi.byCat.length ? `${kpi.byCat[0].name} 최대 · 미조치 기준` : "전량 조치 완료"} />
         <Kpi loading={loading} index={2} tone="ok" label={modelReady ? "예상 매출" : "판매 가능 재고"}
              value={modelReady ? man(kpi.revenue) : (d?.total_stock_quantity ?? 0)} unit={modelReady ? "만원" : "개"} icon={Wallet}
-             sub={modelReady ? (completedItems.length ? `승인완료 ${completedItems.length}건 기준` : "승인 시 집계됩니다") : `RDS 상품 ${d?.product_count ?? 0}종`} />
              sub={modelReady ? `AI 다이나믹 프라이싱 ${completedItems.length + pending.length}건 기준` : `RDS 상품 ${d?.product_count ?? 0}종`} />
-
         <Kpi loading={loading} index={3} label="AI 추천"
              value={pending.length} unit="건" icon={Trash2}
              sub={pending.length ? `승인 대기열 ${pending.length}건` : "현재 추천 없음"} />
