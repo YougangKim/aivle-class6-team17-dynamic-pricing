@@ -135,6 +135,11 @@ jobs:
             "s3://${S3_BUCKET}/releases/${WEB_API_ARTIFACT_NAME}" \
             --region "${AWS_REGION}"
 
+          aws s3 cp \
+            "${WEB_API_ARTIFACT_NAME}" \
+            "s3://${S3_BUCKET}/releases/web-api-latest.zip" \
+            --region "${AWS_REGION}"
+
   # 2. ASG에서 현재 정상 상태인 EC2를 조회하고 SSM으로 한 번에 배포합니다.
   deploy-asg:
     needs: build-and-upload

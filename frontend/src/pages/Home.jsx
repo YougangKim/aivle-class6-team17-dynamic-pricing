@@ -311,7 +311,12 @@ export default function Home({
       pending.reduce((a, i) => ({ ...a, [i.category]: (a[i.category] || 0) + i.expected_loss }), {})
     ).map(([name, value]) => ({ name, value: +(value / 10000).toFixed(1) })).sort((a, b) => b.value - a.value);
 
-    return { risk, revenue: recovered, residual, byCat, baseRisk: inventoryRisk };
+    const revenue = [...completedItems, ...pending].reduce(
+      (sum, i) => sum + Number(i.expected_loss ?? i.expected_waste_loss ?? 0),
+      0,
+    );
+    return { risk, revenue, residual, byCat, baseRisk: inventoryRisk };
+
   }, [completedItems, pending, modelReady, d]);
 
 
@@ -607,8 +612,8 @@ export default function Home({
              sub={kpi.byCat.length ? `${kpi.byCat[0].name} 최대 · 미조치 기준` : "전량 조치 완료"} />
         <Kpi loading={loading} index={2} tone="ok" label={modelReady ? "예상 매출" : "판매 가능 재고"}
              value={modelReady ? man(kpi.revenue) : (d?.total_stock_quantity ?? 0)} unit={modelReady ? "만원" : "개"} icon={Wallet}
-
              sub={modelReady ? (completedItems.length ? `승인완료 ${completedItems.length}건 기준` : "승인 시 집계됩니다") : `RDS 상품 ${d?.product_count ?? 0}종`} />
+             sub={modelReady ? `AI 다이나믹 프라이싱 ${completedItems.length + pending.length}건 기준` : `RDS 상품 ${d?.product_count ?? 0}종`} />
 
         <Kpi loading={loading} index={3} label="AI 추천"
              value={pending.length} unit="건" icon={Trash2}
