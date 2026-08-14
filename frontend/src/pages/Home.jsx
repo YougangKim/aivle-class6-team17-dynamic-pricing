@@ -291,22 +291,15 @@ export default function Home({
       };
     }
     const risk = inventoryRisk;
-    let revenue = 0;
-    completedItems.forEach((i) => {
-      const selected = i.comparison?.ai_candidate ?? i.comparison?.selected;
-      const selectedRevenue = Number(selected?.expected_revenue);
-      if (Number.isFinite(selectedRevenue)) revenue += selectedRevenue;
-    });
-    const recovered = completedItems.reduce((sum, i) => {
-      const baseline = Number(i.comparison?.no_discount?.expected_profit);
-      const selected = Number((i.comparison?.ai_candidate ?? i.comparison?.selected)?.expected_profit);
-      return sum + (Number.isFinite(baseline) && Number.isFinite(selected) ? Math.max(selected - baseline, 0) : 0);
-    }, 0);
+    const recovered = completedItems.reduce(
+      (sum, i) => sum + Number(i.expected_loss ?? i.expected_waste_loss ?? 0),
+      0,
+    );
     const residual = Math.max(risk - recovered, 0);
     const byCat = Object.entries(
       pending.reduce((a, i) => ({ ...a, [i.category]: (a[i.category] || 0) + i.expected_loss }), {})
     ).map(([name, value]) => ({ name, value: +(value / 10000).toFixed(1) })).sort((a, b) => b.value - a.value);
-    return { risk, revenue, residual, byCat, baseRisk: inventoryRisk };
+    return { risk, revenue: recovered, residual, byCat, baseRisk: inventoryRisk };
   }, [completedItems, pending, modelReady, d]);
 
   /* 손실 흐름(워터폴) — risk = 회수 + 잔여 */
@@ -601,7 +594,7 @@ export default function Home({
              sub={kpi.byCat.length ? `${kpi.byCat[0].name} 최대 · 미조치 기준` : "전량 조치 완료"} />
         <Kpi loading={loading} index={2} tone="ok" label={modelReady ? "예상 매출" : "판매 가능 재고"}
              value={modelReady ? man(kpi.revenue) : (d?.total_stock_quantity ?? 0)} unit={modelReady ? "만원" : "개"} icon={Wallet}
-             sub={modelReady ? (approved.size ? `승인 ${approved.size}건에서 발생` : "승인 시 집계됩니다") : `RDS 상품 ${d?.product_count ?? 0}종`} />
+             sub={modelReady ? (completedItems.length ? `승인완료 ${completedItems.length}건 기준` : "승인 시 집계됩니다") : `RDS 상품 ${d?.product_count ?? 0}종`} />
         <Kpi loading={loading} index={3} label="AI 추천"
              value={pending.length} unit="건" icon={Trash2}
              sub={pending.length ? `승인 대기열 ${pending.length}건` : "현재 추천 없음"} />

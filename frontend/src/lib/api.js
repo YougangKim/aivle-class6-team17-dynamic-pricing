@@ -217,7 +217,7 @@ export async function getSummary(storeId) {
     call(`/summary?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
     call(`/inventory?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
   ]);
-  const riskItems = inventory.filter((item) => item.days_until_expiry <= 2);
+  const riskItems = inventory.filter((item) => item.days_until_expiry === 0);
   const byCategory = new Map();
   const riskAmount = riskItems.reduce((total, item) => {
     const amount = item.stock_quantity * item.cost;
@@ -430,7 +430,7 @@ export function repriceUnderConstraint(item, { previousRate, reasonCode, policy,
 
 /* 재추천 요청 — entries: [{ item, previous_rate, reason_code, memo, round }] */
 export async function requestReprice(storeId, entries) {
-  if (USE_MOCK) {
+  if (USE_RECOMMENDATIONS_MOCK) {
     await delay(1500);
     const policy = loadPolicy(storeId);
     return entries.map((e) => ({
@@ -730,6 +730,7 @@ export async function getCompleted(storeId) {
     ...inventoryByCell.get(inventoryCellKey(item)),
     ...item,
     days_until_expiry: item.dte_index,
+    expected_loss: item.expected_waste_loss,
   }));
 }
 
