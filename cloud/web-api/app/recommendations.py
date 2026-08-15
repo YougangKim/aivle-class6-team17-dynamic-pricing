@@ -270,7 +270,7 @@ def _comparison_reason_code(result: dict[str, Any], row: dict[str, Any]) -> str:
     return "FINAL_POLICY_NOT_BETTER_THAN_BOTH_CONTROLS"
 
 
-def _skipped_dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
+def _skipped_dashboard_items(result: dict[str, Any], include_plain_no_discount: bool = False) -> list[dict[str, Any]]:
     dashboard = result.get("dashboard") or {}
     if "items" not in dashboard:
         return []
@@ -279,6 +279,17 @@ def _skipped_dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
         if _ai_outperforms_controls(result, row):
             continue
         if _plain_no_discount_is_best(result, row):
+            if include_plain_no_discount:
+                items.append(_with_comparison(result, {
+                    "request_id": result["request_id"],
+                    "store_id": result["store_id"],
+                    **row,
+                    "approval_required": False,
+                    "type": "ok",
+                    "reason_code": "NO_DISCOUNT_RECOMMENDED",
+                    "selected_discount_rate": 0.0,
+                    "reason": "할인 미적용 판매가 가장 유리합니다.",
+                }))
             continue
         reason_code = _comparison_reason_code(result, row)
         item = {
@@ -508,7 +519,7 @@ def recommendations(store_id: str) -> list[dict[str, Any]]:
 
 
 @router.get("/recommendations/skipped")
-def skipped_recommendations(store_id: str) -> list[dict[str, Any]]:
+def skipped_recommendations(store_id: str, include_plain_no_discount: bool = False) -> list[dict[str, Any]]:
     _drain_result_queue()
     with connect_rds() as connection:
         with connection.cursor() as cursor:
@@ -523,7 +534,11 @@ def skipped_recommendations(store_id: str) -> list[dict[str, Any]]:
                 (store_id,),
             )
             rows = cursor.fetchall()
-    return [item for row in rows for item in _skipped_dashboard_items(row["result_json"])]
+    return [
+        item
+        for row in rows
+        for item in _skipped_dashboard_items(row["result_json"], include_plain_no_discount)
+    ]
 
 
 @router.get("/recommendations/completed")

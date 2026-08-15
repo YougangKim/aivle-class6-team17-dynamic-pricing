@@ -132,6 +132,9 @@ class WebApiTests(unittest.TestCase):
         }
         self.assertEqual(recommendations._dashboard_items(result), [])
         self.assertEqual(recommendations._skipped_dashboard_items(result), [])
+        inventory_decisions = recommendations._skipped_dashboard_items(result, include_plain_no_discount=True)
+        self.assertEqual(len(inventory_decisions), 1)
+        self.assertEqual(inventory_decisions[0]["reason_code"], "NO_DISCOUNT_RECOMMENDED")
 
     def test_profitable_ai_candidate_moves_to_approval_queue(self):
         result = {
