@@ -142,7 +142,7 @@ export default function Inventory({ storeId, onToast, policy }) {
               </thead>
               <tbody>
                 {rows.map((i) => (
-                  <tr key={i.product_id} onClick={() => setDetail(i)}
+                  <tr key={`${i.product_id}:${i.dte_index}`} onClick={() => setDetail(i)}
                       className="cursor-pointer border-b border-slate-50 transition-colors last:border-0 hover:bg-slate-50">
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-2">

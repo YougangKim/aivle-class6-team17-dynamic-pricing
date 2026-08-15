@@ -576,6 +576,7 @@ def reprice_pending_recommendations(store_id: str) -> list[dict[str, Any]]:
                 SELECT result_json
                 FROM pricing_ops.pricing_recommendation
                 WHERE store_id = %s
+                  AND status = 'PENDING'
                   AND jsonb_array_length(COALESCE(result_json->'reprice_items', '[]'::jsonb)) > 0
                 ORDER BY created_at DESC
                 LIMIT 1
@@ -791,9 +792,9 @@ def reprice(request_id: str, request: RepriceRequest) -> list[dict[str, Any]]:
                 raise HTTPException(status_code=404, detail="추천 결과가 없습니다.")
             if recommendation["store_id"] != request.store_id:
                 raise HTTPException(status_code=409, detail="추천 결과의 점포가 일치하지 않습니다.")
-            if recommendation["status"] != "PENDING":
-                raise HTTPException(status_code=409, detail="대기 중인 추천만 반려할 수 있습니다.")
             result = recommendation["result_json"]
+            if recommendation["status"] != "PENDING" and not result.get("reprice_items"):
+                raise HTTPException(status_code=409, detail="대기 중인 추천만 반려할 수 있습니다.")
             base_matrix = (result.get("model_a_output") or {}).get("policy_matrix")
             if not isinstance(base_matrix, list) or len(base_matrix) != 38 or any(len(row) != 4 for row in base_matrix):
                 raise HTTPException(status_code=409, detail="원본 전체 할인 정책을 찾을 수 없습니다.")
@@ -862,7 +863,13 @@ def reprice(request_id: str, request: RepriceRequest) -> list[dict[str, Any]]:
             existing.update({(row["product_id"], int(row["dte_index"])): row for row in responses})
             result["reprice_items"] = list(existing.values())
             cursor.execute(
-                "UPDATE pricing_ops.pricing_recommendation SET result_json = %s::jsonb WHERE request_id = %s",
+                """
+                UPDATE pricing_ops.pricing_recommendation
+                SET result_json = %s::jsonb,
+                    status = 'PENDING',
+                    decided_at = NULL
+                WHERE request_id = %s
+                """,
                 (json.dumps(result), request_id),
             )
     return responses
