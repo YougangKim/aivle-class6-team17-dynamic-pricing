@@ -183,7 +183,10 @@ async function call(path, options) {
     headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
     ...options,
   });
-  if (!res.ok) throw new Error(`API ${res.status}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.detail ?? `API ${res.status}`);
+  }
   return res.json();
 }
 
