@@ -1,0 +1,740 @@
+{
+ "Resources": {
+  "NetworkInfrastructureVpc8959BDDF": {
+   "Type": "AWS::EC2::VPC",
+   "Properties": {
+    "CidrBlock": "10.0.0.0/16"
+   }
+  },
+  "NetworkInfrastructurePublicSubnetA3DDB12DE": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "ap-northeast-2a",
+    "CidrBlock": "10.0.1.0/24",
+    "VpcId": {
+     "Ref": "NetworkInfrastructureVpc8959BDDF"
+    }
+   },
+   "DependsOn": [
+    "NetworkInfrastructureVpc8959BDDF"
+   ]
+  },
+  "NetworkInfrastructurePublicSubnetC7661CC95": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "ap-northeast-2c",
+    "CidrBlock": "10.0.2.0/24",
+    "VpcId": {
+     "Ref": "NetworkInfrastructureVpc8959BDDF"
+    }
+   },
+   "DependsOn": [
+    "NetworkInfrastructureVpc8959BDDF"
+   ]
+  },
+  "NetworkInfrastructureApplicationSubnetA065C4BAF": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "ap-northeast-2a",
+    "CidrBlock": "10.0.10.0/24",
+    "VpcId": {
+     "Ref": "NetworkInfrastructureVpc8959BDDF"
+    }
+   },
+   "DependsOn": [
+    "NetworkInfrastructureVpc8959BDDF"
+   ]
+  },
+  "NetworkInfrastructureApplicationSubnetCFC25805D": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "ap-northeast-2c",
+    "CidrBlock": "10.0.20.0/24",
+    "VpcId": {
+     "Ref": "NetworkInfrastructureVpc8959BDDF"
+    }
+   },
+   "DependsOn": [
+    "NetworkInfrastructureVpc8959BDDF"
+   ]
+  },
+  "NetworkInfrastructureDatabaseSubnetA65D587B4": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "ap-northeast-2a",
+    "CidrBlock": "10.0.30.0/24",
+    "VpcId": {
+     "Ref": "NetworkInfrastructureVpc8959BDDF"
+    }
+   },
+   "DependsOn": [
+    "NetworkInfrastructureVpc8959BDDF"
+   ]
+  },
+  "NetworkInfrastructureDatabaseSubnetC72992C94": {
+   "Type": "AWS::EC2::Subnet",
+   "Properties": {
+    "AvailabilityZone": "ap-northeast-2c",
+    "CidrBlock": "10.0.40.0/24",
+    "VpcId": {
+     "Ref": "NetworkInfrastructureVpc8959BDDF"
+    }
+   },
+   "DependsOn": [
+    "NetworkInfrastructureVpc8959BDDF"
+   ]
+  },
+  "NetworkInfrastructureWebSecurityGroup636329DD": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "aivle web tier",
+    "VpcId": {
+     "Ref": "NetworkInfrastructureVpc8959BDDF"
+    }
+   },
+   "DependsOn": [
+    "NetworkInfrastructureVpc8959BDDF"
+   ]
+  },
+  "NetworkInfrastructureDatabaseSecurityGroupFA44CCD6": {
+   "Type": "AWS::EC2::SecurityGroup",
+   "Properties": {
+    "GroupDescription": "aivle database tier",
+    "SecurityGroupIngress": [
+     {
+      "IpProtocol": "tcp",
+      "FromPort": 5432,
+      "ToPort": 5432,
+      "SourceSecurityGroupId": {
+       "Fn::GetAtt": [
+        "NetworkInfrastructureWebSecurityGroup636329DD",
+        "GroupId"
+       ]
+      }
+     }
+    ],
+    "VpcId": {
+     "Ref": "NetworkInfrastructureVpc8959BDDF"
+    }
+   },
+   "DependsOn": [
+    "NetworkInfrastructureVpc8959BDDF",
+    "NetworkInfrastructureWebSecurityGroup636329DD"
+   ]
+  },
+  "WebDeliveryInfrastructureWebApplicationLoadBalancer76274A2F": {
+   "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+   "DependsOn": [
+    "NetworkInfrastructurePublicSubnetA3DDB12DE",
+    "NetworkInfrastructurePublicSubnetC7661CC95",
+    "NetworkInfrastructureWebSecurityGroup636329DD"
+   ],
+   "Properties": {
+    "Name": "aivle-web-alb",
+    "Scheme": "internet-facing",
+    "Subnets": [
+     {
+      "Ref": "NetworkInfrastructurePublicSubnetA3DDB12DE"
+     },
+     {
+      "Ref": "NetworkInfrastructurePublicSubnetC7661CC95"
+     }
+    ],
+    "SecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "NetworkInfrastructureWebSecurityGroup636329DD",
+       "GroupId"
+      ]
+     }
+    ]
+   }
+  },
+  "WebDeliveryInfrastructureWebTargetGroupC710D7BE": {
+   "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+   "DependsOn": [
+    "NetworkInfrastructureVpc8959BDDF"
+   ],
+   "Properties": {
+    "Name": "aivle-web-tg",
+    "Port": 80,
+    "Protocol": "HTTP",
+    "VpcId": {
+     "Ref": "NetworkInfrastructureVpc8959BDDF"
+    }
+   }
+  },
+  "WebDeliveryInfrastructureWebListenerA5E34D70": {
+   "Type": "AWS::ElasticLoadBalancingV2::Listener",
+   "Properties": {
+    "DefaultActions": [
+     {
+      "Type": "forward",
+      "TargetGroupArn": {
+       "Ref": "WebDeliveryInfrastructureWebTargetGroupC710D7BE"
+      }
+     }
+    ],
+    "LoadBalancerArn": {
+     "Ref": "WebDeliveryInfrastructureWebApplicationLoadBalancer76274A2F"
+    },
+    "Port": 80,
+    "Protocol": "HTTP"
+   },
+   "DependsOn": [
+    "WebDeliveryInfrastructureWebApplicationLoadBalancer76274A2F",
+    "WebDeliveryInfrastructureWebTargetGroupC710D7BE"
+   ]
+  },
+  "WebDeliveryInfrastructureWebEc2RoleABFBC68F": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": []
+    },
+    "RoleName": "AivleWebEC2Role"
+   }
+  },
+  "WebDeliveryInfrastructureWebInstanceProfileDEC2719E": {
+   "Type": "AWS::IAM::InstanceProfile",
+   "Properties": {
+    "InstanceProfileName": "AivleWebEC2Role",
+    "Roles": [
+     {
+      "Ref": "WebDeliveryInfrastructureWebEc2RoleABFBC68F"
+     }
+    ]
+   },
+   "DependsOn": [
+    "WebDeliveryInfrastructureWebEc2RoleABFBC68F"
+   ]
+  },
+  "WebDeliveryInfrastructureWebLaunchTemplate2EB90263": {
+   "Type": "AWS::EC2::LaunchTemplate",
+   "Properties": {
+    "LaunchTemplateData": {
+     "IamInstanceProfile": {
+      "Arn": {
+       "Fn::GetAtt": [
+        "WebDeliveryInfrastructureWebInstanceProfileDEC2719E",
+        "Arn"
+       ]
+      }
+     },
+     "SecurityGroupIds": [
+      {
+       "Fn::GetAtt": [
+        "NetworkInfrastructureWebSecurityGroup636329DD",
+        "GroupId"
+       ]
+      }
+     ]
+    },
+    "LaunchTemplateName": "aivle-web-lt2"
+   },
+   "DependsOn": [
+    "NetworkInfrastructureWebSecurityGroup636329DD",
+    "WebDeliveryInfrastructureWebInstanceProfileDEC2719E"
+   ]
+  },
+  "WebDeliveryInfrastructureWebAutoScalingGroupAC6251F0": {
+   "Type": "AWS::AutoScaling::AutoScalingGroup",
+   "Properties": {
+    "AutoScalingGroupName": "aivle-web-asg",
+    "DesiredCapacity": "2",
+    "LaunchTemplate": {
+     "LaunchTemplateId": {
+      "Ref": "WebDeliveryInfrastructureWebLaunchTemplate2EB90263"
+     },
+     "Version": "$Latest"
+    },
+    "MaxSize": "4",
+    "MinSize": "2",
+    "TargetGroupARNs": [
+     {
+      "Ref": "WebDeliveryInfrastructureWebTargetGroupC710D7BE"
+     }
+    ],
+    "VPCZoneIdentifier": [
+     {
+      "Ref": "NetworkInfrastructureApplicationSubnetA065C4BAF"
+     },
+     {
+      "Ref": "NetworkInfrastructureApplicationSubnetCFC25805D"
+     }
+    ]
+   },
+   "DependsOn": [
+    "NetworkInfrastructureApplicationSubnetA065C4BAF",
+    "NetworkInfrastructureApplicationSubnetCFC25805D",
+    "WebDeliveryInfrastructureWebLaunchTemplate2EB90263",
+    "WebDeliveryInfrastructureWebTargetGroupC710D7BE"
+   ]
+  },
+  "WebDeliveryInfrastructureWebEc2InstanceA44EDC6A8": {
+   "Type": "AWS::EC2::Instance",
+   "DependsOn": [
+    "NetworkInfrastructureApplicationSubnetA065C4BAF",
+    "NetworkInfrastructureWebSecurityGroup636329DD",
+    "WebDeliveryInfrastructureWebAutoScalingGroupAC6251F0"
+   ],
+   "Properties": {
+    "ImageId": "ami-0cd3bfb1dfee6ae9a",
+    "InstanceType": "t3.micro",
+    "PrivateIpAddress": "10.0.10.180",
+    "SubnetId": {
+     "Ref": "NetworkInfrastructureApplicationSubnetA065C4BAF"
+    },
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "NetworkInfrastructureWebSecurityGroup636329DD",
+       "GroupId"
+      ]
+     }
+    ]
+   }
+  },
+  "WebDeliveryInfrastructureWebEc2InstanceCA3A801DA": {
+   "Type": "AWS::EC2::Instance",
+   "DependsOn": [
+    "NetworkInfrastructureApplicationSubnetCFC25805D",
+    "NetworkInfrastructureWebSecurityGroup636329DD",
+    "WebDeliveryInfrastructureWebAutoScalingGroupAC6251F0"
+   ],
+   "Properties": {
+    "ImageId": "ami-0cd3bfb1dfee6ae9a",
+    "InstanceType": "t3.micro",
+    "PrivateIpAddress": "10.0.20.153",
+    "SubnetId": {
+     "Ref": "NetworkInfrastructureApplicationSubnetCFC25805D"
+    },
+    "SecurityGroupIds": [
+     {
+      "Fn::GetAtt": [
+       "NetworkInfrastructureWebSecurityGroup636329DD",
+       "GroupId"
+      ]
+     }
+    ]
+   }
+  },
+  "WebDeliveryInfrastructureWebDistribution56B47B3C": {
+   "Type": "AWS::CloudFront::Distribution",
+   "Properties": {
+    "DistributionConfig": {
+     "DefaultCacheBehavior": {
+      "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
+      "TargetOriginId": "aivle-web-alb",
+      "ViewerProtocolPolicy": "redirect-to-https"
+     },
+     "Enabled": true,
+     "Origins": [
+      {
+       "Id": "aivle-web-alb",
+       "DomainName": {
+        "Fn::GetAtt": [
+         "WebDeliveryInfrastructureWebApplicationLoadBalancer76274A2F",
+         "DNSName"
+        ]
+       },
+       "CustomOriginConfig": {
+        "OriginProtocolPolicy": "http-only"
+       }
+      }
+     ]
+    }
+   },
+   "DependsOn": [
+    "WebDeliveryInfrastructureWebApplicationLoadBalancer76274A2F"
+   ]
+  },
+  "DatabaseInfrastructureDatabaseSubnetGroup9088E4FF": {
+   "Type": "AWS::RDS::DBSubnetGroup",
+   "Properties": {
+    "DBSubnetGroupDescription": "aivle-db-subnet-group",
+    "DBSubnetGroupName": "aivle-db-subnet-group",
+    "SubnetIds": [
+     {
+      "Ref": "NetworkInfrastructureDatabaseSubnetA65D587B4"
+     },
+     {
+      "Ref": "NetworkInfrastructureDatabaseSubnetC72992C94"
+     }
+    ]
+   },
+   "DependsOn": [
+    "NetworkInfrastructureDatabaseSubnetA65D587B4",
+    "NetworkInfrastructureDatabaseSubnetC72992C94"
+   ]
+  },
+  "DatabaseInfrastructurePostgreSqlDatabaseB03D833F": {
+   "Type": "AWS::RDS::DBInstance",
+   "DependsOn": [
+    "DatabaseInfrastructureDatabaseSubnetGroup9088E4FF",
+    "NetworkInfrastructureDatabaseSecurityGroupFA44CCD6"
+   ],
+   "Properties": {
+    "DBInstanceIdentifier": "aivle-rds",
+    "Engine": "postgres",
+    "DBInstanceClass": "db.t3.micro",
+    "AllocatedStorage": "20",
+    "DBSubnetGroupName": {
+     "Ref": "DatabaseInfrastructureDatabaseSubnetGroup9088E4FF"
+    },
+    "VPCSecurityGroups": [
+     {
+      "Fn::GetAtt": [
+       "NetworkInfrastructureDatabaseSecurityGroupFA44CCD6",
+       "GroupId"
+      ]
+     }
+    ]
+   }
+  },
+  "DatabaseInfrastructureDatabaseSecret478D2F20": {
+   "Type": "AWS::SecretsManager::Secret",
+   "Properties": {
+    "Name": "aivle-rds-service-secret",
+    "Description": "Shared PostgreSQL credentials for application and AI services"
+   }
+  },
+  "DatabaseInfrastructureDatabaseSecretAttachment0ED2CF62": {
+   "Type": "AWS::SecretsManager::SecretTargetAttachment",
+   "Properties": {
+    "SecretId": {
+     "Ref": "DatabaseInfrastructureDatabaseSecret478D2F20"
+    },
+    "TargetId": {
+     "Ref": "DatabaseInfrastructurePostgreSqlDatabaseB03D833F"
+    },
+    "TargetType": "AWS::RDS::DBInstance"
+   },
+   "DependsOn": [
+    "DatabaseInfrastructureDatabaseSecret478D2F20",
+    "DatabaseInfrastructurePostgreSqlDatabaseB03D833F"
+   ]
+  },
+  "DatabaseInfrastructureMockErpRdsWriterFunction3581D415": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "ZipFile": "def lambda_handler(event, context): return {}"
+    },
+    "Environment": {
+     "Variables": {
+      "SECRET_ARN": {
+       "Ref": "DatabaseInfrastructureDatabaseSecret478D2F20"
+      },
+      "DB_ENDPOINT": {
+       "Fn::GetAtt": [
+        "DatabaseInfrastructurePostgreSqlDatabaseB03D833F",
+        "Endpoint.Address"
+       ]
+      }
+     }
+    },
+    "FunctionName": "mock-erp-rds-writer",
+    "Handler": "lambda_function.lambda_handler",
+    "Role": "arn:aws:iam::188876037193:role/service-role/mock-erp-rds-writer-role-cj75zvng",
+    "Runtime": "python3.12"
+   },
+   "DependsOn": [
+    "DatabaseInfrastructureDatabaseSecret478D2F20",
+    "DatabaseInfrastructurePostgreSqlDatabaseB03D833F"
+   ]
+  },
+  "AiPricingPipelineInventoryRawQueueBDDA00F2": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "QueueName": "aivle-dev-inventory-raw-queue"
+   }
+  },
+  "AiPricingPipelineModelInputQueueBBA642EE": {
+   "Type": "AWS::SQS::Queue",
+   "Properties": {
+    "QueueName": "aivle-dev-model-input-queue"
+   }
+  },
+  "AiPricingPipelineMachineLearningBucket0C2EB7CC": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketName": "aivle-dynamic-pricing-ml-188876037193-dev"
+   }
+  },
+  "AiPricingPipelineSageMakerArtifactBucketBB3CFB97": {
+   "Type": "AWS::S3::Bucket",
+   "Properties": {
+    "BucketName": "aivle-dev-sagemaker-artifacts-188876037193"
+   }
+  },
+  "AiPricingPipelinePricingServerlessEndpointB0B5AC1F": {
+   "Type": "AWS::SageMaker::Endpoint",
+   "Properties": {
+    "EndpointConfigName": "account-managed-endpoint-config",
+    "EndpointName": "aivle-dev-pricing-serverless-endpoint"
+   },
+   "DependsOn": [
+    "AiPricingPipelineSageMakerArtifactBucketBB3CFB97"
+   ]
+  },
+  "AiPricingPipelineInventoryExtractorRoleE2ADC6A0": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": []
+    },
+    "RoleName": "aivle-dev-role-lambda-extractor"
+   }
+  },
+  "AiPricingPipelineDerivedFeatureRoleA5B52AE4": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": []
+    },
+    "RoleName": "aivle-dev-role-lambda-derived-feature"
+   }
+  },
+  "AiPricingPipelineModelInferenceRoleB91CAB16": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": []
+    },
+    "RoleName": "aivle-dev-role-lambda-model-inference"
+   }
+  },
+  "AiPricingPipelineInventoryExtractorFunction7CC6F0EB": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Ref": "AiPricingPipelineMachineLearningBucket0C2EB7CC"
+     },
+     "S3Key": "visualization-only/not-deployable.zip",
+     "ZipFile": "placeholder"
+    },
+    "Environment": {
+     "Variables": {
+      "OUTPUT_QUEUE_URL": {
+       "Ref": "AiPricingPipelineInventoryRawQueueBDDA00F2"
+      }
+     }
+    },
+    "FunctionName": "aivle-dev-lambda-inventory-extractor",
+    "Handler": "lambda_function.lambda_handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "AiPricingPipelineInventoryExtractorRoleE2ADC6A0",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12"
+   },
+   "DependsOn": [
+    "AiPricingPipelineInventoryExtractorRoleE2ADC6A0",
+    "AiPricingPipelineInventoryRawQueueBDDA00F2",
+    "AiPricingPipelineMachineLearningBucket0C2EB7CC"
+   ]
+  },
+  "AiPricingPipelineDerivedFeatureFunction5C645EF1": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Ref": "AiPricingPipelineMachineLearningBucket0C2EB7CC"
+     },
+     "S3Key": "visualization-only/not-deployable.zip",
+     "ZipFile": "placeholder"
+    },
+    "Environment": {
+     "Variables": {
+      "OUTPUT_QUEUE_URL": {
+       "Ref": "AiPricingPipelineModelInputQueueBBA642EE"
+      }
+     }
+    },
+    "FunctionName": "aivle-dev-lambda-derived-feature",
+    "Handler": "lambda_function.lambda_handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "AiPricingPipelineDerivedFeatureRoleA5B52AE4",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12"
+   },
+   "DependsOn": [
+    "AiPricingPipelineDerivedFeatureRoleA5B52AE4",
+    "AiPricingPipelineMachineLearningBucket0C2EB7CC",
+    "AiPricingPipelineModelInputQueueBBA642EE"
+   ]
+  },
+  "AiPricingPipelineModelInferenceFunctionDC27A257": {
+   "Type": "AWS::Lambda::Function",
+   "Properties": {
+    "Code": {
+     "S3Bucket": {
+      "Ref": "AiPricingPipelineMachineLearningBucket0C2EB7CC"
+     },
+     "S3Key": "visualization-only/not-deployable.zip",
+     "ZipFile": "placeholder"
+    },
+    "Environment": {
+     "Variables": {
+      "SECRET_ARN": {
+       "Ref": "DatabaseInfrastructureDatabaseSecret478D2F20"
+      },
+      "DB_ENDPOINT": {
+       "Fn::GetAtt": [
+        "DatabaseInfrastructurePostgreSqlDatabaseB03D833F",
+        "Endpoint.Address"
+       ]
+      },
+      "SAGEMAKER_ENDPOINT_NAME": {
+       "Ref": "AiPricingPipelinePricingServerlessEndpointB0B5AC1F"
+      }
+     }
+    },
+    "FunctionName": "aivle-dev-lambda-model-inference",
+    "Handler": "lambda_function.lambda_handler",
+    "Role": {
+     "Fn::GetAtt": [
+      "AiPricingPipelineModelInferenceRoleB91CAB16",
+      "Arn"
+     ]
+    },
+    "Runtime": "python3.12"
+   },
+   "DependsOn": [
+    "AiPricingPipelineMachineLearningBucket0C2EB7CC",
+    "AiPricingPipelineModelInferenceRoleB91CAB16",
+    "AiPricingPipelinePricingServerlessEndpointB0B5AC1F",
+    "DatabaseInfrastructureDatabaseSecret478D2F20",
+    "DatabaseInfrastructurePostgreSqlDatabaseB03D833F"
+   ]
+  },
+  "AiPricingPipelineInventoryRawEventSourceCA818ACC": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "BatchSize": 10,
+    "EventSourceArn": {
+     "Fn::GetAtt": [
+      "AiPricingPipelineInventoryRawQueueBDDA00F2",
+      "Arn"
+     ]
+    },
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AiPricingPipelineDerivedFeatureFunction5C645EF1",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "AiPricingPipelineDerivedFeatureFunction5C645EF1",
+    "AiPricingPipelineInventoryRawQueueBDDA00F2"
+   ]
+  },
+  "AiPricingPipelineModelInputEventSourceFCF132DB": {
+   "Type": "AWS::Lambda::EventSourceMapping",
+   "Properties": {
+    "BatchSize": 1,
+    "EventSourceArn": {
+     "Fn::GetAtt": [
+      "AiPricingPipelineModelInputQueueBBA642EE",
+      "Arn"
+     ]
+    },
+    "FunctionName": {
+     "Fn::GetAtt": [
+      "AiPricingPipelineModelInferenceFunctionDC27A257",
+      "Arn"
+     ]
+    }
+   },
+   "DependsOn": [
+    "AiPricingPipelineModelInferenceFunctionDC27A257",
+    "AiPricingPipelineModelInputQueueBBA642EE"
+   ]
+  },
+  "AiPricingPipelineInventorySchedulerRole1C25F252": {
+   "Type": "AWS::IAM::Role",
+   "Properties": {
+    "AssumeRolePolicyDocument": {
+     "Version": "2012-10-17",
+     "Statement": []
+    },
+    "RoleName": "Amazon_EventBridge_Scheduler_LAMBDA_6817b57ba0"
+   }
+  },
+  "AiPricingPipelineInventorySchedule92E8C4BC": {
+   "Type": "AWS::Scheduler::Schedule",
+   "Properties": {
+    "FlexibleTimeWindow": {
+     "Mode": "OFF"
+    },
+    "Name": "aivle-dev-schedule-inventory-extractor",
+    "ScheduleExpression": "rate(10 minutes)",
+    "State": "DISABLED",
+    "Target": {
+     "Arn": {
+      "Fn::GetAtt": [
+       "AiPricingPipelineInventoryExtractorFunction7CC6F0EB",
+       "Arn"
+      ]
+     },
+     "RoleArn": {
+      "Fn::GetAtt": [
+       "AiPricingPipelineInventorySchedulerRole1C25F252",
+       "Arn"
+      ]
+     }
+    }
+   },
+   "DependsOn": [
+    "AiPricingPipelineInventoryExtractorFunction7CC6F0EB",
+    "AiPricingPipelineInventorySchedulerRole1C25F252"
+   ]
+  }
+ },
+ "Parameters": {
+  "BootstrapVersion": {
+   "Type": "AWS::SSM::Parameter::Value<String>",
+   "Default": "/cdk-bootstrap/hnb659fds/version",
+   "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]"
+  }
+ },
+ "Rules": {
+  "CheckBootstrapVersion": {
+   "Assertions": [
+    {
+     "Assert": {
+      "Fn::Not": [
+       {
+        "Fn::Contains": [
+         [
+          "1",
+          "2",
+          "3",
+          "4",
+          "5"
+         ],
+         {
+          "Ref": "BootstrapVersion"
+         }
+        ]
+       }
+      ]
+     },
+     "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI."
+    }
+   ]
+  }
+ }
+}

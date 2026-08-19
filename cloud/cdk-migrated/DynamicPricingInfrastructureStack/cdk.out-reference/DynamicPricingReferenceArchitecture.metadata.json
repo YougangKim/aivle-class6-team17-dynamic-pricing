@@ -1,0 +1,544 @@
+{
+  "/DynamicPricingReferenceArchitecture": [
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/BootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "BootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/CheckBootstrapVersion": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "CheckBootstrapVersion"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...aws-cdk-lib...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/NetworkInfrastructure/Vpc": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "NetworkInfrastructureVpc8959BDDF"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/NetworkInfrastructure/PublicSubnetA": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "NetworkInfrastructurePublicSubnetA3DDB12DE"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/NetworkInfrastructure/PublicSubnetC": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "NetworkInfrastructurePublicSubnetC7661CC95"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/NetworkInfrastructure/ApplicationSubnetA": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "NetworkInfrastructureApplicationSubnetA065C4BAF"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/NetworkInfrastructure/ApplicationSubnetC": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "NetworkInfrastructureApplicationSubnetCFC25805D"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/NetworkInfrastructure/DatabaseSubnetA": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "NetworkInfrastructureDatabaseSubnetA65D587B4"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/NetworkInfrastructure/DatabaseSubnetC": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "NetworkInfrastructureDatabaseSubnetC72992C94"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/NetworkInfrastructure/WebSecurityGroup": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "NetworkInfrastructureWebSecurityGroup636329DD"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/NetworkInfrastructure/DatabaseSecurityGroup": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "NetworkInfrastructureDatabaseSecurityGroupFA44CCD6"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebApplicationLoadBalancer": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebDeliveryInfrastructureWebApplicationLoadBalancer76274A2F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebTargetGroup": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebDeliveryInfrastructureWebTargetGroupC710D7BE"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebListener": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebDeliveryInfrastructureWebListenerA5E34D70"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebEc2Role": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebDeliveryInfrastructureWebEc2RoleABFBC68F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebInstanceProfile": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebDeliveryInfrastructureWebInstanceProfileDEC2719E"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebLaunchTemplate": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebDeliveryInfrastructureWebLaunchTemplate2EB90263"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebAutoScalingGroup": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebDeliveryInfrastructureWebAutoScalingGroupAC6251F0"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebEc2InstanceA": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebDeliveryInfrastructureWebEc2InstanceA44EDC6A8"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebEc2InstanceC": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebDeliveryInfrastructureWebEc2InstanceCA3A801DA"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebDistribution": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "WebDeliveryInfrastructureWebDistribution56B47B3C"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/DatabaseInfrastructure/DatabaseSubnetGroup": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DatabaseInfrastructureDatabaseSubnetGroup9088E4FF"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/DatabaseInfrastructure/PostgreSqlDatabase": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DatabaseInfrastructurePostgreSqlDatabaseB03D833F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/DatabaseInfrastructure/DatabaseSecret": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DatabaseInfrastructureDatabaseSecret478D2F20"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/DatabaseInfrastructure/DatabaseSecretAttachment": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DatabaseInfrastructureDatabaseSecretAttachment0ED2CF62"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/DatabaseInfrastructure/MockErpRdsWriterFunction": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "DatabaseInfrastructureMockErpRdsWriterFunction3581D415"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/InventoryRawQueue": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineInventoryRawQueueBDDA00F2"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/ModelInputQueue": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineModelInputQueueBBA642EE"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/MachineLearningBucket": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineMachineLearningBucket0C2EB7CC"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/SageMakerArtifactBucket": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineSageMakerArtifactBucketBB3CFB97"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/PricingServerlessEndpoint": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelinePricingServerlessEndpointB0B5AC1F"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/InventoryExtractorRole": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineInventoryExtractorRoleE2ADC6A0"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/DerivedFeatureRole": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineDerivedFeatureRoleA5B52AE4"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/ModelInferenceRole": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineModelInferenceRoleB91CAB16"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/InventoryExtractorFunction": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineInventoryExtractorFunction7CC6F0EB"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/DerivedFeatureFunction": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineDerivedFeatureFunction5C645EF1"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/ModelInferenceFunction": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineModelInferenceFunctionDC27A257"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/InventoryRawEventSource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineInventoryRawEventSourceCA818ACC"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/ModelInputEventSource": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineModelInputEventSourceFCF132DB"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/InventorySchedulerRole": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineInventorySchedulerRole1C25F252"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ],
+  "/DynamicPricingReferenceArchitecture/AiPricingPipeline/InventorySchedule": [
+    {
+      "type": "aws:cdk:logicalId",
+      "data": "AiPricingPipelineInventorySchedule92E8C4BC"
+    },
+    {
+      "type": "aws:cdk:creationStack",
+      "data": [
+        "...jsii runtime, node internals...",
+        "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "version": "0.0.0",
+  "artifacts": {
+    "GRAPH": {
+      "id": "GRAPH",
+      "filepath": "cdk.out-step-functions\\cdkgraph\\graph.json",
+      "description": "Serialized graph",
+      "filename": "graph.json",
+      "source": "CdkGraph"
+    }
+  }
+}

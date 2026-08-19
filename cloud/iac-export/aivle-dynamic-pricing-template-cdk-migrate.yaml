@@ -1,0 +1,1938 @@
+Metadata:
+  AWSToolsMetrics:
+    IaC_Generator: arn:aws:cloudformation:ap-northeast-2:188876037193:generatedTemplate/c6176a3c-82ee-48bd-ac45-6aa1f703e56d
+Parameters:
+  LambdaFunctionMockerprdswriterCodeS3ObjectVersiony91Ql:
+    NoEcho: 'true'
+    Type: String
+    Description: For versioned objects, the version of the deployment package object
+      to use.
+  LambdaFunctionAivledevlambdamodelinferenceCodeS3ObjectStorageModeSATUA:
+    NoEcho: 'true'
+    Type: String
+    Description: 'Specifies the storage mode for the deployment package. Use ``COPY``
+      to store the package in LAMlong-managed storage. Use ``REFERENCE`` to read the
+      package directly from the Amazon S3 bucket. If omitted, the default is ``COPY``.Possible
+      values: [COPY, REFERENCE]
+
+      This property can be replaced with other types'
+  LambdaFunctionAivledevlambdainventoryextractorCodeS3ObjectVersionalKzL:
+    NoEcho: 'true'
+    Type: String
+    Description: For versioned objects, the version of the deployment package object
+      to use.
+  LambdaFunctionAivledevlambdamodelinferenceCodeZipFileOn0qz:
+    NoEcho: 'true'
+    Type: String
+    Description: "(Node.js and Python) The source code of your Lambda function. If\
+      \ you include your function source inline with this parameter, CFN places it\
+      \ in a file named ``index`` and zips it to create a [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html).\
+      \ This zip file cannot exceed 4MB. For the ``Handler`` property, the first part\
+      \ of the handler identifier must be ``index``. For example, ``index.handler``.\n\
+      \  When you specify source code inline for a Node.js function, the ``index``\
+      \ file that CFN creates uses the extension ``.js``. This means that Node.js\
+      \ treats the file as a CommonJS module.\n When using Node.js 24 or later, Node.js\
+      \ can automatically detect if a ``.js`` file should be treated as CommonJS or\
+      \ as an ES module. To enable auto-detection, add the ``--experimental-detect-module``\
+      \ flag to the ``NODE_OPTIONS`` environment variable. For more information, see\
+      \ [Experimental Node.js features](https://docs.aws.amazon.com//lambda/latest/dg/lambda-nodejs.html#nodejs-experimental-features).\n\
+      \   For JSON, you must escape quotes and special characters such as newline\
+      \ (``\\n``) with a backslash.\n If you specify a function that interacts with\
+      \ an AWS CloudFormation custom resource, you don't have to write your own functions\
+      \ to send responses to the custom resource that invoked the function. AWS CloudFormation\
+      \ provides a response module ([cfn-response](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-lambda-function-code-cfnresponsemodule.html))\
+      \ that simplifies sending responses. See [Using Lambda with CloudFormation](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudformation.html)\
+      \ for details."
+  LambdaFunctionAivledevlambdamodelinferenceCodeImageUripVi40:
+    NoEcho: 'true'
+    Type: String
+    Description: URI of a [container image](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html)
+      in the Amazon ECR registry.
+  LambdaFunctionAivledevlambdaderivedfeatureCodeS3ObjectVersion7siTt:
+    NoEcho: 'true'
+    Type: String
+    Description: For versioned objects, the version of the deployment package object
+      to use.
+  LambdaFunctionAivledevlambdaderivedfeatureCodeImageUriQe7Gr:
+    NoEcho: 'true'
+    Type: String
+    Description: URI of a [container image](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html)
+      in the Amazon ECR registry.
+  LambdaFunctionMockerprdswriterCodeSourceKMSKeyArnlLfOY:
+    NoEcho: 'true'
+    Type: String
+    Description: The ARN of the KMSlong (KMS) customer managed key that's used to
+      encrypt your function's .zip deployment package. If you don't provide a customer
+      managed key, Lambda uses an [owned key](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#aws-owned-cmk).
+  LambdaFunctionAivledevlambdaderivedfeatureCodeSourceKMSKeyArnjMz7Y:
+    NoEcho: 'true'
+    Type: String
+    Description: The ARN of the KMSlong (KMS) customer managed key that's used to
+      encrypt your function's .zip deployment package. If you don't provide a customer
+      managed key, Lambda uses an [owned key](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#aws-owned-cmk).
+  LambdaFunctionAivledevlambdainventoryextractorCodeSourceKMSKeyArnsfp9Y:
+    NoEcho: 'true'
+    Type: String
+    Description: The ARN of the KMSlong (KMS) customer managed key that's used to
+      encrypt your function's .zip deployment package. If you don't provide a customer
+      managed key, Lambda uses an [owned key](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#aws-owned-cmk).
+  LambdaFunctionAivledevlambdamodelinferenceCodeSourceKMSKeyArnMpclR:
+    NoEcho: 'true'
+    Type: String
+    Description: The ARN of the KMSlong (KMS) customer managed key that's used to
+      encrypt your function's .zip deployment package. If you don't provide a customer
+      managed key, Lambda uses an [owned key](https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html#aws-owned-cmk).
+  LambdaFunctionAivledevlambdainventoryextractorCodeS3KeyhuVpZ:
+    NoEcho: 'true'
+    Type: String
+    Description: The Amazon S3 key of the deployment package.
+  LambdaFunctionMockerprdswriterCodeS3KeynCclY:
+    NoEcho: 'true'
+    Type: String
+    Description: The Amazon S3 key of the deployment package.
+  LambdaFunctionMockerprdswriterCodeS3ObjectStorageMode6LEIE:
+    NoEcho: 'true'
+    Type: String
+    Description: 'Specifies the storage mode for the deployment package. Use ``COPY``
+      to store the package in LAMlong-managed storage. Use ``REFERENCE`` to read the
+      package directly from the Amazon S3 bucket. If omitted, the default is ``COPY``.Possible
+      values: [COPY, REFERENCE]
+
+      This property can be replaced with other types'
+  LambdaFunctionAivledevlambdamodelinferenceCodeS3ObjectVersionYTQ6p:
+    NoEcho: 'true'
+    Type: String
+    Description: For versioned objects, the version of the deployment package object
+      to use.
+  LambdaFunctionAivledevlambdaderivedfeatureCodeS3BucketaY54J:
+    NoEcho: 'true'
+    Type: String
+    Description: An Amazon S3 bucket in the same AWS-Region as your function. The
+      bucket can be in a different AWS-account.
+  LambdaFunctionMockerprdswriterCodeZipFiledvqJa:
+    NoEcho: 'true'
+    Type: String
+    Description: "(Node.js and Python) The source code of your Lambda function. If\
+      \ you include your function source inline with this parameter, CFN places it\
+      \ in a file named ``index`` and zips it to create a [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html).\
+      \ This zip file cannot exceed 4MB. For the ``Handler`` property, the first part\
+      \ of the handler identifier must be ``index``. For example, ``index.handler``.\n\
+      \  When you specify source code inline for a Node.js function, the ``index``\
+      \ file that CFN creates uses the extension ``.js``. This means that Node.js\
+      \ treats the file as a CommonJS module.\n When using Node.js 24 or later, Node.js\
+      \ can automatically detect if a ``.js`` file should be treated as CommonJS or\
+      \ as an ES module. To enable auto-detection, add the ``--experimental-detect-module``\
+      \ flag to the ``NODE_OPTIONS`` environment variable. For more information, see\
+      \ [Experimental Node.js features](https://docs.aws.amazon.com//lambda/latest/dg/lambda-nodejs.html#nodejs-experimental-features).\n\
+      \   For JSON, you must escape quotes and special characters such as newline\
+      \ (``\\n``) with a backslash.\n If you specify a function that interacts with\
+      \ an AWS CloudFormation custom resource, you don't have to write your own functions\
+      \ to send responses to the custom resource that invoked the function. AWS CloudFormation\
+      \ provides a response module ([cfn-response](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-lambda-function-code-cfnresponsemodule.html))\
+      \ that simplifies sending responses. See [Using Lambda with CloudFormation](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudformation.html)\
+      \ for details."
+  LambdaFunctionAivledevlambdaderivedfeatureCodeS3ObjectStorageMode170zQ:
+    NoEcho: 'true'
+    Type: String
+    Description: 'Specifies the storage mode for the deployment package. Use ``COPY``
+      to store the package in LAMlong-managed storage. Use ``REFERENCE`` to read the
+      package directly from the Amazon S3 bucket. If omitted, the default is ``COPY``.Possible
+      values: [COPY, REFERENCE]
+
+      This property can be replaced with other types'
+  LambdaFunctionMockerprdswriterCodeS3Bucketslghb:
+    NoEcho: 'true'
+    Type: String
+    Description: An Amazon S3 bucket in the same AWS-Region as your function. The
+      bucket can be in a different AWS-account.
+  LambdaFunctionMockerprdswriterCodeImageUri5hEu4:
+    NoEcho: 'true'
+    Type: String
+    Description: URI of a [container image](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html)
+      in the Amazon ECR registry.
+  LambdaFunctionAivledevlambdainventoryextractorCodeImageUriHa3Q1:
+    NoEcho: 'true'
+    Type: String
+    Description: URI of a [container image](https://docs.aws.amazon.com/lambda/latest/dg/lambda-images.html)
+      in the Amazon ECR registry.
+  LambdaFunctionAivledevlambdainventoryextractorCodeS3ObjectStorageModemEHie:
+    NoEcho: 'true'
+    Type: String
+    Description: 'Specifies the storage mode for the deployment package. Use ``COPY``
+      to store the package in LAMlong-managed storage. Use ``REFERENCE`` to read the
+      package directly from the Amazon S3 bucket. If omitted, the default is ``COPY``.Possible
+      values: [COPY, REFERENCE]
+
+      This property can be replaced with other types'
+  LambdaFunctionAivledevlambdainventoryextractorCodeZipFile6nZRr:
+    NoEcho: 'true'
+    Type: String
+    Description: "(Node.js and Python) The source code of your Lambda function. If\
+      \ you include your function source inline with this parameter, CFN places it\
+      \ in a file named ``index`` and zips it to create a [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html).\
+      \ This zip file cannot exceed 4MB. For the ``Handler`` property, the first part\
+      \ of the handler identifier must be ``index``. For example, ``index.handler``.\n\
+      \  When you specify source code inline for a Node.js function, the ``index``\
+      \ file that CFN creates uses the extension ``.js``. This means that Node.js\
+      \ treats the file as a CommonJS module.\n When using Node.js 24 or later, Node.js\
+      \ can automatically detect if a ``.js`` file should be treated as CommonJS or\
+      \ as an ES module. To enable auto-detection, add the ``--experimental-detect-module``\
+      \ flag to the ``NODE_OPTIONS`` environment variable. For more information, see\
+      \ [Experimental Node.js features](https://docs.aws.amazon.com//lambda/latest/dg/lambda-nodejs.html#nodejs-experimental-features).\n\
+      \   For JSON, you must escape quotes and special characters such as newline\
+      \ (``\\n``) with a backslash.\n If you specify a function that interacts with\
+      \ an AWS CloudFormation custom resource, you don't have to write your own functions\
+      \ to send responses to the custom resource that invoked the function. AWS CloudFormation\
+      \ provides a response module ([cfn-response](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-lambda-function-code-cfnresponsemodule.html))\
+      \ that simplifies sending responses. See [Using Lambda with CloudFormation](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudformation.html)\
+      \ for details."
+  LambdaFunctionAivledevlambdaderivedfeatureCodeS3KeyhdtXM:
+    NoEcho: 'true'
+    Type: String
+    Description: The Amazon S3 key of the deployment package.
+  LambdaFunctionAivledevlambdainventoryextractorCodeS3BucketwzAQB:
+    NoEcho: 'true'
+    Type: String
+    Description: An Amazon S3 bucket in the same AWS-Region as your function. The
+      bucket can be in a different AWS-account.
+  LambdaFunctionAivledevlambdamodelinferenceCodeS3BucketUqQCw:
+    NoEcho: 'true'
+    Type: String
+    Description: An Amazon S3 bucket in the same AWS-Region as your function. The
+      bucket can be in a different AWS-account.
+  LambdaFunctionAivledevlambdamodelinferenceCodeS3KeyAgjDs:
+    NoEcho: 'true'
+    Type: String
+    Description: The Amazon S3 key of the deployment package.
+  LambdaFunctionAivledevlambdaderivedfeatureCodeZipFileA890S:
+    NoEcho: 'true'
+    Type: String
+    Description: "(Node.js and Python) The source code of your Lambda function. If\
+      \ you include your function source inline with this parameter, CFN places it\
+      \ in a file named ``index`` and zips it to create a [deployment package](https://docs.aws.amazon.com/lambda/latest/dg/gettingstarted-package.html).\
+      \ This zip file cannot exceed 4MB. For the ``Handler`` property, the first part\
+      \ of the handler identifier must be ``index``. For example, ``index.handler``.\n\
+      \  When you specify source code inline for a Node.js function, the ``index``\
+      \ file that CFN creates uses the extension ``.js``. This means that Node.js\
+      \ treats the file as a CommonJS module.\n When using Node.js 24 or later, Node.js\
+      \ can automatically detect if a ``.js`` file should be treated as CommonJS or\
+      \ as an ES module. To enable auto-detection, add the ``--experimental-detect-module``\
+      \ flag to the ``NODE_OPTIONS`` environment variable. For more information, see\
+      \ [Experimental Node.js features](https://docs.aws.amazon.com//lambda/latest/dg/lambda-nodejs.html#nodejs-experimental-features).\n\
+      \   For JSON, you must escape quotes and special characters such as newline\
+      \ (``\\n``) with a backslash.\n If you specify a function that interacts with\
+      \ an AWS CloudFormation custom resource, you don't have to write your own functions\
+      \ to send responses to the custom resource that invoked the function. AWS CloudFormation\
+      \ provides a response module ([cfn-response](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-lambda-function-code-cfnresponsemodule.html))\
+      \ that simplifies sending responses. See [Using Lambda with CloudFormation](https://docs.aws.amazon.com/lambda/latest/dg/services-cloudformation.html)\
+      \ for details."
+Resources:
+  EC2VolumeAttachmentAX:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::VolumeAttachment
+    DeletionPolicy: Retain
+    Properties:
+      VolumeId: vol-05f7e5448fb7dd77d
+      InstanceId: i-06f07cb270b4c9c2c
+      Device: /dev/xvda
+  LogsLogStreamAivlerds:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Logs::LogStream
+    DeletionPolicy: Retain
+    Properties:
+      LogStreamName: aivle-rds
+      LogGroupName: /aws/rds/instance/aivle-rds/postgresql
+  IAMManagedPolicyPolicyserviceroleAmazonEventBridgeSchedulerExecutionPolicy609bc86cd42a425d8b329c053106edfc:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::ManagedPolicy
+    DeletionPolicy: Retain
+    Properties:
+      ManagedPolicyName: Amazon-EventBridge-Scheduler-Execution-Policy-609bc86c-d42a-425d-8b32-9c053106edfc
+      Path: /service-role/
+      Description: ''
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Resource:
+          - arn:aws:lambda:ap-northeast-2:188876037193:function:aivle-dev-lambda-inventory-extractor:*
+          - arn:aws:lambda:ap-northeast-2:188876037193:function:aivle-dev-lambda-inventory-extractor
+          Action:
+          - lambda:InvokeFunction
+          Effect: Allow
+      Roles:
+      - Amazon_EventBridge_Scheduler_LAMBDA_6817b57ba0
+  IAMRoleAivleGlueSnapshotRole:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSGlueServiceRole
+      MaxSessionDuration: 3600
+      RoleName: AivleGlueSnapshotRole
+      Description: Glue role for RDS training snapshot export to S3
+      Policies:
+      - PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: arn:aws:s3:::aivle-dynamic-pricing-ml-188876037193-dev
+            Action:
+            - s3:ListBucket
+            - s3:GetBucketLocation
+            Effect: Allow
+            Sid: ListMLBucket
+          - Resource:
+            - arn:aws:s3:::aivle-dynamic-pricing-ml-188876037193-dev/datasets/*
+            - arn:aws:s3:::aivle-dynamic-pricing-ml-188876037193-dev/metadata/*
+            - arn:aws:s3:::aivle-dynamic-pricing-ml-188876037193-dev/glue/*
+            Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
+            Effect: Allow
+            Sid: ReadWriteGlueData
+          - Resource: arn:aws:secretsmanager:ap-northeast-2:188876037193:secret:aivle-rds-service-secret-E3klki
+            Action:
+            - secretsmanager:GetSecretValue
+            - secretsmanager:DescribeSecret
+            Effect: Allow
+            Sid: ReadRDSSecret
+        PolicyName: AivleGlueSnapshotDataAccess
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: glue.amazonaws.com
+      Tags:
+      - Value: aivle-dynamic-pricing
+        Key: Project
+      - Value: dev
+        Key: Environment
+      - Value: data-tier
+        Key: Service
+  EC2VolumeAttachmentEV:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::VolumeAttachment
+    DeletionPolicy: Retain
+    Properties:
+      VolumeId: vol-0e059f809ecf79a80
+      InstanceId: i-0a4f5f01873c2bf22
+      Device: /dev/xvda
+  S3BucketAivledevsagemakerartifacts188876037193:
+    UpdateReplacePolicy: Retain
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        RestrictPublicBuckets: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        BlockPublicAcls: true
+      BucketName: aivle-dev-sagemaker-artifacts-188876037193
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - BucketKeyEnabled: true
+          ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+  IAMRoleAivledevrolesagemakerexecution:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/AmazonSageMakerFullAccess
+      MaxSessionDuration: 3600
+      RoleName: aivle-dev-role-sagemaker-execution
+      Description: Allows SageMaker notebook instances, training jobs, and models
+        to access S3, ECR, and CloudWatch on your behalf.
+      Policies:
+      - PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource:
+            - arn:aws:s3:::aivle-dev-sagemaker-artifacts-188876037193
+            - arn:aws:s3:::aivle-dev-sagemaker-artifacts-188876037193/*
+            Action:
+            - s3:GetObject
+            - s3:ListBucket
+            Effect: Allow
+            Sid: ReadSageMakerArtifacts
+        PolicyName: SageMaker_S3_Allow
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: sagemaker.amazonaws.com
+          Sid: ''
+  SQSQueueAivledevmodelinputqueue:
+    UpdateReplacePolicy: Retain
+    Type: AWS::SQS::Queue
+    DeletionPolicy: Retain
+    Properties:
+      SqsManagedSseEnabled: true
+      ReceiveMessageWaitTimeSeconds: 0
+      DelaySeconds: 0
+      RedrivePolicy:
+        deadLetterTargetArn: arn:aws:sqs:ap-northeast-2:188876037193:aivle-dev-model-input-dlq
+        maxReceiveCount: 3
+      MessageRetentionPeriod: 86400
+      MaximumMessageSize: 1048576
+      VisibilityTimeout: 720
+      QueueName: aivle-dev-model-input-queue
+  EC2NetworkInterfaceYE:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::NetworkInterface
+    DeletionPolicy: Retain
+    Properties:
+      SourceDestCheck: true
+      Description: ''
+      PrivateIpAddresses:
+      - PrivateIpAddress: 10.0.10.180
+        Primary: true
+      Ipv6PrefixCount: 0
+      Ipv4PrefixCount: 0
+      GroupSet:
+      - sg-08af1a5a646a2a66f
+      SubnetId: subnet-0795e706ec3c9515f
+  LogsLogGroupawsrdsinstanceaivleproductpricerdspostgresql:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupClass: STANDARD
+      LogGroupName: /aws/rds/instance/aivle-product-price-rds/postgresql
+  IAMRoleAivledevrolelambdamodelinference:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole
+      MaxSessionDuration: 3600
+      RoleName: aivle-dev-role-lambda-model-inference
+      Description: Allows Lambda functions to call AWS services on your behalf.
+      Policies:
+      - PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: arn:aws:sagemaker:ap-northeast-2:188876037193:endpoint/aivle-dev-pricing-serverless-endpoint
+            Action:
+            - sagemaker:InvokeEndpoint
+            Effect: Allow
+            Sid: InvokePricingEndpoint
+        PolicyName: aivle-dev-policy-invoke-pricing-endpoint
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+  S3BucketPolicyAivledynamicpricingml188876037193dev:
+    UpdateReplacePolicy: Retain
+    Type: AWS::S3::BucketPolicy
+    DeletionPolicy: Retain
+    Properties:
+      Bucket: aivle-dynamic-pricing-ml-188876037193-dev
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Condition:
+            Bool:
+              aws:SecureTransport: 'false'
+          Resource:
+          - arn:aws:s3:::aivle-dynamic-pricing-ml-188876037193-dev
+          - arn:aws:s3:::aivle-dynamic-pricing-ml-188876037193-dev/*
+          Action: s3:*
+          Effect: Deny
+          Principal: '*'
+          Sid: DenyInsecureTransport
+  IAMRoleAivleWebEC2Role:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::188876037193:policy/AivleWebArtifactReadPolicy
+      - arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+      MaxSessionDuration: 3600
+      RoleName: AivleWebEC2Role
+      Description: Allows EC2 instances to call AWS services on your behalf.
+      Policies:
+      - PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: arn:aws:lambda:ap-northeast-2:188876037193:function:aivle-dev-erp-price-outbox-publisher
+            Action: lambda:InvokeFunction
+            Effect: Allow
+        PolicyName: AivleInvokeErpPriceOutboxPublisher
+      - PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: arn:aws:lambda:ap-northeast-2:188876037193:function:aivle-dev-lambda-model-b-candidate
+            Action: lambda:InvokeFunction
+            Effect: Allow
+        PolicyName: AivleLambdaInvokeCandidatePolicy
+      - PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: arn:aws:sqs:ap-northeast-2:188876037193:aivle-dev-pricing-result-queue
+            Action:
+            - sqs:ReceiveMessage
+            - sqs:DeleteMessage
+            - sqs:GetQueueAttributes
+            Effect: Allow
+        PolicyName: AivlePricingResultQueueRead
+      - PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource:
+            - arn:aws:secretsmanager:ap-northeast-2:188876037193:secret:aivle-rds-service-secret-E3klki
+            Action:
+            - secretsmanager:GetSecretValue
+            - secretsmanager:DescribeSecret
+            Effect: Allow
+            Sid: ReadAivleRdsServiceSecret
+        PolicyName: AivleRdsServiceSecretRead
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+  IAMUserDylee:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      UserName: dy.lee
+      LoginProfile:
+        PasswordResetRequired: true
+      Groups:
+      - aivle
+      PermissionsBoundary: arn:aws:iam::aws:policy/PowerUserAccess
+  EC2SubnetGO:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Retain
+    Properties:
+      MapPublicIpOnLaunch: false
+      EnableDns64: false
+      VpcId: vpc-062243d7d5b99e9b0
+      PrivateDnsNameOptionsOnLaunch:
+        EnableResourceNameDnsARecord: false
+        HostnameType: ip-name
+        EnableResourceNameDnsAAAARecord: false
+      AvailabilityZone: ap-northeast-2c
+      CidrBlock: 10.0.2.0/24
+      Ipv6Native: false
+      Tags:
+      - Value: aivle-public-c
+        Key: Name
+  EC2InstanceRc:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::Instance
+    DeletionPolicy: Retain
+    Properties:
+      Tenancy: default
+      PrivateIpAddress: 10.0.10.180
+      UserData: IyEvYmluL2Jhc2gKc2V0IC1lCgpmb3IgYXR0ZW1wdCBpbiAkKHNlcSAxIDMwKTsgZG8KICBpZiAvdXNyL2xvY2FsL2Jpbi9kZXBsb3ktYWl2bGUtd2ViIGZyb250ZW5kLWxhdGVzdC56aXA7IHRoZW4KICAgIGV4aXQgMAogIGZpCgogIHNsZWVwIDEwCmRvbmUKCmV4aXQgMQ==
+      InstanceInitiatedShutdownBehavior: stop
+      BlockDeviceMappings:
+      - Ebs:
+          SnapshotId: snap-00beee5acea576a73
+          VolumeType: gp3
+          Iops: 3000
+          VolumeSize: 8
+          Encrypted: false
+          DeleteOnTermination: true
+        DeviceName: /dev/xvda
+      PrivateDnsNameOptions:
+        EnableResourceNameDnsARecord: false
+        HostnameType: ip-name
+        EnableResourceNameDnsAAAARecord: false
+      SecurityGroupIds:
+      - sg-08af1a5a646a2a66f
+      EbsOptimized: false
+      DisableApiTermination: false
+      SourceDestCheck: true
+      PlacementGroupName: ''
+      NetworkInterfaces:
+      - SecondaryPrivateIpAddressCount: 0
+        NetworkInterfaceId: eni-02bcace25b86a9c61
+        DeviceIndex: '0'
+      ImageId: ami-0cd3bfb1dfee6ae9a
+      InstanceType: t3.micro
+      Monitoring: false
+      CreditSpecification:
+        CPUCredits: unlimited
+  IAMRoleAmazonEventBridgeSchedulerLAMBDA6817b57ba0:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties:
+      Path: /service-role/
+      ManagedPolicyArns:
+      - arn:aws:iam::188876037193:policy/service-role/Amazon-EventBridge-Scheduler-Execution-Policy-609bc86c-d42a-425d-8b32-9c053106edfc
+      MaxSessionDuration: 3600
+      RoleName: Amazon_EventBridge_Scheduler_LAMBDA_6817b57ba0
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Condition:
+            StringEquals:
+              aws:SourceAccount: '188876037193'
+          Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: scheduler.amazonaws.com
+  IAMManagedPolicyPolicyAivleWebArtifactReadPolicy:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::ManagedPolicy
+    DeletionPolicy: Retain
+    Properties:
+      ManagedPolicyName: AivleWebArtifactReadPolicy
+      Path: /
+      Description: ''
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Condition:
+            StringLike:
+              s3:prefix:
+              - releases/*
+          Resource: arn:aws:s3:::aivle-web-git-update-s3-1888-7603-7193
+          Action:
+          - s3:ListBucket
+          Effect: Allow
+          Sid: ListArtifactBucket
+        - Resource: arn:aws:s3:::aivle-web-git-update-s3-1888-7603-7193/releases/*
+          Action:
+          - s3:GetObject
+          Effect: Allow
+          Sid: ReadDeploymentArtifacts
+      Roles:
+      - AivleWebEC2Role
+  EC2SecurityGroupM8:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::SecurityGroup
+    DeletionPolicy: Retain
+    Properties:
+      GroupDescription: alb - Web/API EC2
+      GroupName: aivle-web-sg
+      VpcId: vpc-062243d7d5b99e9b0
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        SourceSecurityGroupId: sg-0da77200d6a429c2b
+        ToPort: 80
+        SourceSecurityGroupOwnerId: '188876037193'
+      - IpProtocol: tcp
+        FromPort: 5432
+        SourceSecurityGroupId: sg-034317ebd1d603169
+        ToPort: 5432
+        SourceSecurityGroupOwnerId: '188876037193'
+      - IpProtocol: tcp
+        FromPort: 22
+        SourceSecurityGroupId: sg-0f959770bbedd5ac8
+        ToPort: 22
+        SourceSecurityGroupOwnerId: '188876037193'
+      SecurityGroupEgress:
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: '-1'
+  LambdaFunctionAivledevlambdamodelinference:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Lambda::Function
+    DeletionPolicy: Retain
+    Properties:
+      MemorySize: 256
+      Description: ''
+      TracingConfig:
+        Mode: PassThrough
+      Timeout: 300
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+      Handler: lambda_function.lambda_handler
+      Code:
+        SourceKMSKeyArn:
+          Ref: LambdaFunctionAivledevlambdamodelinferenceCodeSourceKMSKeyArnMpclR
+        S3ObjectVersion:
+          Ref: LambdaFunctionAivledevlambdamodelinferenceCodeS3ObjectVersionYTQ6p
+        S3Bucket:
+          Ref: LambdaFunctionAivledevlambdamodelinferenceCodeS3BucketUqQCw
+        ZipFile:
+          Ref: LambdaFunctionAivledevlambdamodelinferenceCodeZipFileOn0qz
+        S3Key:
+          Ref: LambdaFunctionAivledevlambdamodelinferenceCodeS3KeyAgjDs
+        S3ObjectStorageMode:
+          Ref: LambdaFunctionAivledevlambdamodelinferenceCodeS3ObjectStorageModeSATUA
+        ImageUri:
+          Ref: LambdaFunctionAivledevlambdamodelinferenceCodeImageUripVi40
+      Role: arn:aws:iam::188876037193:role/aivle-dev-role-lambda-model-inference
+      FunctionName: aivle-dev-lambda-model-inference
+      Runtime: python3.15
+      PackageType: Zip
+      LoggingConfig:
+        LogFormat: Text
+        LogGroup: /aws/lambda/aivle-dev-lambda-model-inference
+      Environment:
+        Variables:
+          SAGEMAKER_ENDPOINT_NAME: aivle-dev-pricing-serverless-endpoint
+      EphemeralStorage:
+        Size: 512
+      Architectures:
+      - x86_64
+  IAMRoleMockerprdswriterrolecj75zvng:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties:
+      Path: /service-role/
+      ManagedPolicyArns:
+      - arn:aws:iam::188876037193:policy/service-role/AWSLambdaVPCAccessExecutionRole-d1e3bc2e-498d-4ae2-9738-6c4548f8158f
+      - arn:aws:iam::188876037193:policy/service-role/AWSLambdaBasicExecutionRole-ca72b042-6f4b-45d5-bbdc-0e4958a7840d
+      MaxSessionDuration: 3600
+      RoleName: mock-erp-rds-writer-role-cj75zvng
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+  EC2InstanceFR:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::Instance
+    DeletionPolicy: Retain
+    Properties:
+      Tenancy: default
+      PrivateIpAddress: 10.0.20.153
+      UserData: IyEvYmluL2Jhc2gNCnNldCAtRWV1byBwaXBlZmFpbA0KDQpBV1NfUkVHSU9OPSJhcC1ub3J0aGVhc3QtMiINClMzX0JVQ0tFVD0iYWl2bGUtd2ViLWdpdC11cGRhdGUtczMtMTg4OC03NjAzLTcxOTMiDQoNCmZvciBhdHRlbXB0IGluICQoc2VxIDEgMzApOyBkbw0KICB3b3JrX2Rpcj0iJChta3RlbXAgLWQgL3RtcC9haXZsZS1ib290c3RyYXAuWFhYWFhYKSINCg0KICBpZiBhd3MgczMgY3AgInMzOi8vJHtTM19CVUNLRVR9L3JlbGVhc2VzL3dlYi1hcGktbGF0ZXN0LnppcCIgIiR7d29ya19kaXJ9L3dlYi1hcGkuemlwIiAtLXJlZ2lvbiAiJHtBV1NfUkVHSU9OfSIgXA0KICAgICYmIHVuemlwIC1xICIke3dvcmtfZGlyfS93ZWItYXBpLnppcCIgLWQgIiR7d29ya19kaXJ9L3dlYi1hcGkiIFwNCiAgICAmJiBiYXNoICIke3dvcmtfZGlyfS93ZWItYXBpL2RlcGxveS5zaCIgIiR7d29ya19kaXJ9L3dlYi1hcGkiICJib290c3RyYXAtJChkYXRlICslcykiIFwNCiAgICAmJiAvdXNyL2xvY2FsL2Jpbi9kZXBsb3ktYWl2bGUtd2ViIGZyb250ZW5kLWxhdGVzdC56aXA7IHRoZW4NCiAgICBybSAtcmYgIiR7d29ya19kaXJ9Ig0KICAgIGV4aXQgMA0KICBmaQ0KDQogIHJtIC1yZiAiJHt3b3JrX2Rpcn0iDQogIHNsZWVwIDEwDQpkb25lDQoNCmV4aXQgMQ0K
+      InstanceInitiatedShutdownBehavior: stop
+      BlockDeviceMappings:
+      - Ebs:
+          SnapshotId: snap-00beee5acea576a73
+          VolumeType: gp3
+          Iops: 3000
+          VolumeSize: 8
+          Encrypted: false
+          DeleteOnTermination: true
+        DeviceName: /dev/xvda
+      PrivateDnsNameOptions:
+        EnableResourceNameDnsARecord: false
+        HostnameType: ip-name
+        EnableResourceNameDnsAAAARecord: false
+      SecurityGroupIds:
+      - sg-08af1a5a646a2a66f
+      EbsOptimized: false
+      DisableApiTermination: false
+      SourceDestCheck: true
+      PlacementGroupName: ''
+      NetworkInterfaces:
+      - SecondaryPrivateIpAddressCount: 0
+        NetworkInterfaceId: eni-07fa852f94d630d05
+        DeviceIndex: '0'
+      ImageId: ami-0cd3bfb1dfee6ae9a
+      InstanceType: t3.micro
+      Monitoring: false
+      CreditSpecification:
+        CPUCredits: unlimited
+  IAMUserYkkim:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/IAMUserChangePassword
+      - arn:aws:iam::188876037193:policy/AivleYkKimRoleReadPolicy
+      - arn:aws:iam::aws:policy/AdministratorAccess
+      UserName: yk.kim
+      LoginProfile:
+        PasswordResetRequired: false
+      Groups:
+      - aivle
+      Tags:
+      - Value: yk.kim CDK
+        Key: YOUR_ACCESS_KEY
+  IAMUserYskim:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      UserName: ys.kim
+      LoginProfile:
+        PasswordResetRequired: true
+      Groups:
+      - aivle
+      PermissionsBoundary: arn:aws:iam::aws:policy/PowerUserAccess
+  EC2VolumeXJ:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::Volume
+    DeletionPolicy: Retain
+    Properties:
+      MultiAttachEnabled: false
+      SnapshotId: snap-00beee5acea576a73
+      VolumeType: gp3
+      Encrypted: false
+      Size: 8
+      AutoEnableIO: true
+      AvailabilityZone: ap-northeast-2c
+      Throughput: 125
+      Iops: 3000
+  EC2SubnetS0:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Retain
+    Properties:
+      MapPublicIpOnLaunch: false
+      EnableDns64: false
+      VpcId: vpc-062243d7d5b99e9b0
+      PrivateDnsNameOptionsOnLaunch:
+        EnableResourceNameDnsARecord: false
+        HostnameType: ip-name
+        EnableResourceNameDnsAAAARecord: false
+      AvailabilityZone: ap-northeast-2a
+      CidrBlock: 10.0.10.0/24
+      Ipv6Native: false
+      Tags:
+      - Value: aivle-private-a
+        Key: Name
+  SecretsManagerSecretTargetAttachment:
+    UpdateReplacePolicy: Retain
+    Type: AWS::SecretsManager::SecretTargetAttachment
+    DeletionPolicy: Retain
+    Properties:
+      TargetType: AWS::RDS::DBInstance
+      TargetId: aivle-rds
+      SecretId: arn:aws:secretsmanager:ap-northeast-2:188876037193:secret:aivle-rds-service-secret-E3klki
+  IAMRoleAivledevrolelambdaextractor:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+      MaxSessionDuration: 3600
+      RoleName: aivle-dev-role-lambda-extractor
+      Description: Allows Lambda functions to call AWS services on your behalf.
+      Policies:
+      - PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: arn:aws:secretsmanager:ap-northeast-2:188876037193:secret:aivle-rds-feature-lambda-app-RPPcEQ
+            Action:
+            - secretsmanager:GetSecretValue
+            Effect: Allow
+            Sid: ReadDatabaseSecret
+          - Resource: arn:aws:sqs:ap-northeast-2:188876037193:aivle-dev-inventory-raw-queue
+            Action:
+            - sqs:SendMessage
+            - sqs:GetQueueAttributes
+            Effect: Allow
+            Sid: SendInventoryMessages
+        PolicyName: aivle-dev-policy-extractor-access
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+  IAMManagedPolicyPolicyAivleWebGitHubDeployPolicy:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::ManagedPolicy
+    DeletionPolicy: Retain
+    Properties:
+      ManagedPolicyName: AivleWebGitHubDeployPolicy
+      Path: /
+      Description: ''
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Resource: arn:aws:s3:::aivle-web-git-update-s3-1888-7603-7193/releases/*
+          Action:
+          - s3:PutObject
+          Effect: Allow
+          Sid: UploadFrontendArtifact
+        - Resource:
+          - arn:aws:ssm:ap-northeast-2:*:document/AWS-RunShellScript
+          - arn:aws:ec2:ap-northeast-2:188876037193:instance/*
+          Action:
+          - ssm:SendCommand
+          Effect: Allow
+          Sid: SendFrontendDeploymentCommand
+        - Resource: '*'
+          Action:
+          - ssm:GetCommandInvocation
+          - ssm:ListCommandInvocations
+          Effect: Allow
+          Sid: ReadCommandResult
+        - Resource: arn:aws:cloudfront::188876037193:distribution/ELDUDUTC45Y21
+          Action:
+          - cloudfront:CreateInvalidation
+          Effect: Allow
+          Sid: InvalidateCloudFront
+        - Resource: '*'
+          Action:
+          - autoscaling:DescribeAutoScalingGroups
+          Effect: Allow
+          Sid: ReadAutoScalingGroup
+        - Resource: '*'
+          Action:
+          - ssm:DescribeInstanceInformation
+          Effect: Allow
+          Sid: DescribeSSMManagedInstances
+      Roles:
+      - AivleWebGitHubDeployRole
+  LambdaEventSourceMapping:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Lambda::EventSourceMapping
+    DeletionPolicy: Retain
+    Properties:
+      BatchSize: 1
+      FunctionName: arn:aws:lambda:ap-northeast-2:188876037193:function:aivle-dev-lambda-model-inference
+      ScalingConfig:
+        MaximumConcurrency: 2
+      Enabled: true
+      EventSourceArn: arn:aws:sqs:ap-northeast-2:188876037193:aivle-dev-model-input-queue
+      FunctionResponseTypes:
+      - ReportBatchItemFailures
+      MaximumBatchingWindowInSeconds: 0
+  EC2NetworkInterfaceBd:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::NetworkInterface
+    DeletionPolicy: Retain
+    Properties:
+      SourceDestCheck: true
+      Description: ''
+      PrivateIpAddresses:
+      - PrivateIpAddress: 10.0.20.153
+        Primary: true
+      Ipv6PrefixCount: 0
+      Ipv4PrefixCount: 0
+      GroupSet:
+      - sg-08af1a5a646a2a66f
+      SubnetId: subnet-0f1ca9a5fcb1db9c3
+  LambdaEventSourceMappingVe:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Lambda::EventSourceMapping
+    DeletionPolicy: Retain
+    Properties:
+      BatchSize: 10
+      FunctionName: arn:aws:lambda:ap-northeast-2:188876037193:function:aivle-dev-lambda-derived-feature
+      Enabled: true
+      EventSourceArn: arn:aws:sqs:ap-northeast-2:188876037193:aivle-dev-inventory-raw-queue
+      FunctionResponseTypes:
+      - ReportBatchItemFailures
+      MaximumBatchingWindowInSeconds: 0
+  IAMInstanceProfileAivleWebEC2Role:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::InstanceProfile
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      Roles:
+      - AivleWebEC2Role
+      InstanceProfileName: AivleWebEC2Role
+  SecretsManagerSecret:
+    UpdateReplacePolicy: Retain
+    Type: AWS::SecretsManager::Secret
+    DeletionPolicy: Retain
+    Properties:
+      Description: Shared PostgreSQL credentials for AIVLE Application and AI services
+      Tags:
+      - Value: aivle-rds
+        Key: Database
+      - Value: aivle-dynamic-pricing
+        Key: Project
+      Name: aivle-rds-service-secret
+  CloudFrontCachePolicy:
+    UpdateReplacePolicy: Retain
+    Type: AWS::CloudFront::CachePolicy
+    DeletionPolicy: Retain
+    Properties:
+      CachePolicyConfig:
+        Comment: Policy with caching disabled
+        MinTTL: 0
+        MaxTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          QueryStringsConfig:
+            QueryStringBehavior: none
+          EnableAcceptEncodingBrotli: false
+          HeadersConfig:
+            HeaderBehavior: none
+          CookiesConfig:
+            CookieBehavior: none
+          EnableAcceptEncodingGzip: false
+        DefaultTTL: 0
+        Name: Managed-CachingDisabled
+  LambdaFunctionAivledevlambdainventoryextractor:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Lambda::Function
+    DeletionPolicy: Retain
+    Properties:
+      MemorySize: 512
+      Description: ''
+      TracingConfig:
+        Mode: PassThrough
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-05961d8ea52fbe01f
+        SubnetIds:
+        - subnet-0795e706ec3c9515f
+        - subnet-0f1ca9a5fcb1db9c3
+        Ipv6AllowedForDualStack: false
+      Timeout: 300
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+      Handler: lambda_function.lambda_handler
+      Code:
+        SourceKMSKeyArn:
+          Ref: LambdaFunctionAivledevlambdainventoryextractorCodeSourceKMSKeyArnsfp9Y
+        S3ObjectVersion:
+          Ref: LambdaFunctionAivledevlambdainventoryextractorCodeS3ObjectVersionalKzL
+        S3Bucket:
+          Ref: LambdaFunctionAivledevlambdainventoryextractorCodeS3BucketwzAQB
+        ZipFile:
+          Ref: LambdaFunctionAivledevlambdainventoryextractorCodeZipFile6nZRr
+        S3Key:
+          Ref: LambdaFunctionAivledevlambdainventoryextractorCodeS3KeyhuVpZ
+        S3ObjectStorageMode:
+          Ref: LambdaFunctionAivledevlambdainventoryextractorCodeS3ObjectStorageModemEHie
+        ImageUri:
+          Ref: LambdaFunctionAivledevlambdainventoryextractorCodeImageUriHa3Q1
+      Role: arn:aws:iam::188876037193:role/aivle-dev-role-lambda-extractor
+      FunctionName: aivle-dev-lambda-inventory-extractor
+      Runtime: python3.14
+      PackageType: Zip
+      LoggingConfig:
+        LogFormat: Text
+        LogGroup: /aws/lambda/aivle-dev-lambda-inventory-extractor
+      Environment:
+        Variables:
+          QUEUE_URL: https://sqs.ap-northeast-2.amazonaws.com/188876037193/aivle-dev-inventory-raw-queue
+          DB_SECRET_ARN: arn:aws:secretsmanager:ap-northeast-2:188876037193:secret:aivle-rds-feature-lambda-app-RPPcEQ
+          EVENT_TYPE: inventory.UPSERT
+          PIPELINE_NAME: inventory-feature-pipeline
+          SOURCE_SYSTEM: mock-erp
+      EphemeralStorage:
+        Size: 512
+      Layers:
+      - arn:aws:lambda:ap-northeast-2:188876037193:layer:aivle-dev-pg8000-layer:1
+      Architectures:
+      - x86_64
+  KMSKey:
+    UpdateReplacePolicy: Retain
+    Type: AWS::KMS::Key
+    DeletionPolicy: Retain
+    Properties:
+      Origin: AWS_KMS
+      MultiRegion: false
+      Description: Default key that protects my RDS database volumes when no other
+        key is defined
+      KeyPolicy:
+        Version: '2012-10-17'
+        Statement:
+        - Condition:
+            StringEquals:
+              kms:ViaService: rds.ap-northeast-2.amazonaws.com
+              kms:CallerAccount: '188876037193'
+          Resource: '*'
+          Action:
+          - kms:Encrypt
+          - kms:Decrypt
+          - kms:ReEncrypt*
+          - kms:GenerateDataKey*
+          - kms:CreateGrant
+          - kms:ListGrants
+          - kms:DescribeKey
+          Effect: Allow
+          Principal:
+            AWS: '*'
+          Sid: Allow access through RDS for all principals in the account that are
+            authorized to use RDS
+        - Resource: '*'
+          Action:
+          - kms:Describe*
+          - kms:Get*
+          - kms:List*
+          - kms:RevokeGrant
+          Effect: Allow
+          Principal:
+            AWS: arn:aws:iam::188876037193:root
+          Sid: Allow direct access to key metadata to the account
+        Id: auto-rds-2
+      KeySpec: SYMMETRIC_DEFAULT
+      Enabled: true
+      EnableKeyRotation: true
+      KeyUsage: ENCRYPT_DECRYPT
+  RDSDBInstance:
+    UpdateReplacePolicy: Retain
+    Type: AWS::RDS::DBInstance
+    DeletionPolicy: Retain
+    Properties:
+      StorageEncrypted: true
+      Port: '5432'
+      StorageThroughput: 125
+      PreferredBackupWindow: 18:35-19:05
+      MonitoringInterval: 0
+      DBParameterGroupName: default.postgres18
+      NetworkType: IPV4
+      DedicatedLogVolume: false
+      CopyTagsToSnapshot: true
+      MultiAZ: false
+      Engine: postgres
+      Tags:
+      - Value: aivle-dynamic-pricing
+        Key: Project
+      - Value: data-tier
+        Key: Service
+      - Value: aivle-rds
+        Key: Name
+      PerformanceInsightsKMSKeyId: arn:aws:kms:ap-northeast-2:188876037193:key/b3670dbc-9ae9-45b5-b461-060af00130b4
+      LicenseModel: postgresql-license
+      EngineVersion: '18.3'
+      StorageType: gp3
+      KmsKeyId: arn:aws:kms:ap-northeast-2:188876037193:key/b3670dbc-9ae9-45b5-b461-060af00130b4
+      DBInstanceClass: db.t3.micro
+      PerformanceInsightsRetentionPeriod: 7
+      AvailabilityZone: ap-northeast-2a
+      OptionGroupName: default:postgres-18
+      PreferredMaintenanceWindow: tue:17:05-tue:17:35
+      EnablePerformanceInsights: true
+      AutoMinorVersionUpgrade: true
+      DBSubnetGroupName: aivle-db-subnet-group
+      DeletionProtection: false
+      Iops: 3000
+      DBInstanceIdentifier: aivle-rds
+      AllocatedStorage: '20'
+      CACertificateIdentifier: rds-ca-rsa2048-g1
+      ManageMasterUserPassword: true
+      MasterUserSecret:
+        KmsKeyId: arn:aws:kms:ap-northeast-2:188876037193:key/b833f516-9cd6-4ba2-ad1c-abb9844ebcb2
+      VPCSecurityGroups:
+      - sg-034317ebd1d603169
+      MasterUsername: db_admin
+      MaxAllocatedStorage: 22
+      DBName: aivle_db
+      EnableIAMDatabaseAuthentication: false
+      PubliclyAccessible: false
+      BackupRetentionPeriod: 1
+      EnableCloudwatchLogsExports:
+      - postgresql
+      - upgrade
+  NeptuneDBInstance:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Neptune::DBInstance
+    DeletionPolicy: Retain
+    Properties:
+      DBParameterGroupName: default.postgres18
+      DBInstanceClass: db.t3.micro
+      AvailabilityZone: ap-northeast-2a
+      PreferredMaintenanceWindow: tue:17:05-tue:17:35
+      AutoMinorVersionUpgrade: true
+      DBSubnetGroupName: aivle-db-subnet-group
+      DBInstanceIdentifier: aivle-rds
+      Tags:
+      - Value: aivle-rds
+        Key: Name
+      - Value: data-tier
+        Key: Service
+      - Value: aivle-dynamic-pricing
+        Key: Project
+  AutoScalingAutoScalingGroupAivlewebasg:
+    UpdateReplacePolicy: Retain
+    Type: AWS::AutoScaling::AutoScalingGroup
+    DeletionPolicy: Retain
+    Properties:
+      ServiceLinkedRoleARN: arn:aws:iam::188876037193:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling
+      TargetGroupARNs:
+      - arn:aws:elasticloadbalancing:ap-northeast-2:188876037193:targetgroup/aivle-web-tg/29b9b53ee647669a
+      Cooldown: '300'
+      AvailabilityZones:
+      - ap-northeast-2a
+      - ap-northeast-2c
+      DesiredCapacity: '2'
+      HealthCheckGracePeriod: 300
+      MaxSize: '4'
+      NewInstancesProtectedFromScaleIn: false
+      MinSize: '2'
+      TerminationPolicies:
+      - Default
+      LaunchTemplate:
+        Version: $Default
+        LaunchTemplateName: aivle-web-lt2
+        LaunchTemplateId: lt-0e260b3f4ab0c3020
+      AutoScalingGroupName: aivle-web-asg
+      VPCZoneIdentifier:
+      - subnet-0f1ca9a5fcb1db9c3
+      - subnet-0795e706ec3c9515f
+      HealthCheckType: ELB
+  LambdaPermissionFunctionaivledeverppriceoutboxpublisher:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Lambda::Permission
+    DeletionPolicy: Retain
+    Properties:
+      FunctionName: arn:aws:lambda:ap-northeast-2:188876037193:function:aivle-dev-erp-price-outbox-publisher
+      Action: lambda:InvokeFunction
+      SourceArn: arn:aws:events:ap-northeast-2:188876037193:rule/aivle-dev-erp-price-publisher-every-minute
+      Principal: events.amazonaws.com
+  LambdaFunctionAivledevlambdaderivedfeature:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Lambda::Function
+    DeletionPolicy: Retain
+    Properties:
+      MemorySize: 256
+      Description: ''
+      TracingConfig:
+        Mode: PassThrough
+      Timeout: 30
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+      Handler: lambda_function.lambda_handler
+      Code:
+        SourceKMSKeyArn:
+          Ref: LambdaFunctionAivledevlambdaderivedfeatureCodeSourceKMSKeyArnjMz7Y
+        S3ObjectVersion:
+          Ref: LambdaFunctionAivledevlambdaderivedfeatureCodeS3ObjectVersion7siTt
+        S3Bucket:
+          Ref: LambdaFunctionAivledevlambdaderivedfeatureCodeS3BucketaY54J
+        ZipFile:
+          Ref: LambdaFunctionAivledevlambdaderivedfeatureCodeZipFileA890S
+        S3Key:
+          Ref: LambdaFunctionAivledevlambdaderivedfeatureCodeS3KeyhdtXM
+        S3ObjectStorageMode:
+          Ref: LambdaFunctionAivledevlambdaderivedfeatureCodeS3ObjectStorageMode170zQ
+        ImageUri:
+          Ref: LambdaFunctionAivledevlambdaderivedfeatureCodeImageUriQe7Gr
+      Role: arn:aws:iam::188876037193:role/aivle-dev-role-lambda-derived-feature
+      FunctionName: aivle-dev-lambda-derived-feature
+      Runtime: python3.14
+      PackageType: Zip
+      LoggingConfig:
+        LogFormat: Text
+        LogGroup: /aws/lambda/aivle-dev-lambda-derived-feature
+      Environment:
+        Variables:
+          MODEL_INPUT_QUEUE_URL: https://sqs.ap-northeast-2.amazonaws.com/188876037193/aivle-dev-model-input-queue
+      EphemeralStorage:
+        Size: 512
+      Architectures:
+      - x86_64
+  ElasticLoadBalancingV2LoadBalancerLoadbalancerappaivlewebalb25b1d8022c4b6043:
+    UpdateReplacePolicy: Retain
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    DeletionPolicy: Retain
+    Properties:
+      IpAddressType: ipv4
+      SecurityGroups:
+      - sg-0da77200d6a429c2b
+      LoadBalancerAttributes:
+      - Value: ''
+        Key: access_logs.s3.prefix
+      - Value: append
+        Key: routing.http.xff_header_processing.mode
+      - Value: 'true'
+        Key: routing.http2.enabled
+      - Value: 'false'
+        Key: waf.fail_open.enabled
+      - Value: ''
+        Key: connection_logs.s3.bucket
+      - Value: 'false'
+        Key: access_logs.s3.enabled
+      - Value: 'false'
+        Key: zonal_shift.config.enabled
+      - Value: defensive
+        Key: routing.http.desync_mitigation_mode
+      - Value: ''
+        Key: connection_logs.s3.prefix
+      - Value: ''
+        Key: health_check_logs.s3.prefix
+      - Value: 'false'
+        Key: routing.http.x_amzn_tls_version_and_cipher_suite.enabled
+      - Value: 'false'
+        Key: routing.http.preserve_host_header.enabled
+      - Value: 'true'
+        Key: load_balancing.cross_zone.enabled
+      - Value: 'false'
+        Key: health_check_logs.s3.enabled
+      - Value: ''
+        Key: health_check_logs.s3.bucket
+      - Value: 'false'
+        Key: routing.http.xff_client_port.enabled
+      - Value: ''
+        Key: access_logs.s3.bucket
+      - Value: 'false'
+        Key: deletion_protection.enabled
+      - Value: '3600'
+        Key: client_keep_alive.seconds
+      - Value: 'false'
+        Key: routing.http.drop_invalid_header_fields.enabled
+      - Value: 'false'
+        Key: connection_logs.s3.enabled
+      - Value: '60'
+        Key: idle_timeout.timeout_seconds
+      Subnets:
+      - subnet-02bc0d58e9ca0453a
+      - subnet-084b35b7192b72cd3
+      Type: application
+      Scheme: internet-facing
+      Name: aivle-web-alb
+      SubnetMappings:
+      - SubnetId: subnet-02bc0d58e9ca0453a
+      - SubnetId: subnet-084b35b7192b72cd3
+  IAMUserNypark:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/IAMUserChangePassword
+      UserName: ny.park
+      LoginProfile:
+        PasswordResetRequired: true
+      Groups:
+      - aivle
+  S3BucketPolicyAwssamclimanageddefaultsamclisourcebucket4hjufpdzyyuw:
+    UpdateReplacePolicy: Retain
+    Type: AWS::S3::BucketPolicy
+    DeletionPolicy: Retain
+    Properties:
+      Bucket: aws-sam-cli-managed-default-samclisourcebucket-4hjufpdzyyuw
+      PolicyDocument:
+        Version: '2008-10-17'
+        Statement:
+        - Condition:
+            StringEquals:
+              aws:SourceAccount: '188876037193'
+          Resource: arn:aws:s3:::aws-sam-cli-managed-default-samclisourcebucket-4hjufpdzyyuw/*
+          Action: s3:GetObject
+          Effect: Allow
+          Principal:
+            Service: serverlessrepo.amazonaws.com
+        - Condition:
+            Bool:
+              aws:SecureTransport: 'false'
+          Resource:
+          - arn:aws:s3:::aws-sam-cli-managed-default-samclisourcebucket-4hjufpdzyyuw
+          - arn:aws:s3:::aws-sam-cli-managed-default-samclisourcebucket-4hjufpdzyyuw/*
+          Action: s3:*
+          Effect: Deny
+          Principal: '*'
+  IAMGroupAivle:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::Group
+    DeletionPolicy: Retain
+    Properties:
+      GroupName: aivle
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/PowerUserAccess
+  NeptuneDBSubnetGroupAivledbsubnetgroup:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Neptune::DBSubnetGroup
+    DeletionPolicy: Retain
+    Properties:
+      DBSubnetGroupDescription: Private DB subnets for AIVLE Data Tier
+      SubnetIds:
+      - subnet-00228edc0010713a8
+      - subnet-01974946b167eb88a
+      DBSubnetGroupName: aivle-db-subnet-group
+  EC2Subnet:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Retain
+    Properties:
+      MapPublicIpOnLaunch: false
+      EnableDns64: false
+      VpcId: vpc-062243d7d5b99e9b0
+      PrivateDnsNameOptionsOnLaunch:
+        EnableResourceNameDnsARecord: false
+        HostnameType: ip-name
+        EnableResourceNameDnsAAAARecord: false
+      AvailabilityZone: ap-northeast-2a
+      CidrBlock: 10.0.30.0/24
+      Ipv6Native: false
+      Tags:
+      - Value: aivle-db-a
+        Key: Name
+  EC2SecurityGroup:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::SecurityGroup
+    DeletionPolicy: Retain
+    Properties:
+      GroupDescription: Allow PostgreSQL from AIVLE application services
+      GroupName: aivle-rds-sg
+      VpcId: vpc-062243d7d5b99e9b0
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 5432
+        SourceSecurityGroupId: sg-08af1a5a646a2a66f
+        ToPort: 5432
+        SourceSecurityGroupOwnerId: '188876037193'
+      - IpProtocol: tcp
+        FromPort: 5432
+        SourceSecurityGroupId: sg-0d9ec0878f9e798fd
+        ToPort: 5432
+        SourceSecurityGroupOwnerId: '188876037193'
+      - IpProtocol: tcp
+        FromPort: 5432
+        SourceSecurityGroupId: sg-063170d7eb76e9d79
+        ToPort: 5432
+        SourceSecurityGroupOwnerId: '188876037193'
+      - IpProtocol: tcp
+        FromPort: 5432
+        SourceSecurityGroupId: sg-01bbe87b6351a9b22
+        ToPort: 5432
+        SourceSecurityGroupOwnerId: '188876037193'
+      - IpProtocol: tcp
+        FromPort: 5432
+        SourceSecurityGroupId: sg-05961d8ea52fbe01f
+        ToPort: 5432
+        SourceSecurityGroupOwnerId: '188876037193'
+      - IpProtocol: tcp
+        Description: PostgreSQL from Mock ERP receiver Lambda
+        FromPort: 5432
+        SourceSecurityGroupId: sg-03980717daff09c63
+        ToPort: 5432
+        SourceSecurityGroupOwnerId: '188876037193'
+      - IpProtocol: tcp
+        Description: Allow candidate snapshot builder PostgreSQL access
+        FromPort: 5432
+        SourceSecurityGroupId: sg-0948557b61bdcb08e
+        ToPort: 5432
+        SourceSecurityGroupOwnerId: '188876037193'
+      - IpProtocol: tcp
+        Description: Temporary CloudShell PostgreSQL administration
+        FromPort: 5432
+        SourceSecurityGroupId: sg-06066a716ad342dae
+        ToPort: 5432
+        SourceSecurityGroupOwnerId: '188876037193'
+      - IpProtocol: tcp
+        Description: PostgreSQL from ERP price sync Lambdas
+        FromPort: 5432
+        SourceSecurityGroupId: sg-01ac1ee119035d56e
+        ToPort: 5432
+        SourceSecurityGroupOwnerId: '188876037193'
+      SecurityGroupEgress:
+      - CidrIp: 0.0.0.0/0
+        IpProtocol: '-1'
+  S3BucketAivledynamicpricingml188876037193dev:
+    UpdateReplacePolicy: Retain
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        RestrictPublicBuckets: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        BlockPublicAcls: true
+      BucketName: aivle-dynamic-pricing-ml-188876037193-dev
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - BucketKeyEnabled: true
+          ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+      VersioningConfiguration:
+        Status: Enabled
+      Tags:
+      - Value: aivle-dynamic-pricing
+        Key: Project
+      - Value: dev
+        Key: Environment
+      - Value: data-tier
+        Key: Service
+      - Value: ml-data-and-artifacts
+        Key: Purpose
+      - Value: aivle-dynamic-pricing-ml-dev
+        Key: Name
+  SchedulerScheduleAivledevscheduleinventoryextractor:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Scheduler::Schedule
+    DeletionPolicy: Retain
+    Properties:
+      GroupName: default
+      ScheduleExpression: rate(10 minutes)
+      Target:
+        Input: '{"trigger":"scheduled"}'
+        Arn: arn:aws:lambda:ap-northeast-2:188876037193:function:aivle-dev-lambda-inventory-extractor
+        RetryPolicy:
+          MaximumEventAgeInSeconds: 600
+          MaximumRetryAttempts: 1
+        RoleArn: arn:aws:iam::188876037193:role/service-role/Amazon_EventBridge_Scheduler_LAMBDA_6817b57ba0
+      State: DISABLED
+      FlexibleTimeWindow:
+        Mode: 'OFF'
+      ScheduleExpressionTimezone: Asia/Seoul
+      Name: aivle-dev-schedule-inventory-extractor
+  S3BucketAivlewebgitupdates3188876037193:
+    UpdateReplacePolicy: Retain
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        RestrictPublicBuckets: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        BlockPublicAcls: true
+      LifecycleConfiguration:
+        TransitionDefaultMinimumObjectSize: all_storage_classes_128K
+        Rules:
+        - Status: Enabled
+          Id: delete-old-frontend-artifacts
+          Prefix: releases/
+          ExpirationInDays: 14
+      BucketName: aivle-web-git-update-s3-1888-7603-7193
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - BucketKeyEnabled: true
+          ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+  RDSDBSubnetGroupAivledbsubnetgroup:
+    UpdateReplacePolicy: Retain
+    Type: AWS::RDS::DBSubnetGroup
+    DeletionPolicy: Retain
+    Properties:
+      DBSubnetGroupDescription: Private DB subnets for AIVLE Data Tier
+      SubnetIds:
+      - subnet-00228edc0010713a8
+      - subnet-01974946b167eb88a
+      DBSubnetGroupName: aivle-db-subnet-group
+  SQSQueueAivledevinventoryrawqueue:
+    UpdateReplacePolicy: Retain
+    Type: AWS::SQS::Queue
+    DeletionPolicy: Retain
+    Properties:
+      SqsManagedSseEnabled: true
+      ReceiveMessageWaitTimeSeconds: 20
+      DelaySeconds: 0
+      RedrivePolicy:
+        deadLetterTargetArn: arn:aws:sqs:ap-northeast-2:188876037193:aivle-dev-inventory-raw-dlq
+        maxReceiveCount: 3
+      MessageRetentionPeriod: 86400
+      MaximumMessageSize: 1048576
+      VisibilityTimeout: 180
+      QueueName: aivle-dev-inventory-raw-queue
+  LambdaFunctionMockerprdswriter:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Lambda::Function
+    DeletionPolicy: Retain
+    Properties:
+      MemorySize: 256
+      Description: ''
+      TracingConfig:
+        Mode: PassThrough
+      VpcConfig:
+        SecurityGroupIds:
+        - sg-01bfea33c4ed09c36
+        SubnetIds:
+        - subnet-00228edc0010713a8
+        - subnet-01974946b167eb88a
+        Ipv6AllowedForDualStack: false
+      Timeout: 30
+      RuntimeManagementConfig:
+        UpdateRuntimeOn: Auto
+      Handler: lambda_function.lambda_handler
+      Code:
+        SourceKMSKeyArn:
+          Ref: LambdaFunctionMockerprdswriterCodeSourceKMSKeyArnlLfOY
+        S3ObjectVersion:
+          Ref: LambdaFunctionMockerprdswriterCodeS3ObjectVersiony91Ql
+        S3Bucket:
+          Ref: LambdaFunctionMockerprdswriterCodeS3Bucketslghb
+        ZipFile:
+          Ref: LambdaFunctionMockerprdswriterCodeZipFiledvqJa
+        S3Key:
+          Ref: LambdaFunctionMockerprdswriterCodeS3KeynCclY
+        S3ObjectStorageMode:
+          Ref: LambdaFunctionMockerprdswriterCodeS3ObjectStorageMode6LEIE
+        ImageUri:
+          Ref: LambdaFunctionMockerprdswriterCodeImageUri5hEu4
+      Role: arn:aws:iam::188876037193:role/service-role/mock-erp-rds-writer-role-cj75zvng
+      FunctionName: mock-erp-rds-writer
+      Runtime: python3.12
+      PackageType: Zip
+      LoggingConfig:
+        LogFormat: Text
+        LogGroup: /aws/lambda/mock-erp-rds-writer
+      Environment:
+        Variables:
+          DB_NAME: mock_erp
+          DB_PORT: '5432'
+          DB_HOST: mock-erp-postgres.cd2co2kos0oc.ap-northeast-2.rds.amazonaws.com
+          DB_USER: erp_admin
+          ERP_SHARED_TOKEN: t10eKbpgzMTculfQuCDdiYPP25vzFfYKVhWzAnk+CSo=
+          DB_PASSWORD: dpdlqmftmznf
+      EphemeralStorage:
+        Size: 512
+      Architectures:
+      - x86_64
+  S3BucketPolicyCdkhnb659fdsassets188876037193apnortheast2:
+    UpdateReplacePolicy: Retain
+    Type: AWS::S3::BucketPolicy
+    DeletionPolicy: Retain
+    Properties:
+      Bucket: cdk-hnb659fds-assets-188876037193-ap-northeast-2
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Condition:
+            Bool:
+              aws:SecureTransport: 'false'
+          Resource:
+          - arn:aws:s3:::cdk-hnb659fds-assets-188876037193-ap-northeast-2
+          - arn:aws:s3:::cdk-hnb659fds-assets-188876037193-ap-northeast-2/*
+          Action: s3:*
+          Effect: Deny
+          Principal: '*'
+          Sid: AllowSSLRequestsOnly
+        Id: AccessControl
+  IAMUserHslee:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      UserName: hs.lee
+      LoginProfile:
+        PasswordResetRequired: true
+      Groups:
+      - aivle
+      PermissionsBoundary: arn:aws:iam::aws:policy/PowerUserAccess
+  RDSDBParameterGroupDefaultpostgres18:
+    UpdateReplacePolicy: Retain
+    Type: AWS::RDS::DBParameterGroup
+    DeletionPolicy: Retain
+    Properties:
+      DBParameterGroupName: default.postgres18
+      Family: postgres18
+      Description: Default parameter group for postgres18
+  S3BucketPolicyAivlepricingmodelfoundatipricingmodelartifactbuckqckoozxnjioi:
+    UpdateReplacePolicy: Retain
+    Type: AWS::S3::BucketPolicy
+    DeletionPolicy: Retain
+    Properties:
+      Bucket: aivlepricingmodelfoundati-pricingmodelartifactbuck-qckoozxnjioi
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Condition:
+            Bool:
+              aws:SecureTransport: 'false'
+          Resource:
+          - arn:aws:s3:::aivlepricingmodelfoundati-pricingmodelartifactbuck-qckoozxnjioi
+          - arn:aws:s3:::aivlepricingmodelfoundati-pricingmodelartifactbuck-qckoozxnjioi/*
+          Action: s3:*
+          Effect: Deny
+          Principal:
+            AWS: '*'
+  S3BucketAivledbreset188876037193apnortheast2:
+    UpdateReplacePolicy: Retain
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        RestrictPublicBuckets: true
+        IgnorePublicAcls: true
+        BlockPublicPolicy: true
+        BlockPublicAcls: true
+      BucketName: aivle-db-reset-188876037193-ap-northeast-2
+      OwnershipControls:
+        Rules:
+        - ObjectOwnership: BucketOwnerEnforced
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+        - BucketKeyEnabled: true
+          ServerSideEncryptionByDefault:
+            SSEAlgorithm: AES256
+  EC2VolumeVP:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::Volume
+    DeletionPolicy: Retain
+    Properties:
+      MultiAttachEnabled: false
+      SnapshotId: snap-00beee5acea576a73
+      VolumeType: gp3
+      Encrypted: false
+      Size: 8
+      AutoEnableIO: true
+      AvailabilityZone: ap-northeast-2a
+      Throughput: 125
+      Iops: 3000
+  CloudFrontOriginRequestPolicy:
+    UpdateReplacePolicy: Retain
+    Type: AWS::CloudFront::OriginRequestPolicy
+    DeletionPolicy: Retain
+    Properties:
+      OriginRequestPolicyConfig:
+        QueryStringsConfig:
+          QueryStringBehavior: all
+        Comment: Policy to forward all parameters in viewer requests except for the
+          Host header
+        HeadersConfig:
+          HeaderBehavior: allExcept
+          Headers:
+          - host
+        CookiesConfig:
+          CookieBehavior: all
+        Name: Managed-AllViewerExceptHostHeader
+  EC2SubnetTC:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Retain
+    Properties:
+      MapPublicIpOnLaunch: false
+      EnableDns64: false
+      VpcId: vpc-062243d7d5b99e9b0
+      PrivateDnsNameOptionsOnLaunch:
+        EnableResourceNameDnsARecord: false
+        HostnameType: ip-name
+        EnableResourceNameDnsAAAARecord: false
+      AvailabilityZone: ap-northeast-2c
+      CidrBlock: 10.0.20.0/24
+      Ipv6Native: false
+      Tags:
+      - Value: aivle-private-c
+        Key: Name
+  IAMRoleAivledevrolelambdaderivedfeature:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      - arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole
+      MaxSessionDuration: 3600
+      RoleName: aivle-dev-role-lambda-derived-feature
+      Description: Allows Lambda functions to call AWS services on your behalf.
+      Policies:
+      - PolicyDocument:
+          Version: '2012-10-17'
+          Statement:
+          - Resource: arn:aws:sqs:ap-northeast-2:188876037193:aivle-dev-model-input-queue
+            Action:
+            - sqs:SendMessage
+            - sqs:GetQueueAttributes
+            Effect: Allow
+            Sid: SendModelInputMessages
+        PolicyName: aivle-dev-policy-derived-send-model-input
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Action: sts:AssumeRole
+          Effect: Allow
+          Principal:
+            Service: lambda.amazonaws.com
+  EC2SubnetHV:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Retain
+    Properties:
+      MapPublicIpOnLaunch: false
+      EnableDns64: false
+      VpcId: vpc-062243d7d5b99e9b0
+      PrivateDnsNameOptionsOnLaunch:
+        EnableResourceNameDnsARecord: false
+        HostnameType: ip-name
+        EnableResourceNameDnsAAAARecord: false
+      AvailabilityZone: ap-northeast-2c
+      CidrBlock: 10.0.40.0/24
+      Ipv6Native: false
+      Tags:
+      - Value: aivle-db-c
+        Key: Name
+  EC2VPC:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::VPC
+    DeletionPolicy: Retain
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      InstanceTenancy: default
+      EnableDnsHostnames: true
+      Tags:
+      - Value: yk-aivle-vpc
+        Key: Name
+  IAMUserSubin:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      UserName: subin
+      LoginProfile:
+        PasswordResetRequired: true
+      Groups:
+      - aivle
+      PermissionsBoundary: arn:aws:iam::aws:policy/PowerUserAccess
+  IAMManagedPolicyPolicyAivleYkKimRoleReadPolicy:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::ManagedPolicy
+    DeletionPolicy: Retain
+    Properties:
+      ManagedPolicyName: AivleYkKimRoleReadPolicy
+      Path: /
+      Description: ''
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Resource:
+          - arn:aws:iam::188876037193:role/AWS-QuickSetup-SSM-LocalAdministrationRole
+          - arn:aws:iam::188876037193:role/AWS-QuickSetup-SSM-LocalExecutionRole
+          - arn:aws:iam::188876037193:role/AivleWebEC2Role
+          - arn:aws:iam::188876037193:role/AivleWebGitHubDeployRole
+          Action:
+          - iam:GetRole
+          Effect: Allow
+          Sid: ReadRequiredIAMRoles
+        - Resource: '*'
+          Action:
+          - iam:ListRoles
+          Effect: Allow
+          Sid: ListRolesInConsole
+      Users:
+      - yk.kim
+  IAMRoleAivleWebGitHubDeployRole:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::Role
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      ManagedPolicyArns:
+      - arn:aws:iam::188876037193:policy/AivleWebGitHubDeployPolicy
+      MaxSessionDuration: 3600
+      RoleName: AivleWebGitHubDeployRole
+      Description: ''
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Condition:
+            StringEquals:
+              token.actions.githubusercontent.com:aud: sts.amazonaws.com
+              token.actions.githubusercontent.com:sub: repo:YougangKim@63978643/aivle-class6-team17-dynamic-pricing@1302430390:ref:refs/heads/main
+          Action: sts:AssumeRoleWithWebIdentity
+          Effect: Allow
+          Principal:
+            Federated: arn:aws:iam::188876037193:oidc-provider/token.actions.githubusercontent.com
+  EC2SubnetDI:
+    UpdateReplacePolicy: Retain
+    Type: AWS::EC2::Subnet
+    DeletionPolicy: Retain
+    Properties:
+      MapPublicIpOnLaunch: false
+      EnableDns64: false
+      VpcId: vpc-062243d7d5b99e9b0
+      PrivateDnsNameOptionsOnLaunch:
+        EnableResourceNameDnsARecord: false
+        HostnameType: ip-name
+        EnableResourceNameDnsAAAARecord: false
+      AvailabilityZone: ap-northeast-2a
+      CidrBlock: 10.0.1.0/24
+      Ipv6Native: false
+      Tags:
+      - Value: aivle-public-a
+        Key: Name
+  LogsLogStreamAivlerds0:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Logs::LogStream
+    DeletionPolicy: Retain
+    Properties:
+      LogStreamName: aivle-rds.0
+      LogGroupName: /aws/rds/instance/aivle-rds/postgresql
+  LogsLogGroupawsrdsinstanceaivlerdspostgresql:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Logs::LogGroup
+    DeletionPolicy: Retain
+    Properties:
+      LogGroupClass: STANDARD
+      LogGroupName: /aws/rds/instance/aivle-rds/postgresql
+  GlueJobAivlerdsconnectiontest:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Glue::Job
+    DeletionPolicy: Retain
+    Properties:
+      Connections:
+        Connections:
+        - aivle-rds-postgresql
+      MaxRetries: 0
+      Description: Read-only validation from aivle RDS PostgreSQL to S3 Parquet
+      Timeout: 15
+      AllocatedCapacity: 2
+      Name: aivle-rds-connection-test
+      Role: arn:aws:iam::188876037193:role/AivleGlueSnapshotRole
+      DefaultArguments:
+        --enable-metrics: 'true'
+        --job-language: python
+        --TempDir: s3://aivle-dynamic-pricing-ml-188876037193-dev/glue/temp/
+        --enable-observability-metrics: 'true'
+        --enable-continuous-cloudwatch-log: 'true'
+      WorkerType: G.1X
+      ExecutionClass: STANDARD
+      Command:
+        ScriptLocation: s3://aivle-dynamic-pricing-ml-188876037193-dev/glue/scripts/aivle_rds_connection_test.py
+        PythonVersion: '3'
+        Name: glueetl
+      GlueVersion: '5.0'
+      ExecutionProperty:
+        MaxConcurrentRuns: 1
+      NumberOfWorkers: 2
+      Tags:
+        Project: aivle-dynamic-pricing
+        Service: data-tier
+        Environment: dev
+        Purpose: rds-connection-test
+      MaxCapacity: 2
+  IAMUserJulim:
+    UpdateReplacePolicy: Retain
+    Type: AWS::IAM::User
+    DeletionPolicy: Retain
+    Properties:
+      Path: /
+      UserName: julim
+      LoginProfile:
+        PasswordResetRequired: false
+      Groups:
+      - aivle
+      PermissionsBoundary: arn:aws:iam::aws:policy/PowerUserAccess
+  LambdaPermissionFunctionaivleerpeventreceiver:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Lambda::Permission
+    DeletionPolicy: Retain
+    Properties:
+      FunctionName: arn:aws:lambda:ap-northeast-2:188876037193:function:aivle-erp-event-receiver
+      Action: lambda:InvokeFunction
+      SourceArn: arn:aws:execute-api:ap-northeast-2:188876037193:tzr0w5ahsh/*/POST/erp/events
+      Principal: apigateway.amazonaws.com
+  LogsLogStreamAivleproductpricerds0:
+    UpdateReplacePolicy: Retain
+    Type: AWS::Logs::LogStream
+    DeletionPolicy: Retain
+    Properties:
+      LogStreamName: aivle-product-price-rds.0
+      LogGroupName: /aws/rds/instance/aivle-product-price-rds/postgresql

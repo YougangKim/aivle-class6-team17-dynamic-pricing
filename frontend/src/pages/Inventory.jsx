@@ -33,6 +33,7 @@ export default function Inventory({ storeId, onToast, policy }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("전체");
   const [sort, setSort] = useState("risk");
+  const [sortReversed, setSortReversed] = useState(false);
   const [detail, setDetail] = useState(null);
   const [rates, setRates] = useState({});
 
@@ -72,8 +73,8 @@ export default function Inventory({ storeId, onToast, policy }) {
         return av - bv;
       },
     }[sort];
-    return [...r].sort(by);
-  }, [items, cat, q, sort]);
+    return [...r].sort((a, b) => by(a, b) * (sortReversed ? -1 : 1));
+  }, [items, cat, q, sort, sortReversed]);
 
   if (error) return <ErrorBox message={error} onRetry={reload} />;
 
@@ -110,9 +111,13 @@ export default function Inventory({ storeId, onToast, policy }) {
           <b className="text-brand-600">{riskItems}품목</b>
         </p>
         <div className="flex items-center gap-1.5 text-xs">
-          <ArrowUpDown size={13} className="text-slate-400" />
+          <button type="button" onClick={() => setSortReversed((value) => !value)}
+                  className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
+                  aria-label="정렬 순서 반전" title="오름차순·내림차순 전환">
+            <ArrowUpDown size={13} />
+          </button>
           {[["risk", "위험도순"], ["expiry", "유통기한순"], ["stock", "재고많은순"], ["turnover", "회전느린순"]].map(([k, l]) => (
-            <button type="button" key={k} onClick={() => setSort(k)} aria-pressed={sort === k}
+            <button type="button" key={k} onClick={() => { setSort(k); setSortReversed(false); }} aria-pressed={sort === k}
                     className={`rounded-lg px-2.5 py-1 font-semibold transition-colors ${
                       sort === k ? "bg-slate-100 text-slate-900" : "text-slate-500 hover:text-slate-700"
                     }`}>
@@ -142,7 +147,7 @@ export default function Inventory({ storeId, onToast, policy }) {
               </thead>
               <tbody>
                 {rows.map((i) => (
-                  <tr key={i.product_id} onClick={() => setDetail(i)}
+                  <tr key={`${i.product_id}:${i.dte_index}`} onClick={() => setDetail(i)}
                       className="cursor-pointer border-b border-slate-50 transition-colors last:border-0 hover:bg-slate-50">
                     <td className="px-5 py-3.5">
                       <div className="flex items-center gap-2">
@@ -168,7 +173,11 @@ export default function Inventory({ storeId, onToast, policy }) {
                         : <span className="text-slate-300">—</span>}
                     </td>
                     <td className="px-5 py-3.5 text-right">
-                      {i.recommended_rate > 0
+                      {i.completed_rate != null
+                        ? <span className="rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-600">−{Math.round(i.completed_rate * 100)}% 할인 조치 완료</span>
+                        : i.regular_price_recommended
+                        ? <span className="rounded-lg bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-600">정가 판매 추천</span>
+                        : i.recommended_rate > 0
                         ? <span className="rounded-lg bg-brand-50 px-2.5 py-1 text-xs font-bold text-brand-600">−{Math.round(i.recommended_rate * 100)}%</span>
                         : <span className="text-xs text-slate-400">조치 불필요</span>}
                     </td>

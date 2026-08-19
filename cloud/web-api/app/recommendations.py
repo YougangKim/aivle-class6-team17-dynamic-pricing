@@ -270,7 +270,7 @@ def _comparison_reason_code(result: dict[str, Any], row: dict[str, Any]) -> str:
     return "FINAL_POLICY_NOT_BETTER_THAN_BOTH_CONTROLS"
 
 
-def _skipped_dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
+def _skipped_dashboard_items(result: dict[str, Any], include_plain_no_discount: bool = False) -> list[dict[str, Any]]:
     dashboard = result.get("dashboard") or {}
     if "items" not in dashboard:
         return []
@@ -279,6 +279,17 @@ def _skipped_dashboard_items(result: dict[str, Any]) -> list[dict[str, Any]]:
         if _ai_outperforms_controls(result, row):
             continue
         if _plain_no_discount_is_best(result, row):
+            if include_plain_no_discount:
+                items.append(_with_comparison(result, {
+                    "request_id": result["request_id"],
+                    "store_id": result["store_id"],
+                    **row,
+                    "approval_required": False,
+                    "type": "ok",
+                    "reason_code": "NO_DISCOUNT_RECOMMENDED",
+                    "selected_discount_rate": 0.0,
+                    "reason": "할인 미적용 판매가 가장 유리합니다.",
+                }))
             continue
         reason_code = _comparison_reason_code(result, row)
         item = {
@@ -508,7 +519,7 @@ def recommendations(store_id: str) -> list[dict[str, Any]]:
 
 
 @router.get("/recommendations/skipped")
-def skipped_recommendations(store_id: str) -> list[dict[str, Any]]:
+def skipped_recommendations(store_id: str, include_plain_no_discount: bool = False) -> list[dict[str, Any]]:
     _drain_result_queue()
     with connect_rds() as connection:
         with connection.cursor() as cursor:
@@ -523,7 +534,11 @@ def skipped_recommendations(store_id: str) -> list[dict[str, Any]]:
                 (store_id,),
             )
             rows = cursor.fetchall()
-    return [item for row in rows for item in _skipped_dashboard_items(row["result_json"])]
+    return [
+        item
+        for row in rows
+        for item in _skipped_dashboard_items(row["result_json"], include_plain_no_discount)
+    ]
 
 
 @router.get("/recommendations/completed")
@@ -576,6 +591,7 @@ def reprice_pending_recommendations(store_id: str) -> list[dict[str, Any]]:
                 SELECT result_json
                 FROM pricing_ops.pricing_recommendation
                 WHERE store_id = %s
+                  AND status = 'PENDING'
                   AND jsonb_array_length(COALESCE(result_json->'reprice_items', '[]'::jsonb)) > 0
                 ORDER BY created_at DESC
                 LIMIT 1
@@ -791,9 +807,9 @@ def reprice(request_id: str, request: RepriceRequest) -> list[dict[str, Any]]:
                 raise HTTPException(status_code=404, detail="추천 결과가 없습니다.")
             if recommendation["store_id"] != request.store_id:
                 raise HTTPException(status_code=409, detail="추천 결과의 점포가 일치하지 않습니다.")
-            if recommendation["status"] != "PENDING":
-                raise HTTPException(status_code=409, detail="대기 중인 추천만 반려할 수 있습니다.")
             result = recommendation["result_json"]
+            if recommendation["status"] != "PENDING" and not result.get("reprice_items"):
+                raise HTTPException(status_code=409, detail="대기 중인 추천만 반려할 수 있습니다.")
             base_matrix = (result.get("model_a_output") or {}).get("policy_matrix")
             if not isinstance(base_matrix, list) or len(base_matrix) != 38 or any(len(row) != 4 for row in base_matrix):
                 raise HTTPException(status_code=409, detail="원본 전체 할인 정책을 찾을 수 없습니다.")
@@ -862,7 +878,13 @@ def reprice(request_id: str, request: RepriceRequest) -> list[dict[str, Any]]:
             existing.update({(row["product_id"], int(row["dte_index"])): row for row in responses})
             result["reprice_items"] = list(existing.values())
             cursor.execute(
-                "UPDATE pricing_ops.pricing_recommendation SET result_json = %s::jsonb WHERE request_id = %s",
+                """
+                UPDATE pricing_ops.pricing_recommendation
+                SET result_json = %s::jsonb,
+                    status = 'PENDING',
+                    decided_at = NULL
+                WHERE request_id = %s
+                """,
                 (json.dumps(result), request_id),
             )
     return responses

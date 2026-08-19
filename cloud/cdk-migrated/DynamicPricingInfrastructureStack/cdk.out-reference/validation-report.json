@@ -1,0 +1,188 @@
+{
+  "version": "54.0.0",
+  "title": "Validation Report",
+  "pluginReports": [
+    {
+      "pluginName": "CloudFormation Validate",
+      "pluginVersion": "1.7.0",
+      "conclusion": "success",
+      "violations": [
+        {
+          "ruleName": "W3010",
+          "description": "AvailabilityZone: Avoid hardcoding availability zones 'ap-northeast-2a'",
+          "severity": "warning",
+          "ruleMetadata": {
+            "category": "Best Practice"
+          },
+          "violatingConstructs": [
+            {
+              "constructPath": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/PublicSubnetA",
+              "constructFqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+              "libraryVersion": "2.265.0",
+              "cloudFormationResource": {
+                "templatePath": "DynamicPricingReferenceArchitecture.template.json",
+                "logicalId": "NetworkInfrastructurePublicSubnetA3DDB12DE",
+                "propertyPaths": [
+                  "Properties.AvailabilityZone"
+                ]
+              },
+              "stackTraces": [
+                "...jsii runtime, node internals...",
+                "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+              ]
+            },
+            {
+              "constructPath": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/PublicSubnetC",
+              "constructFqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+              "libraryVersion": "2.265.0",
+              "cloudFormationResource": {
+                "templatePath": "DynamicPricingReferenceArchitecture.template.json",
+                "logicalId": "NetworkInfrastructurePublicSubnetC7661CC95",
+                "propertyPaths": [
+                  "Properties.AvailabilityZone"
+                ]
+              },
+              "stackTraces": [
+                "...jsii runtime, node internals...",
+                "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+              ]
+            },
+            {
+              "constructPath": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/ApplicationSubnetA",
+              "constructFqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+              "libraryVersion": "2.265.0",
+              "cloudFormationResource": {
+                "templatePath": "DynamicPricingReferenceArchitecture.template.json",
+                "logicalId": "NetworkInfrastructureApplicationSubnetA065C4BAF",
+                "propertyPaths": [
+                  "Properties.AvailabilityZone"
+                ]
+              },
+              "stackTraces": [
+                "...jsii runtime, node internals...",
+                "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+              ]
+            },
+            {
+              "constructPath": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/ApplicationSubnetC",
+              "constructFqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+              "libraryVersion": "2.265.0",
+              "cloudFormationResource": {
+                "templatePath": "DynamicPricingReferenceArchitecture.template.json",
+                "logicalId": "NetworkInfrastructureApplicationSubnetCFC25805D",
+                "propertyPaths": [
+                  "Properties.AvailabilityZone"
+                ]
+              },
+              "stackTraces": [
+                "...jsii runtime, node internals...",
+                "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+              ]
+            },
+            {
+              "constructPath": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/DatabaseSubnetA",
+              "constructFqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+              "libraryVersion": "2.265.0",
+              "cloudFormationResource": {
+                "templatePath": "DynamicPricingReferenceArchitecture.template.json",
+                "logicalId": "NetworkInfrastructureDatabaseSubnetA65D587B4",
+                "propertyPaths": [
+                  "Properties.AvailabilityZone"
+                ]
+              },
+              "stackTraces": [
+                "...jsii runtime, node internals...",
+                "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+              ]
+            },
+            {
+              "constructPath": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/DatabaseSubnetC",
+              "constructFqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+              "libraryVersion": "2.265.0",
+              "cloudFormationResource": {
+                "templatePath": "DynamicPricingReferenceArchitecture.template.json",
+                "logicalId": "NetworkInfrastructureDatabaseSubnetC72992C94",
+                "propertyPaths": [
+                  "Properties.AvailabilityZone"
+                ]
+              },
+              "stackTraces": [
+                "...jsii runtime, node internals...",
+                "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+              ]
+            }
+          ]
+        },
+        {
+          "ruleName": "W9008",
+          "description": "StorageEncrypted: RDS instance should have StorageEncrypted set to true",
+          "suggestedFix": "Set StorageEncrypted to true",
+          "severity": "warning",
+          "ruleMetadata": {
+            "category": "Security"
+          },
+          "violatingConstructs": [
+            {
+              "constructPath": "DynamicPricingReferenceArchitecture/DatabaseInfrastructure/PostgreSqlDatabase",
+              "constructFqn": "aws-cdk-lib.aws_rds.CfnDBInstance",
+              "libraryVersion": "2.265.0",
+              "cloudFormationResource": {
+                "templatePath": "DynamicPricingReferenceArchitecture.template.json",
+                "logicalId": "DatabaseInfrastructurePostgreSqlDatabaseB03D833F",
+                "propertyPaths": [
+                  "Properties.StorageEncrypted"
+                ]
+              },
+              "stackTraces": [
+                "...jsii runtime, node internals...",
+                "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+              ]
+            }
+          ]
+        },
+        {
+          "ruleName": "W9010",
+          "description": "ImageId: Hardcoded AMI ID - use a parameter or mapping for portability",
+          "severity": "warning",
+          "ruleMetadata": {
+            "category": "Security"
+          },
+          "violatingConstructs": [
+            {
+              "constructPath": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebEc2InstanceA",
+              "constructFqn": "aws-cdk-lib.aws_ec2.CfnInstance",
+              "libraryVersion": "2.265.0",
+              "cloudFormationResource": {
+                "templatePath": "DynamicPricingReferenceArchitecture.template.json",
+                "logicalId": "WebDeliveryInfrastructureWebEc2InstanceA44EDC6A8",
+                "propertyPaths": [
+                  "Properties.ImageId"
+                ]
+              },
+              "stackTraces": [
+                "...jsii runtime, node internals...",
+                "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+              ]
+            },
+            {
+              "constructPath": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebEc2InstanceC",
+              "constructFqn": "aws-cdk-lib.aws_ec2.CfnInstance",
+              "libraryVersion": "2.265.0",
+              "cloudFormationResource": {
+                "templatePath": "DynamicPricingReferenceArchitecture.template.json",
+                "logicalId": "WebDeliveryInfrastructureWebEc2InstanceCA3A801DA",
+                "propertyPaths": [
+                  "Properties.ImageId"
+                ]
+              },
+              "stackTraces": [
+                "...jsii runtime, node internals...",
+                "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

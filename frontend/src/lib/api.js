@@ -183,7 +183,10 @@ async function call(path, options) {
     headers: { "Content-Type": "application/json", "Cache-Control": "no-cache" },
     ...options,
   });
-  if (!res.ok) throw new Error(`API ${res.status}`);
+  if (!res.ok) {
+    const body = await res.json().catch(() => null);
+    throw new Error(body?.detail ?? `API ${res.status}`);
+  }
   return res.json();
 }
 
@@ -274,15 +277,24 @@ export async function getInventory(storeId) {
     call(`/inventory?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
     call(`/recommendations?store_id=${encodeURIComponent(storeId)}&_=${revision}`),
   ]);
+  const completed = await call(`/recommendations/completed?store_id=${encodeURIComponent(storeId)}&_=${revision}`);
   const recommendations = latestPolicyRows(rawRecommendations);
   const recommendationByCell = new Map(recommendations.map((rec) => [inventoryCellKey(rec), rec]));
+  const completedByCell = new Map(completed.map((item) => [inventoryCellKey(item), item]));
+  const decisions = await call(`/recommendations/skipped?store_id=${encodeURIComponent(storeId)}&include_plain_no_discount=true&_=${revision}`);
+  const regularPriceCells = new Set(
+    decisions.filter((item) => item.reason_code === "NO_DISCOUNT_RECOMMENDED").map(inventoryCellKey),
+  );
   return inventory.map((item) => {
     const rec = recommendationByCell.get(inventoryCellKey(item));
+    const completedItem = completedByCell.get(inventoryCellKey(item));
     return rec ? {
       ...item,
       request_id: rec.request_id,
       dte_index: rec.dte_index,
       recommended_rate: rec.recommended_rate,
+      completed_rate: completedItem?.approved_rate,
+      regular_price_recommended: regularPriceCells.has(inventoryCellKey(item)),
       recommendation_available: true,
       expected_loss: rec.expected_waste_loss,
       sell_probability: rec.sell_through_rate,
@@ -290,6 +302,8 @@ export async function getInventory(storeId) {
       ...item,
       request_id: undefined,
       recommended_rate: 0,
+      completed_rate: completedItem?.approved_rate,
+      regular_price_recommended: regularPriceCells.has(inventoryCellKey(item)),
       recommendation_available: false,
       sell_probability: 0,
     };

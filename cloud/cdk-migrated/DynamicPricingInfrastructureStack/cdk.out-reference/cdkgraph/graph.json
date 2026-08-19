@@ -1,0 +1,2048 @@
+{
+  "version": "0.0.0",
+  "tree": {
+    "uuid": "Root",
+    "flags": [
+      "GRAPH_CONTAINER",
+      "CLUSTER"
+    ],
+    "nodeType": "ROOT",
+    "id": "Root",
+    "path": "",
+    "children": {
+      "App": {
+        "uuid": "App",
+        "metadata": [
+          {
+            "type": "__aws-pdk-metric",
+            "data": {
+              "metric": "c6"
+            }
+          },
+          {
+            "type": "__aws-pdk-metric",
+            "data": {
+              "metric": "c7"
+            }
+          }
+        ],
+        "flags": [
+          "GRAPH_CONTAINER",
+          "CLUSTER"
+        ],
+        "nodeType": "APP",
+        "parent": "Root",
+        "id": "App",
+        "path": "/",
+        "constructInfo": {
+          "fqn": "aws-cdk-lib.App",
+          "version": "2.265.0"
+        },
+        "children": {
+          "DynamicPricingReferenceArchitecture": {
+            "uuid": "DynamicPricingReferenceArchitecture",
+            "metadata": [
+              {
+                "type": "aws:cdk:creationStack",
+                "data": [
+                  "...jsii runtime, node internals...",
+                  "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                ]
+              }
+            ],
+            "flags": [
+              "CLUSTER"
+            ],
+            "nodeType": "STACK",
+            "stack": "DynamicPricingReferenceArchitecture",
+            "parent": "App",
+            "id": "DynamicPricingReferenceArchitecture",
+            "path": "DynamicPricingReferenceArchitecture",
+            "constructInfo": {
+              "fqn": "aws-cdk-lib.Stack",
+              "version": "2.265.0"
+            },
+            "children": {
+              "NetworkInfrastructure": {
+                "uuid": "DynamicPricingReferenceArchitectureNetworkInfrastructureA580FB9E",
+                "nodeType": "DEFAULT",
+                "stack": "DynamicPricingReferenceArchitecture",
+                "parent": "DynamicPricingReferenceArchitecture",
+                "id": "NetworkInfrastructure",
+                "path": "DynamicPricingReferenceArchitecture/NetworkInfrastructure",
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.8.1"
+                },
+                "children": {
+                  "Vpc": {
+                    "uuid": "DynamicPricingReferenceArchitectureNetworkInfrastructureVpcDCCEEBDF",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "NetworkInfrastructureVpc8959BDDF",
+                      "aws:cdk:cloudformation:props": {}
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureNetworkInfrastructureA580FB9E",
+                    "id": "Vpc",
+                    "path": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/Vpc",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnVPC",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "NetworkInfrastructureVpc8959BDDF",
+                    "cfnType": "AWS::EC2::VPC"
+                  },
+                  "PublicSubnetA": {
+                    "uuid": "DynamicPricingReferenceArchitectureNetworkInfrastructurePublicSubnetAA3015453",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "NetworkInfrastructurePublicSubnetA3DDB12DE",
+                      "aws:cdk:cloudformation:props": {
+                        "vpcId": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureNetworkInfrastructureA580FB9E",
+                    "id": "PublicSubnetA",
+                    "path": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/PublicSubnetA",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "NetworkInfrastructurePublicSubnetA3DDB12DE",
+                    "cfnType": "AWS::EC2::Subnet",
+                    "edges": [
+                      "DEP:Z6Uv74"
+                    ]
+                  },
+                  "PublicSubnetC": {
+                    "uuid": "DynamicPricingReferenceArchitectureNetworkInfrastructurePublicSubnetCF1360B47",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "NetworkInfrastructurePublicSubnetC7661CC95",
+                      "aws:cdk:cloudformation:props": {
+                        "vpcId": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureNetworkInfrastructureA580FB9E",
+                    "id": "PublicSubnetC",
+                    "path": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/PublicSubnetC",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "NetworkInfrastructurePublicSubnetC7661CC95",
+                    "cfnType": "AWS::EC2::Subnet",
+                    "edges": [
+                      "DEP:ZGXD5e"
+                    ]
+                  },
+                  "ApplicationSubnetA": {
+                    "uuid": "DynamicPricingReferenceArchitectureNetworkInfrastructureApplicationSubnetAA8323A9D",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "NetworkInfrastructureApplicationSubnetA065C4BAF",
+                      "aws:cdk:cloudformation:props": {
+                        "vpcId": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureNetworkInfrastructureA580FB9E",
+                    "id": "ApplicationSubnetA",
+                    "path": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/ApplicationSubnetA",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "NetworkInfrastructureApplicationSubnetA065C4BAF",
+                    "cfnType": "AWS::EC2::Subnet",
+                    "edges": [
+                      "DEP:Zagm0G"
+                    ]
+                  },
+                  "ApplicationSubnetC": {
+                    "uuid": "DynamicPricingReferenceArchitectureNetworkInfrastructureApplicationSubnetC7023DD0D",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "NetworkInfrastructureApplicationSubnetCFC25805D",
+                      "aws:cdk:cloudformation:props": {
+                        "vpcId": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureNetworkInfrastructureA580FB9E",
+                    "id": "ApplicationSubnetC",
+                    "path": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/ApplicationSubnetC",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "NetworkInfrastructureApplicationSubnetCFC25805D",
+                    "cfnType": "AWS::EC2::Subnet",
+                    "edges": [
+                      "DEP:Z11ShH5"
+                    ]
+                  },
+                  "DatabaseSubnetA": {
+                    "uuid": "DynamicPricingReferenceArchitectureNetworkInfrastructureDatabaseSubnetA40ADB951",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "NetworkInfrastructureDatabaseSubnetA65D587B4",
+                      "aws:cdk:cloudformation:props": {
+                        "vpcId": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureNetworkInfrastructureA580FB9E",
+                    "id": "DatabaseSubnetA",
+                    "path": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/DatabaseSubnetA",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "NetworkInfrastructureDatabaseSubnetA65D587B4",
+                    "cfnType": "AWS::EC2::Subnet",
+                    "edges": [
+                      "DEP:ZMdzLR"
+                    ]
+                  },
+                  "DatabaseSubnetC": {
+                    "uuid": "DynamicPricingReferenceArchitectureNetworkInfrastructureDatabaseSubnetCAF740780",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "NetworkInfrastructureDatabaseSubnetC72992C94",
+                      "aws:cdk:cloudformation:props": {
+                        "vpcId": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureNetworkInfrastructureA580FB9E",
+                    "id": "DatabaseSubnetC",
+                    "path": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/DatabaseSubnetC",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSubnet",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "NetworkInfrastructureDatabaseSubnetC72992C94",
+                    "cfnType": "AWS::EC2::Subnet",
+                    "edges": [
+                      "DEP:ZiWsor"
+                    ]
+                  },
+                  "WebSecurityGroup": {
+                    "uuid": "DynamicPricingReferenceArchitectureNetworkInfrastructureWebSecurityGroupCBD2AA4C",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "NetworkInfrastructureWebSecurityGroup636329DD",
+                      "aws:cdk:cloudformation:props": {
+                        "groupDescription": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureNetworkInfrastructureA580FB9E",
+                    "id": "WebSecurityGroup",
+                    "path": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/WebSecurityGroup",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "NetworkInfrastructureWebSecurityGroup636329DD",
+                    "cfnType": "AWS::EC2::SecurityGroup",
+                    "edges": [
+                      "DEP:2lqdiq"
+                    ]
+                  },
+                  "DatabaseSecurityGroup": {
+                    "uuid": "DynamicPricingReferenceArchitectureNetworkInfrastructureDatabaseSecurityGroup7517B9DD",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "NetworkInfrastructureDatabaseSecurityGroupFA44CCD6",
+                      "aws:cdk:cloudformation:props": {
+                        "groupDescription": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureNetworkInfrastructureA580FB9E",
+                    "id": "DatabaseSecurityGroup",
+                    "path": "DynamicPricingReferenceArchitecture/NetworkInfrastructure/DatabaseSecurityGroup",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnSecurityGroup",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "NetworkInfrastructureDatabaseSecurityGroupFA44CCD6",
+                    "cfnType": "AWS::EC2::SecurityGroup",
+                    "edges": [
+                      "DEP:1s4Yz0",
+                      "DEP:EAN4d"
+                    ]
+                  }
+                }
+              },
+              "WebDeliveryInfrastructure": {
+                "uuid": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureDBDDA397",
+                "nodeType": "DEFAULT",
+                "stack": "DynamicPricingReferenceArchitecture",
+                "parent": "DynamicPricingReferenceArchitecture",
+                "id": "WebDeliveryInfrastructure",
+                "path": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure",
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.8.1"
+                },
+                "children": {
+                  "WebApplicationLoadBalancer": {
+                    "uuid": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebApplicationLoadBalancer0B08788B",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "WebDeliveryInfrastructureWebApplicationLoadBalancer76274A2F",
+                      "aws:cdk:cloudformation:props": {}
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureDBDDA397",
+                    "id": "WebApplicationLoadBalancer",
+                    "path": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebApplicationLoadBalancer",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_elasticloadbalancingv2.CfnLoadBalancer",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "WebDeliveryInfrastructureWebApplicationLoadBalancer76274A2F",
+                    "cfnType": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+                    "edges": [
+                      "DEP:veKe3",
+                      "DEP:u6c2v",
+                      "DEP:1rt28V"
+                    ]
+                  },
+                  "WebTargetGroup": {
+                    "uuid": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebTargetGroupA3EB8FDB",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "WebDeliveryInfrastructureWebTargetGroupC710D7BE",
+                      "aws:cdk:cloudformation:props": {}
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureDBDDA397",
+                    "id": "WebTargetGroup",
+                    "path": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebTargetGroup",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_elasticloadbalancingv2.CfnTargetGroup",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "WebDeliveryInfrastructureWebTargetGroupC710D7BE",
+                    "cfnType": "AWS::ElasticLoadBalancingV2::TargetGroup",
+                    "edges": [
+                      "DEP:ZKyrYD"
+                    ]
+                  },
+                  "WebListener": {
+                    "uuid": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebListener6C32D69E",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "WebDeliveryInfrastructureWebListenerA5E34D70",
+                      "aws:cdk:cloudformation:props": {
+                        "defaultActions": [],
+                        "loadBalancerArn": "placeholder",
+                        "port": 80
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureDBDDA397",
+                    "id": "WebListener",
+                    "path": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebListener",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_elasticloadbalancingv2.CfnListener",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "WebDeliveryInfrastructureWebListenerA5E34D70",
+                    "cfnType": "AWS::ElasticLoadBalancingV2::Listener",
+                    "edges": [
+                      "DEP:2tHOLq",
+                      "DEP:ZJLqyf"
+                    ]
+                  },
+                  "WebEc2Role": {
+                    "uuid": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebEc2Role41711531",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "WebDeliveryInfrastructureWebEc2RoleABFBC68F",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {}
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureDBDDA397",
+                    "id": "WebEc2Role",
+                    "path": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebEc2Role",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "WebDeliveryInfrastructureWebEc2RoleABFBC68F",
+                    "cfnType": "AWS::IAM::Role"
+                  },
+                  "WebInstanceProfile": {
+                    "uuid": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebInstanceProfile5ECAC623",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "WebDeliveryInfrastructureWebInstanceProfileDEC2719E",
+                      "aws:cdk:cloudformation:props": {
+                        "roles": []
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureDBDDA397",
+                    "id": "WebInstanceProfile",
+                    "path": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebInstanceProfile",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnInstanceProfile",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "WebDeliveryInfrastructureWebInstanceProfileDEC2719E",
+                    "cfnType": "AWS::IAM::InstanceProfile",
+                    "edges": [
+                      "DEP:Z66ahY"
+                    ]
+                  },
+                  "WebLaunchTemplate": {
+                    "uuid": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebLaunchTemplate2CCFAD7D",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "WebDeliveryInfrastructureWebLaunchTemplate2EB90263",
+                      "aws:cdk:cloudformation:props": {
+                        "launchTemplateData": {}
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureDBDDA397",
+                    "id": "WebLaunchTemplate",
+                    "path": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebLaunchTemplate",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnLaunchTemplate",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "WebDeliveryInfrastructureWebLaunchTemplate2EB90263",
+                    "cfnType": "AWS::EC2::LaunchTemplate",
+                    "edges": [
+                      "DEP:1yyeJf",
+                      "DEP:Z5aO1g"
+                    ]
+                  },
+                  "WebAutoScalingGroup": {
+                    "uuid": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebAutoScalingGroupD202C6F4",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "WebDeliveryInfrastructureWebAutoScalingGroupAC6251F0",
+                      "aws:cdk:cloudformation:props": {
+                        "maxSize": "0",
+                        "minSize": "0"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureDBDDA397",
+                    "id": "WebAutoScalingGroup",
+                    "path": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebAutoScalingGroup",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_autoscaling.CfnAutoScalingGroup",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "WebDeliveryInfrastructureWebAutoScalingGroupAC6251F0",
+                    "cfnType": "AWS::AutoScaling::AutoScalingGroup",
+                    "edges": [
+                      "DEP:3ajE7",
+                      "DEP:ZraFvL",
+                      "DEP:1PBI9N",
+                      "DEP:Z11GeAp"
+                    ]
+                  },
+                  "WebEc2InstanceA": {
+                    "uuid": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebEc2InstanceAF7AA9DE0",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "WebDeliveryInfrastructureWebEc2InstanceA44EDC6A8",
+                      "aws:cdk:cloudformation:props": {}
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureDBDDA397",
+                    "id": "WebEc2InstanceA",
+                    "path": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebEc2InstanceA",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnInstance",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "WebDeliveryInfrastructureWebEc2InstanceA44EDC6A8",
+                    "cfnType": "AWS::EC2::Instance",
+                    "edges": [
+                      "DEP:5bn1X",
+                      "DEP:Z4SYNd",
+                      "DEP:ZDnmSm"
+                    ]
+                  },
+                  "WebEc2InstanceC": {
+                    "uuid": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebEc2InstanceCABAF1820",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "WebDeliveryInfrastructureWebEc2InstanceCA3A801DA",
+                      "aws:cdk:cloudformation:props": {}
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureDBDDA397",
+                    "id": "WebEc2InstanceC",
+                    "path": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebEc2InstanceC",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_ec2.CfnInstance",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "WebDeliveryInfrastructureWebEc2InstanceCA3A801DA",
+                    "cfnType": "AWS::EC2::Instance",
+                    "edges": [
+                      "DEP:bBvu8",
+                      "DEP:Z1Ko34b",
+                      "DEP:Z975sl"
+                    ]
+                  },
+                  "WebDistribution": {
+                    "uuid": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebDistributionC12975FF",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "WebDeliveryInfrastructureWebDistribution56B47B3C",
+                      "aws:cdk:cloudformation:props": {
+                        "distributionConfig": {
+                          "defaultCacheBehavior": {
+                            "targetOriginId": "placeholder",
+                            "viewerProtocolPolicy": "allow-all"
+                          },
+                          "enabled": true
+                        }
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureDBDDA397",
+                    "id": "WebDistribution",
+                    "path": "DynamicPricingReferenceArchitecture/WebDeliveryInfrastructure/WebDistribution",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_cloudfront.CfnDistribution",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "WebDeliveryInfrastructureWebDistribution56B47B3C",
+                    "cfnType": "AWS::CloudFront::Distribution",
+                    "edges": [
+                      "DEP:2hGmd8"
+                    ]
+                  }
+                }
+              },
+              "DatabaseInfrastructure": {
+                "uuid": "DynamicPricingReferenceArchitectureDatabaseInfrastructureB2C04771",
+                "nodeType": "DEFAULT",
+                "stack": "DynamicPricingReferenceArchitecture",
+                "parent": "DynamicPricingReferenceArchitecture",
+                "id": "DatabaseInfrastructure",
+                "path": "DynamicPricingReferenceArchitecture/DatabaseInfrastructure",
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.8.1"
+                },
+                "children": {
+                  "DatabaseSubnetGroup": {
+                    "uuid": "DynamicPricingReferenceArchitectureDatabaseInfrastructureDatabaseSubnetGroup8983156D",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "DatabaseInfrastructureDatabaseSubnetGroup9088E4FF",
+                      "aws:cdk:cloudformation:props": {
+                        "dbSubnetGroupDescription": "placeholder",
+                        "subnetIds": []
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureDatabaseInfrastructureB2C04771",
+                    "id": "DatabaseSubnetGroup",
+                    "path": "DynamicPricingReferenceArchitecture/DatabaseInfrastructure/DatabaseSubnetGroup",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_rds.CfnDBSubnetGroup",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "DatabaseInfrastructureDatabaseSubnetGroup9088E4FF",
+                    "cfnType": "AWS::RDS::DBSubnetGroup",
+                    "edges": [
+                      "DEP:Z14xdcK",
+                      "DEP:Z1WArOc"
+                    ]
+                  },
+                  "PostgreSqlDatabase": {
+                    "uuid": "DynamicPricingReferenceArchitectureDatabaseInfrastructurePostgreSqlDatabase72323BBC",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "DatabaseInfrastructurePostgreSqlDatabaseB03D833F",
+                      "aws:cdk:cloudformation:props": {}
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureDatabaseInfrastructureB2C04771",
+                    "id": "PostgreSqlDatabase",
+                    "path": "DynamicPricingReferenceArchitecture/DatabaseInfrastructure/PostgreSqlDatabase",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_rds.CfnDBInstance",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "DatabaseInfrastructurePostgreSqlDatabaseB03D833F",
+                    "cfnType": "AWS::RDS::DBInstance",
+                    "edges": [
+                      "DEP:Z23WPhJ",
+                      "DEP:ZwVUqG"
+                    ]
+                  },
+                  "DatabaseSecret": {
+                    "uuid": "DynamicPricingReferenceArchitectureDatabaseInfrastructureDatabaseSecretA7D7D83C",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "DatabaseInfrastructureDatabaseSecret478D2F20",
+                      "aws:cdk:cloudformation:props": {}
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureDatabaseInfrastructureB2C04771",
+                    "id": "DatabaseSecret",
+                    "path": "DynamicPricingReferenceArchitecture/DatabaseInfrastructure/DatabaseSecret",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_secretsmanager.CfnSecret",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "DatabaseInfrastructureDatabaseSecret478D2F20",
+                    "cfnType": "AWS::SecretsManager::Secret"
+                  },
+                  "DatabaseSecretAttachment": {
+                    "uuid": "DynamicPricingReferenceArchitectureDatabaseInfrastructureDatabaseSecretAttachment38D67071",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "DatabaseInfrastructureDatabaseSecretAttachment0ED2CF62",
+                      "aws:cdk:cloudformation:props": {
+                        "secretId": "placeholder",
+                        "targetId": "placeholder",
+                        "targetType": "AWS::RDS::DBInstance"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureDatabaseInfrastructureB2C04771",
+                    "id": "DatabaseSecretAttachment",
+                    "path": "DynamicPricingReferenceArchitecture/DatabaseInfrastructure/DatabaseSecretAttachment",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_secretsmanager.CfnSecretTargetAttachment",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "DatabaseInfrastructureDatabaseSecretAttachment0ED2CF62",
+                    "cfnType": "AWS::SecretsManager::SecretTargetAttachment",
+                    "edges": [
+                      "DEP:Zl2RDj",
+                      "DEP:Z1PSvRP"
+                    ]
+                  },
+                  "MockErpRdsWriterFunction": {
+                    "uuid": "DynamicPricingReferenceArchitectureDatabaseInfrastructureMockErpRdsWriterFunction30B0C441",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "DatabaseInfrastructureMockErpRdsWriterFunction3581D415",
+                      "aws:cdk:cloudformation:props": {
+                        "code": {
+                          "zipFile": "placeholder"
+                        },
+                        "role": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureDatabaseInfrastructureB2C04771",
+                    "id": "MockErpRdsWriterFunction",
+                    "path": "DynamicPricingReferenceArchitecture/DatabaseInfrastructure/MockErpRdsWriterFunction",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "DatabaseInfrastructureMockErpRdsWriterFunction3581D415",
+                    "cfnType": "AWS::Lambda::Function",
+                    "edges": [
+                      "DEP:Z2dPqOI",
+                      "DEP:KwWGN"
+                    ]
+                  }
+                }
+              },
+              "AiPricingPipeline": {
+                "uuid": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                "nodeType": "DEFAULT",
+                "stack": "DynamicPricingReferenceArchitecture",
+                "parent": "DynamicPricingReferenceArchitecture",
+                "id": "AiPricingPipeline",
+                "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline",
+                "constructInfo": {
+                  "fqn": "constructs.Construct",
+                  "version": "10.8.1"
+                },
+                "children": {
+                  "InventoryRawQueue": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryRawQueue4A072ACF",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineInventoryRawQueueBDDA00F2",
+                      "aws:cdk:cloudformation:props": {}
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "InventoryRawQueue",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/InventoryRawQueue",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_sqs.CfnQueue",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineInventoryRawQueueBDDA00F2",
+                    "cfnType": "AWS::SQS::Queue"
+                  },
+                  "ModelInputQueue": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInputQueue1B6F8995",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineModelInputQueueBBA642EE",
+                      "aws:cdk:cloudformation:props": {}
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "ModelInputQueue",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/ModelInputQueue",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_sqs.CfnQueue",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineModelInputQueueBBA642EE",
+                    "cfnType": "AWS::SQS::Queue"
+                  },
+                  "MachineLearningBucket": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineMachineLearningBucket03587621",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineMachineLearningBucket0C2EB7CC",
+                      "aws:cdk:cloudformation:props": {}
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "MachineLearningBucket",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/MachineLearningBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineMachineLearningBucket0C2EB7CC",
+                    "cfnType": "AWS::S3::Bucket"
+                  },
+                  "SageMakerArtifactBucket": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineSageMakerArtifactBucket70208E05",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineSageMakerArtifactBucketBB3CFB97",
+                      "aws:cdk:cloudformation:props": {}
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "SageMakerArtifactBucket",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/SageMakerArtifactBucket",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_s3.CfnBucket",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineSageMakerArtifactBucketBB3CFB97",
+                    "cfnType": "AWS::S3::Bucket"
+                  },
+                  "PricingServerlessEndpoint": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelinePricingServerlessEndpointC21E8D75",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelinePricingServerlessEndpointB0B5AC1F",
+                      "aws:cdk:cloudformation:props": {
+                        "endpointConfigName": "account-managed-endpoint-config"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "PricingServerlessEndpoint",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/PricingServerlessEndpoint",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_sagemaker.CfnEndpoint",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelinePricingServerlessEndpointB0B5AC1F",
+                    "cfnType": "AWS::SageMaker::Endpoint",
+                    "edges": [
+                      "DEP:Z1vMnLD"
+                    ]
+                  },
+                  "InventoryExtractorRole": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryExtractorRoleA5EBCC51",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineInventoryExtractorRoleE2ADC6A0",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {}
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "InventoryExtractorRole",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/InventoryExtractorRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineInventoryExtractorRoleE2ADC6A0",
+                    "cfnType": "AWS::IAM::Role"
+                  },
+                  "DerivedFeatureRole": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineDerivedFeatureRole8AF91D66",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineDerivedFeatureRoleA5B52AE4",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {}
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "DerivedFeatureRole",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/DerivedFeatureRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineDerivedFeatureRoleA5B52AE4",
+                    "cfnType": "AWS::IAM::Role"
+                  },
+                  "ModelInferenceRole": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInferenceRole6804A0CA",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineModelInferenceRoleB91CAB16",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {}
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "ModelInferenceRole",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/ModelInferenceRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineModelInferenceRoleB91CAB16",
+                    "cfnType": "AWS::IAM::Role"
+                  },
+                  "InventoryExtractorFunction": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryExtractorFunctionE559D2B0",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineInventoryExtractorFunction7CC6F0EB",
+                      "aws:cdk:cloudformation:props": {
+                        "code": {
+                          "zipFile": "placeholder"
+                        },
+                        "role": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "InventoryExtractorFunction",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/InventoryExtractorFunction",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineInventoryExtractorFunction7CC6F0EB",
+                    "cfnType": "AWS::Lambda::Function",
+                    "edges": [
+                      "DEP:Z1DdTJI",
+                      "DEP:ZrSYkq",
+                      "DEP:Z1R5abn"
+                    ]
+                  },
+                  "DerivedFeatureFunction": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineDerivedFeatureFunction6E6E8D7E",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineDerivedFeatureFunction5C645EF1",
+                      "aws:cdk:cloudformation:props": {
+                        "code": {
+                          "zipFile": "placeholder"
+                        },
+                        "role": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "DerivedFeatureFunction",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/DerivedFeatureFunction",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineDerivedFeatureFunction5C645EF1",
+                    "cfnType": "AWS::Lambda::Function",
+                    "edges": [
+                      "DEP:2k9chd",
+                      "DEP:Z1kD6fd",
+                      "DEP:Z89wHH"
+                    ]
+                  },
+                  "ModelInferenceFunction": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInferenceFunction67B3D402",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineModelInferenceFunctionDC27A257",
+                      "aws:cdk:cloudformation:props": {
+                        "code": {
+                          "zipFile": "placeholder"
+                        },
+                        "role": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "ModelInferenceFunction",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/ModelInferenceFunction",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnFunction",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineModelInferenceFunctionDC27A257",
+                    "cfnType": "AWS::Lambda::Function",
+                    "edges": [
+                      "DEP:2pvLHR",
+                      "DEP:2w03FL",
+                      "DEP:14Mkex",
+                      "DEP:1bauUd",
+                      "DEP:1zPFG"
+                    ]
+                  },
+                  "InventoryRawEventSource": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryRawEventSource0E98B619",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineInventoryRawEventSourceCA818ACC",
+                      "aws:cdk:cloudformation:props": {
+                        "functionName": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "InventoryRawEventSource",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/InventoryRawEventSource",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnEventSourceMapping",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineInventoryRawEventSourceCA818ACC",
+                    "cfnType": "AWS::Lambda::EventSourceMapping",
+                    "edges": [
+                      "DEP:EzLj9",
+                      "DEP:IBmJU"
+                    ]
+                  },
+                  "ModelInputEventSource": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInputEventSourceEB01D28B",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineModelInputEventSourceFCF132DB",
+                      "aws:cdk:cloudformation:props": {
+                        "functionName": "placeholder"
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "ModelInputEventSource",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/ModelInputEventSource",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_lambda.CfnEventSourceMapping",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineModelInputEventSourceFCF132DB",
+                    "cfnType": "AWS::Lambda::EventSourceMapping",
+                    "edges": [
+                      "DEP:j4yU1",
+                      "DEP:ZVHw1l"
+                    ]
+                  },
+                  "InventorySchedulerRole": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineInventorySchedulerRoleE28678E4",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineInventorySchedulerRole1C25F252",
+                      "aws:cdk:cloudformation:props": {
+                        "assumeRolePolicyDocument": {}
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "InventorySchedulerRole",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/InventorySchedulerRole",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_iam.CfnRole",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineInventorySchedulerRole1C25F252",
+                    "cfnType": "AWS::IAM::Role"
+                  },
+                  "InventorySchedule": {
+                    "uuid": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryScheduleF320A3DE",
+                    "attributes": {
+                      "aws:cdk:cloudformation:logicalId": "AiPricingPipelineInventorySchedule92E8C4BC",
+                      "aws:cdk:cloudformation:props": {
+                        "flexibleTimeWindow": {
+                          "mode": "OFF"
+                        },
+                        "scheduleExpression": "rate(1 day)",
+                        "target": {
+                          "arn": "placeholder",
+                          "roleArn": "placeholder"
+                        }
+                      }
+                    },
+                    "metadata": [
+                      {
+                        "type": "aws:cdk:creationStack",
+                        "data": [
+                          "...jsii runtime, node internals...",
+                          "(no user code in 10 frames, use --stack-trace-limit to capture more)"
+                        ]
+                      }
+                    ],
+                    "flags": [
+                      "CFN_FQN"
+                    ],
+                    "nodeType": "CFN_RESOURCE",
+                    "stack": "DynamicPricingReferenceArchitecture",
+                    "parent": "DynamicPricingReferenceArchitectureAiPricingPipeline833E48C0",
+                    "id": "InventorySchedule",
+                    "path": "DynamicPricingReferenceArchitecture/AiPricingPipeline/InventorySchedule",
+                    "constructInfo": {
+                      "fqn": "aws-cdk-lib.aws_scheduler.CfnSchedule",
+                      "version": "2.265.0"
+                    },
+                    "logicalId": "AiPricingPipelineInventorySchedule92E8C4BC",
+                    "cfnType": "AWS::Scheduler::Schedule",
+                    "edges": [
+                      "DEP:Z1TrqNz",
+                      "DEP:JF9D5"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "edges": [
+    {
+      "uuid": "DEP:Z6Uv74",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureNetworkInfrastructurePublicSubnetAA3015453",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureVpcDCCEEBDF"
+    },
+    {
+      "uuid": "DEP:ZGXD5e",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureNetworkInfrastructurePublicSubnetCF1360B47",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureVpcDCCEEBDF"
+    },
+    {
+      "uuid": "DEP:Zagm0G",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureNetworkInfrastructureApplicationSubnetAA8323A9D",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureVpcDCCEEBDF"
+    },
+    {
+      "uuid": "DEP:Z11ShH5",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureNetworkInfrastructureApplicationSubnetC7023DD0D",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureVpcDCCEEBDF"
+    },
+    {
+      "uuid": "DEP:ZMdzLR",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureNetworkInfrastructureDatabaseSubnetA40ADB951",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureVpcDCCEEBDF"
+    },
+    {
+      "uuid": "DEP:ZiWsor",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureNetworkInfrastructureDatabaseSubnetCAF740780",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureVpcDCCEEBDF"
+    },
+    {
+      "uuid": "DEP:2lqdiq",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureNetworkInfrastructureWebSecurityGroupCBD2AA4C",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureVpcDCCEEBDF"
+    },
+    {
+      "uuid": "DEP:1s4Yz0",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureNetworkInfrastructureDatabaseSecurityGroup7517B9DD",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureVpcDCCEEBDF"
+    },
+    {
+      "uuid": "DEP:EAN4d",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureNetworkInfrastructureDatabaseSecurityGroup7517B9DD",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureWebSecurityGroupCBD2AA4C"
+    },
+    {
+      "uuid": "DEP:veKe3",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebApplicationLoadBalancer0B08788B",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructurePublicSubnetAA3015453"
+    },
+    {
+      "uuid": "DEP:u6c2v",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebApplicationLoadBalancer0B08788B",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructurePublicSubnetCF1360B47"
+    },
+    {
+      "uuid": "DEP:1rt28V",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebApplicationLoadBalancer0B08788B",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureWebSecurityGroupCBD2AA4C"
+    },
+    {
+      "uuid": "DEP:ZKyrYD",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebTargetGroupA3EB8FDB",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureVpcDCCEEBDF"
+    },
+    {
+      "uuid": "DEP:2tHOLq",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebListener6C32D69E",
+      "target": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebApplicationLoadBalancer0B08788B"
+    },
+    {
+      "uuid": "DEP:ZJLqyf",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebListener6C32D69E",
+      "target": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebTargetGroupA3EB8FDB"
+    },
+    {
+      "uuid": "DEP:Z66ahY",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebInstanceProfile5ECAC623",
+      "target": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebEc2Role41711531"
+    },
+    {
+      "uuid": "DEP:1yyeJf",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebLaunchTemplate2CCFAD7D",
+      "target": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebInstanceProfile5ECAC623"
+    },
+    {
+      "uuid": "DEP:Z5aO1g",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebLaunchTemplate2CCFAD7D",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureWebSecurityGroupCBD2AA4C"
+    },
+    {
+      "uuid": "DEP:3ajE7",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebAutoScalingGroupD202C6F4",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureApplicationSubnetAA8323A9D"
+    },
+    {
+      "uuid": "DEP:ZraFvL",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebAutoScalingGroupD202C6F4",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureApplicationSubnetC7023DD0D"
+    },
+    {
+      "uuid": "DEP:1PBI9N",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebAutoScalingGroupD202C6F4",
+      "target": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebTargetGroupA3EB8FDB"
+    },
+    {
+      "uuid": "DEP:Z11GeAp",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebAutoScalingGroupD202C6F4",
+      "target": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebLaunchTemplate2CCFAD7D"
+    },
+    {
+      "uuid": "DEP:5bn1X",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebEc2InstanceAF7AA9DE0",
+      "target": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebAutoScalingGroupD202C6F4"
+    },
+    {
+      "uuid": "DEP:Z4SYNd",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebEc2InstanceAF7AA9DE0",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureApplicationSubnetAA8323A9D"
+    },
+    {
+      "uuid": "DEP:ZDnmSm",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebEc2InstanceAF7AA9DE0",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureWebSecurityGroupCBD2AA4C"
+    },
+    {
+      "uuid": "DEP:bBvu8",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebEc2InstanceCABAF1820",
+      "target": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebAutoScalingGroupD202C6F4"
+    },
+    {
+      "uuid": "DEP:Z1Ko34b",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebEc2InstanceCABAF1820",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureApplicationSubnetC7023DD0D"
+    },
+    {
+      "uuid": "DEP:Z975sl",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebEc2InstanceCABAF1820",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureWebSecurityGroupCBD2AA4C"
+    },
+    {
+      "uuid": "DEP:2hGmd8",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebDistributionC12975FF",
+      "target": "DynamicPricingReferenceArchitectureWebDeliveryInfrastructureWebApplicationLoadBalancer0B08788B"
+    },
+    {
+      "uuid": "DEP:Z14xdcK",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureDatabaseInfrastructureDatabaseSubnetGroup8983156D",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureDatabaseSubnetA40ADB951"
+    },
+    {
+      "uuid": "DEP:Z1WArOc",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureDatabaseInfrastructureDatabaseSubnetGroup8983156D",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureDatabaseSubnetCAF740780"
+    },
+    {
+      "uuid": "DEP:Z23WPhJ",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureDatabaseInfrastructurePostgreSqlDatabase72323BBC",
+      "target": "DynamicPricingReferenceArchitectureDatabaseInfrastructureDatabaseSubnetGroup8983156D"
+    },
+    {
+      "uuid": "DEP:ZwVUqG",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureDatabaseInfrastructurePostgreSqlDatabase72323BBC",
+      "target": "DynamicPricingReferenceArchitectureNetworkInfrastructureDatabaseSecurityGroup7517B9DD"
+    },
+    {
+      "uuid": "DEP:Zl2RDj",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureDatabaseInfrastructureDatabaseSecretAttachment38D67071",
+      "target": "DynamicPricingReferenceArchitectureDatabaseInfrastructureDatabaseSecretA7D7D83C"
+    },
+    {
+      "uuid": "DEP:Z1PSvRP",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureDatabaseInfrastructureDatabaseSecretAttachment38D67071",
+      "target": "DynamicPricingReferenceArchitectureDatabaseInfrastructurePostgreSqlDatabase72323BBC"
+    },
+    {
+      "uuid": "DEP:Z2dPqOI",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureDatabaseInfrastructureMockErpRdsWriterFunction30B0C441",
+      "target": "DynamicPricingReferenceArchitectureDatabaseInfrastructureDatabaseSecretA7D7D83C"
+    },
+    {
+      "uuid": "DEP:KwWGN",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureDatabaseInfrastructureMockErpRdsWriterFunction30B0C441",
+      "target": "DynamicPricingReferenceArchitectureDatabaseInfrastructurePostgreSqlDatabase72323BBC"
+    },
+    {
+      "uuid": "DEP:Z1vMnLD",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelinePricingServerlessEndpointC21E8D75",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineSageMakerArtifactBucket70208E05"
+    },
+    {
+      "uuid": "DEP:Z1DdTJI",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryExtractorFunctionE559D2B0",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryExtractorRoleA5EBCC51"
+    },
+    {
+      "uuid": "DEP:ZrSYkq",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryExtractorFunctionE559D2B0",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineMachineLearningBucket03587621"
+    },
+    {
+      "uuid": "DEP:Z1R5abn",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryExtractorFunctionE559D2B0",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryRawQueue4A072ACF"
+    },
+    {
+      "uuid": "DEP:2k9chd",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineDerivedFeatureFunction6E6E8D7E",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineDerivedFeatureRole8AF91D66"
+    },
+    {
+      "uuid": "DEP:Z1kD6fd",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineDerivedFeatureFunction6E6E8D7E",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineMachineLearningBucket03587621"
+    },
+    {
+      "uuid": "DEP:Z89wHH",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineDerivedFeatureFunction6E6E8D7E",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInputQueue1B6F8995"
+    },
+    {
+      "uuid": "DEP:2pvLHR",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInferenceFunction67B3D402",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInferenceRole6804A0CA"
+    },
+    {
+      "uuid": "DEP:2w03FL",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInferenceFunction67B3D402",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineMachineLearningBucket03587621"
+    },
+    {
+      "uuid": "DEP:14Mkex",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInferenceFunction67B3D402",
+      "target": "DynamicPricingReferenceArchitectureDatabaseInfrastructureDatabaseSecretA7D7D83C"
+    },
+    {
+      "uuid": "DEP:1bauUd",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInferenceFunction67B3D402",
+      "target": "DynamicPricingReferenceArchitectureDatabaseInfrastructurePostgreSqlDatabase72323BBC"
+    },
+    {
+      "uuid": "DEP:1zPFG",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInferenceFunction67B3D402",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelinePricingServerlessEndpointC21E8D75"
+    },
+    {
+      "uuid": "DEP:EzLj9",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryRawEventSource0E98B619",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryRawQueue4A072ACF"
+    },
+    {
+      "uuid": "DEP:IBmJU",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryRawEventSource0E98B619",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineDerivedFeatureFunction6E6E8D7E"
+    },
+    {
+      "uuid": "DEP:j4yU1",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInputEventSourceEB01D28B",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInputQueue1B6F8995"
+    },
+    {
+      "uuid": "DEP:ZVHw1l",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInputEventSourceEB01D28B",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineModelInferenceFunction67B3D402"
+    },
+    {
+      "uuid": "DEP:Z1TrqNz",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryScheduleF320A3DE",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineInventorySchedulerRoleE28678E4"
+    },
+    {
+      "uuid": "DEP:JF9D5",
+      "flags": [
+        "EXTRANEOUS"
+      ],
+      "edgeType": "DEPENDENCY",
+      "direction": "forward",
+      "source": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryScheduleF320A3DE",
+      "target": "DynamicPricingReferenceArchitectureAiPricingPipelineInventoryExtractorFunctionE559D2B0"
+    }
+  ]
+}

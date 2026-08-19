@@ -132,6 +132,9 @@ class WebApiTests(unittest.TestCase):
         }
         self.assertEqual(recommendations._dashboard_items(result), [])
         self.assertEqual(recommendations._skipped_dashboard_items(result), [])
+        inventory_decisions = recommendations._skipped_dashboard_items(result, include_plain_no_discount=True)
+        self.assertEqual(len(inventory_decisions), 1)
+        self.assertEqual(inventory_decisions[0]["reason_code"], "NO_DISCOUNT_RECOMMENDED")
 
     def test_profitable_ai_candidate_moves_to_approval_queue(self):
         result = {
@@ -165,7 +168,6 @@ class WebApiTests(unittest.TestCase):
         }
         self.assertEqual(recommendations._dashboard_items(result), [])
 
-
     def test_skip_reason_uses_displayed_profit_comparison(self):
         result = {
             "request_id": "S02-204", "store_id": "S02",
@@ -198,7 +200,6 @@ class WebApiTests(unittest.TestCase):
         skipped = recommendations._skipped_dashboard_items(result)
         self.assertEqual(skipped[0]["reason_code"], "STANDARD_MARKDOWN_OUTPERFORMED_AI")
         self.assertEqual(skipped[0]["selected_discount_rate"], 0.40)
-
 
     def test_approval_stages_keep_manager_items_out_of_rds_pending_list(self):
         result = {
