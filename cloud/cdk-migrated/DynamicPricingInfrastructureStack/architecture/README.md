@@ -53,7 +53,7 @@ PDK 원본은 의존 관계를 `리소스 → 의존 대상`으로 기록할 수
 
 - PDK가 인식하는 CDK L1 리소스에는 공식 AWS Architecture 아이콘을 사용합니다.
 - PDK 0.26.15에서 `AWS::Scheduler::Schedule`의 직접 아이콘 매핑이 없으므로 EventBridge Rule 아이콘을 사용합니다.
-- Step Functions 아이콘은 SVG가 단독으로 열려도 보이도록 `application_integration/step_functions/service_icon.svg`에 복사해 참조합니다.
+- 모든 AWS 아이콘은 최종 SVG에 Base64 데이터로 내장합니다. 따라서 README·GitHub처럼 SVG 내부의 외부 이미지 참조를 차단하는 환경에서도 아이콘이 유지됩니다.
 - 선 집중(`concentrate`)을 끄고, 노드보다 연결선을 먼저 렌더링하며, 노드·계층 간 간격을 조정해 교차와 겹침을 줄입니다.
 
 ## 주의사항

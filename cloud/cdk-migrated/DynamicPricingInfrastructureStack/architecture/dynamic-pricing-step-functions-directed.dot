@@ -1,6 +1,6 @@
 digraph "ROOT" {
   label = "Cloud Diagram";
-  imagepath = "C:/Users/User/Documents/git/aivle-class6-team17-dynamic-pricing/.codex-temp/jsii-cache/@aws/pdk/0.26.15/5782d51a3761debcfdcdd37c5177a300756bac600b808dd4c40bd29a275aea2c/assets/aws-arch";
+  imagepath = "C:/Users/User/Documents/git/aivle-class6-team17-dynamic-pricing/cloud/cdk-migrated/DynamicPricingInfrastructureStack/architecture";
   fontname = "Roboto Condensed";
   class = "font_regular";
   center = true;

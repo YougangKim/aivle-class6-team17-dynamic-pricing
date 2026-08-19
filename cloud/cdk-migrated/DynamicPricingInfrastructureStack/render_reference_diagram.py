@@ -7,6 +7,7 @@ keeps the PDK-generated graph and only changes its visual edge style.
 """
 
 from pathlib import Path
+import base64
 import re
 import shutil
 import subprocess
@@ -17,6 +18,28 @@ source = root / "cdk.out-reference" / "cdkgraph" / "diagram.dot"
 architecture = root / "architecture"
 target_dot = architecture / "dynamic-pricing-reference.dot"
 target_svg = architecture / "dynamic-pricing-reference.svg"
+
+
+def embed_svg_images(svg_path: Path) -> int:
+    """Inline local AWS icon SVGs so README renderers cannot block them."""
+    svg = svg_path.read_text(encoding="utf-8")
+    embedded = 0
+
+    def replace_href(match: re.Match) -> str:
+        nonlocal embedded
+        href = match.group(1)
+        if href.startswith(("data:", "http:", "https:")):
+            return match.group(0)
+        icon_path = architecture / href
+        if not icon_path.is_file():
+            return match.group(0)
+        encoded = base64.b64encode(icon_path.read_bytes()).decode("ascii")
+        embedded += 1
+        return f'xlink:href="data:image/svg+xml;base64,{encoded}"'
+
+    svg = re.sub(r'xlink:href="([^"]+)"', replace_href, svg)
+    svg_path.write_text(svg, encoding="utf-8")
+    return embedded
 
 text = source.read_text(encoding="utf-8")
 text = text.replace('style = "dotted";', 'style = "solid";')
@@ -64,17 +87,14 @@ text = re.sub(
     flags=re.DOTALL,
 )
 
-# The jsii temp directory disappears when synth exits. Point DOT at the stable
-# PDK package cache; SVG consumers use the copied relative icon assets.
-cache_root = root.parents[2] / ".codex-temp" / "jsii-cache" / "@aws" / "pdk" / "0.26.15"
-asset_roots = list(cache_root.glob("*/assets/aws-arch"))
-if asset_roots:
-    image_path = asset_roots[0].as_posix()
-    text = re.sub(r'  imagepath = ".*?";', f'  imagepath = "{image_path}";', text, count=1)
+# Use the checked-in icon assets instead of a temporary jsii cache. This keeps
+# Graphviz rendering reproducible after the cache has been removed.
+image_path = architecture.as_posix()
+text = re.sub(r'  imagepath = ".*?";', f'  imagepath = "{image_path}";', text, count=1)
 
 target_dot.write_text(text, encoding="utf-8")
 
 dot = shutil.which("dot") or r"C:\Program Files\Graphviz\bin\dot.exe"
 subprocess.run([dot, "-Tsvg", str(target_dot), "-o", str(target_svg)], check=True)
 
-print(f"wrote {target_svg}")
+print(f"wrote {target_svg} ({embed_svg_images(target_svg)} icons embedded)")

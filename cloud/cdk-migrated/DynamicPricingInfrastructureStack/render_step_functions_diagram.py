@@ -2,6 +2,7 @@
 """Render the separate right-angled diagram that includes Step Functions."""
 
 from pathlib import Path
+import base64
 import re
 import shutil
 import subprocess
@@ -14,6 +15,28 @@ directed_dot = architecture / "dynamic-pricing-step-functions-directed.dot"
 directed_svg = architecture / "dynamic-pricing-step-functions-directed.svg"
 undirected_dot = architecture / "dynamic-pricing-step-functions-undirected.dot"
 undirected_svg = architecture / "dynamic-pricing-step-functions-undirected.svg"
+
+
+def embed_svg_images(svg_path: Path) -> int:
+    """Inline local AWS icon SVGs so README renderers cannot block them."""
+    svg = svg_path.read_text(encoding="utf-8")
+    embedded = 0
+
+    def replace_href(match: re.Match) -> str:
+        nonlocal embedded
+        href = match.group(1)
+        if href.startswith(("data:", "http:", "https:")):
+            return match.group(0)
+        icon_path = architecture / href
+        if not icon_path.is_file():
+            return match.group(0)
+        encoded = base64.b64encode(icon_path.read_bytes()).decode("ascii")
+        embedded += 1
+        return f'xlink:href="data:image/svg+xml;base64,{encoded}"'
+
+    svg = re.sub(r'xlink:href="([^"]+)"', replace_href, svg)
+    svg_path.write_text(svg, encoding="utf-8")
+    return embedded
 
 text = source.read_text(encoding="utf-8")
 text = text.replace('style = "dotted";', 'style = "solid";')
@@ -55,15 +78,10 @@ text = re.sub(
     flags=re.DOTALL,
 )
 
-cache_root = root.parents[2] / ".codex-temp" / "jsii-cache" / "@aws" / "pdk" / "0.26.15"
-asset_roots = list(cache_root.glob("*/assets/aws-arch"))
-if asset_roots:
-    image_path = asset_roots[0].as_posix()
-    text = re.sub(r'  imagepath = ".*?";', f'  imagepath = "{image_path}";', text, count=1)
-    step_icon_source = asset_roots[0] / "application_integration" / "step_functions" / "service_icon.svg"
-    step_icon_target = architecture / "application_integration" / "step_functions" / "service_icon.svg"
-    step_icon_target.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(step_icon_source, step_icon_target)
+# Use the checked-in icon assets instead of a temporary jsii cache. This keeps
+# Graphviz rendering reproducible after the cache has been removed.
+image_path = architecture.as_posix()
+text = re.sub(r'  imagepath = ".*?";', f'  imagepath = "{image_path}";', text, count=1)
 
 # Dependency edges normally point from a resource to the resource it depends
 # on. `dir=back` presents them as prerequisite -> consumer. These AI pipeline
@@ -107,5 +125,5 @@ undirected_dot.write_text(undirected_text, encoding="utf-8")
 dot = shutil.which("dot") or r"C:\Program Files\Graphviz\bin\dot.exe"
 subprocess.run([dot, "-Tsvg", str(directed_dot), "-o", str(directed_svg)], check=True)
 subprocess.run([dot, "-Tsvg", str(undirected_dot), "-o", str(undirected_svg)], check=True)
-print(f"wrote {directed_svg}")
-print(f"wrote {undirected_svg}")
+print(f"wrote {directed_svg} ({embed_svg_images(directed_svg)} icons embedded)")
+print(f"wrote {undirected_svg} ({embed_svg_images(undirected_svg)} icons embedded)")
