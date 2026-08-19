@@ -1,0 +1,12 @@
+{
+  "version": "0.0.0",
+  "artifacts": {
+    "GRAPH": {
+      "id": "GRAPH",
+      "filepath": "C:\\Users\\User\\Documents\\git\\aivle-class6-team17-dynamic-pricing\\cloud\\cdk-migrated\\DynamicPricingInfrastructureStack\\cdk.out-reference\\cdkgraph\\graph.json",
+      "description": "Serialized graph",
+      "filename": "graph.json",
+      "source": "CdkGraph"
+    }
+  }
+}

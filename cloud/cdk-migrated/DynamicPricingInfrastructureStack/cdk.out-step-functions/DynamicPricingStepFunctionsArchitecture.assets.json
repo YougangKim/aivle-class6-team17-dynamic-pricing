@@ -1,0 +1,21 @@
+{
+  "version": "54.0.0",
+  "files": {
+    "0bbc5a0e2adc5d62db4ffe7b0e9c1c8438b9faf2785b5a475617c89b58d839fa": {
+      "displayName": "DynamicPricingStepFunctionsArchitecture Template",
+      "source": {
+        "path": "DynamicPricingStepFunctionsArchitecture.template.json",
+        "packaging": "file"
+      },
+      "destinations": {
+        "188876037193-ap-northeast-2-349e2e90": {
+          "bucketName": "cdk-hnb659fds-assets-188876037193-ap-northeast-2",
+          "objectKey": "0bbc5a0e2adc5d62db4ffe7b0e9c1c8438b9faf2785b5a475617c89b58d839fa.json",
+          "region": "ap-northeast-2",
+          "assumeRoleArn": "arn:${AWS::Partition}:iam::188876037193:role/cdk-hnb659fds-file-publishing-role-188876037193-ap-northeast-2"
+        }
+      }
+    }
+  },
+  "dockerImages": {}
+}
