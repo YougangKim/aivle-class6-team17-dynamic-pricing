@@ -1,0 +1,23 @@
+{
+  "status": "VALID",
+  "model_status": "TRAINED",
+  "training_attempted": true,
+  "initial_policy_source": "LIGHTGBM",
+  "fallback_enabled": true,
+  "validated_policy_group_count": 16,
+  "validated_training_row_count": 2432,
+  "validation_policy_group_count": 4,
+  "validation_row_count": 608,
+  "train_label_period": [
+    "2025-01-01",
+    "2025-09-30"
+  ],
+  "validation_label_period": [
+    "2025-10-01",
+    "2025-11-15"
+  ],
+  "test_rows_used_for_training": 0,
+  "test_rows_used_for_tuning": 0,
+  "discriminator_mode": "SCOPE_ALIGNED_EXPERIMENTAL",
+  "label_source": "offline_coordinate_ascent_real_b_threshold_passing_executable_policy"
+}
